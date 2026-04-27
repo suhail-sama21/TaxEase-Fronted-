@@ -10,7 +10,7 @@ import { MetricCardComponent } from '../components/metric-card/metric-card';
   templateUrl: './dashboard.html'
 })
 export class DashboardComponent {
-  // We will eventually load this array from your backend API
+  // We will eventually load this array from your backend API 
   recentFilings = [
     { id: 'FIL-2026-001', period: 'Q1 2026', amount: '$45,000', date: '2026-03-01', status: 'Approved', statusColor: 'green' },
     { id: 'FIL-2026-002', period: 'Q2 2026', amount: '$52,000', date: '2026-03-05', status: 'Submitted', statusColor: 'blue' },
