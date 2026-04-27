@@ -1,0 +1,48 @@
+<div class="max-w-4xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl font-medium text-app-text">Notifications</h1>
+      <p class="text-[13px] text-app-muted mt-1">Manage your alerts and system messages.</p>
+    </div>
+    <button (click)="markAllAsRead()" class="bg-transparent border border-[#30363d] text-app-muted rounded-md px-3.5 py-2 text-[13px] cursor-pointer hover:bg-[#1f2937] hover:text-app-text transition-colors">
+      Mark all as read
+    </button>
+  </div>
+
+  <div class="bg-[#161b22] border border-app-border rounded-xl overflow-hidden shadow-sm">
+    <div class="flex flex-col">
+      
+      <div *ngFor="let n of notifications"
+           (click)="markAsRead(n)"
+           class="flex gap-4 p-5 border-b border-[#21262d] last:border-0 cursor-pointer transition-colors relative"
+           [ngClass]="n.read ? 'hover:bg-[#1c2128]' : 'bg-[#1f6feb]/5 hover:bg-[#1f6feb]/10'">
+
+        <div class="w-9 h-9 rounded-full flex items-center justify-center text-[15px] shrink-0 mt-0.5"
+             [ngClass]="{
+               'bg-[#1e1a0e] text-[#e3b341]': n.type === 'warning',
+               'bg-[#0d1f12] text-[#3fb950]': n.type === 'success',
+               'bg-[#1f2937] text-app-primary': n.type === 'info',
+               'bg-[#161b22] text-[#8b949e] border border-[#30363d]': n.type === 'system',
+               'bg-[#1a1230] text-[#bc8cff]': n.type === 'verified'
+             }">
+          {{ n.icon }}
+        </div>
+
+        <div class="flex-1">
+          <div class="text-[14px] font-medium mb-1" [ngClass]="n.read ? 'text-[#c9d1d9]' : 'text-app-text'">
+            {{ n.title }}
+          </div>
+          <div class="text-[13px] text-[#8b949e] leading-relaxed mb-1.5">
+            {{ n.desc }}
+          </div>
+          <div class="text-[11px] text-[#6e7681]">
+            {{ n.time }}
+          </div>
+        </div>
+
+        <div *ngIf="!n.read" class="w-2.5 h-2.5 rounded-full bg-app-primary mt-1.5 shrink-0 shadow-[0_0_8px_rgba(31,111,235,0.6)]"></div>
+      </div>
+      
+    </div>
+  </div>
+</div>

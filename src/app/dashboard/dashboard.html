@@ -1,0 +1,95 @@
+<div>
+  <div class="flex items-center justify-between mb-5">
+    <div>
+      <h1 class="text-xl font-medium text-app-text">Taxpayer Dashboard</h1>
+      <p class="text-[13px] text-app-muted mt-1">Overview of your tax filings and compliance status · FY 2026</p>
+    </div>
+    <button class="bg-app-primary text-white border-none rounded-md px-3.5 py-2 text-[13px] cursor-pointer flex items-center gap-1.5 hover:bg-app-primary-hover transition-colors">
+      + New Filing ↗
+    </button>
+  </div>
+
+  <div class="grid grid-cols-4 gap-3 mb-5">
+    <app-metric-card label="Total Filings" value="12" icon="📄" trendText="▲ 2 since last quarter" trendType="up" theme="blue"></app-metric-card>
+    <app-metric-card label="Pending Filings" value="1" icon="⏳" trendText="— No change" trendType="neutral" theme="amber"></app-metric-card>
+    <app-metric-card label="Payment Status" value="Up to date" icon="✓" trendText="▲ Last paid Feb 15" trendType="up" theme="green"></app-metric-card>
+    <app-metric-card label="Compliance Alerts" value="0" icon="⚠" trendText="▲ All clear" trendType="up" theme="red"></app-metric-card>
+  </div>
+
+  <div class="grid grid-cols-3 gap-3 mb-5">
+    <div class="bg-[#161b22] border border-app-border rounded-lg p-3.5 cursor-pointer flex items-center gap-3 hover:border-app-primary transition-colors">
+      <div class="w-8 h-8 rounded-lg bg-[#1f2937] flex items-center justify-center text-sm shrink-0">📝</div>
+      <div>
+        <div class="text-[13px] text-app-text">File Taxes</div>
+        <div class="text-[11px] text-app-muted mt-0.5">Submit a return</div>
+      </div>
+    </div>
+    <div class="bg-[#161b22] border border-app-border rounded-lg p-3.5 cursor-pointer flex items-center gap-3 hover:border-app-primary transition-colors">
+      <div class="w-8 h-8 rounded-lg bg-[#1f2937] flex items-center justify-center text-sm shrink-0">💳</div>
+      <div>
+        <div class="text-[13px] text-app-text">Make Payment</div>
+        <div class="text-[11px] text-app-muted mt-0.5">Pay outstanding dues</div>
+      </div>
+    </div>
+    <div class="bg-[#161b22] border border-app-border rounded-lg p-3.5 cursor-pointer flex items-center gap-3 hover:border-app-primary transition-colors">
+      <div class="w-8 h-8 rounded-lg bg-[#1f2937] flex items-center justify-center text-sm shrink-0">📎</div>
+      <div>
+        <div class="text-[13px] text-app-text">Upload Doc</div>
+        <div class="text-[11px] text-app-muted mt-0.5">Add supporting files</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-[1fr_280px] gap-3.5">
+    
+    <div class="bg-[#161b22] border border-app-border rounded-lg overflow-hidden">
+      <div class="px-4 py-3.5 border-b border-app-border flex items-center justify-between">
+        <span class="text-[14px] font-medium text-app-text">Recent Activity</span>
+        <span class="text-[12px] text-app-primary cursor-pointer hover:underline">View all →</span>
+      </div>
+      
+      <table class="w-full border-collapse text-[13px]">
+        <thead>
+          <tr>
+            <th class="px-4 py-2.5 text-left text-[#8b949e] text-[11px] uppercase tracking-wide font-normal border-b border-app-border">Filing ID</th>
+            <th class="px-4 py-2.5 text-left text-[#8b949e] text-[11px] uppercase tracking-wide font-normal border-b border-app-border">Period</th>
+            <th class="px-4 py-2.5 text-left text-[#8b949e] text-[11px] uppercase tracking-wide font-normal border-b border-app-border">Amount</th>
+            <th class="px-4 py-2.5 text-left text-[#8b949e] text-[11px] uppercase tracking-wide font-normal border-b border-app-border">Date</th>
+            <th class="px-4 py-2.5 text-left text-[#8b949e] text-[11px] uppercase tracking-wide font-normal border-b border-app-border">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let filing of recentFilings" class="hover:bg-[#1c2128] transition-colors border-b border-[#161b22] last:border-0">
+            <td class="px-4 py-3 text-app-primary font-mono text-[12px]">{{ filing.id }}</td>
+            <td class="px-4 py-3 text-[#c9d1d9]">{{ filing.period }}</td>
+            <td class="px-4 py-3 text-[#c9d1d9]">{{ filing.amount }}</td>
+            <td class="px-4 py-3 text-app-muted">{{ filing.date }}</td>
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full border"
+                    [ngClass]="{
+                      'bg-[#0d1f12] text-[#3fb950] border-[#1a3a20]': filing.statusColor === 'green',
+                      'bg-[#1f2937] text-app-primary border-[#1f3a5c]': filing.statusColor === 'blue',
+                      'bg-[#1e0f0f] text-[#f85149] border-[#3a1a1a]': filing.statusColor === 'red'
+                    }">
+                {{ filing.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex flex-col gap-3.5">
+      <div class="bg-[#161b22] border border-app-border rounded-lg">
+        <div class="px-4 py-3 border-b border-app-border flex items-center justify-between">
+          <span class="text-[14px] font-medium text-app-text">Compliance Score</span>
+          <span class="text-[18px] font-medium text-[#3fb950]">94%</span>
+        </div>
+        <div class="p-4">
+          <div class="text-[12px] text-app-muted">Progress bars coming soon...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

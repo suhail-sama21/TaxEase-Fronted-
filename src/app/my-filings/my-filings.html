@@ -1,0 +1,74 @@
+<div>
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl font-medium text-app-text">My Tax Filings</h1>
+      <p class="text-[13px] text-app-muted mt-1">View and manage your submitted tax returns.</p>
+    </div>
+    <button class="bg-app-primary text-white border-none rounded-md px-3.5 py-2 text-[13px] cursor-pointer flex items-center gap-1.5 hover:bg-app-primary-hover transition-colors">
+      + New Filing ↗
+    </button>
+  </div>
+
+  <div class="bg-[#161b22] border border-app-border rounded-xl overflow-hidden shadow-sm">
+    
+    <div class="px-5 py-4 border-b border-app-border flex items-center justify-between bg-app-card">
+      <div class="flex gap-3">
+        <select class="bg-[#161b22] border border-[#30363d] rounded-lg text-app-text text-[13px] px-3 py-1.5 outline-none focus:border-app-primary cursor-pointer appearance-none min-w-[120px]">
+          <option>All Periods</option>
+          <option>2026</option>
+          <option>2025</option>
+        </select>
+        <select class="bg-[#161b22] border border-[#30363d] rounded-lg text-app-text text-[13px] px-3 py-1.5 outline-none focus:border-app-primary cursor-pointer appearance-none min-w-[120px]">
+          <option>All Statuses</option>
+          <option>Approved</option>
+          <option>Submitted</option>
+          <option>Rejected</option>
+        </select>
+      </div>
+      <button class="bg-transparent border border-[#30363d] text-app-muted rounded-lg px-3 py-1.5 text-[12px] hover:bg-[#1f2937] hover:text-app-text transition-colors">
+        ↓ Export CSV
+      </button>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse text-[13px] whitespace-nowrap">
+        <thead>
+          <tr class="bg-app-card border-b border-app-border">
+            <th class="px-5 py-3 text-left text-app-muted text-[10px] uppercase tracking-wide font-normal">Filing ID</th>
+            <th class="px-5 py-3 text-left text-app-muted text-[10px] uppercase tracking-wide font-normal">Period</th>
+            <th class="px-5 py-3 text-left text-app-muted text-[10px] uppercase tracking-wide font-normal">Amount Declared</th>
+            <th class="px-5 py-3 text-left text-app-muted text-[10px] uppercase tracking-wide font-normal">Tax Due</th>
+            <th class="px-5 py-3 text-left text-app-muted text-[10px] uppercase tracking-wide font-normal">Submitted</th>
+            <th class="px-5 py-3 text-left text-app-muted text-[10px] uppercase tracking-wide font-normal">Status</th>
+            <th class="px-5 py-3 text-left text-app-muted text-[10px] uppercase tracking-wide font-normal">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let f of filings" class="hover:bg-[#1c2128] border-b border-[#21262d] last:border-0 transition-colors">
+            <td class="px-5 py-3 text-app-primary font-mono text-[12px]">{{ f.id }}</td>
+            <td class="px-5 py-3 text-[#c9d1d9]">{{ f.period }}</td>
+            <td class="px-5 py-3 text-[#c9d1d9]">{{ f.declared }}</td>
+            <td class="px-5 py-3 text-app-text font-medium">{{ f.tax }}</td>
+            <td class="px-5 py-3 text-app-muted">{{ f.submitted }}</td>
+            <td class="px-5 py-3">
+              <span class="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border"
+                    [ngClass]="{
+                      'bg-[#0d1f12] text-[#3fb950] border-[#1a3a20]': f.statusColor === 'green',
+                      'bg-[#1f2937] text-app-primary border-[#1f3a5c]': f.statusColor === 'blue',
+                      'bg-[#1e0f0f] text-[#f85149] border-[#3a1a1a]': f.statusColor === 'red'
+                    }">
+                {{ f.status }}
+              </span>
+            </td>
+            <td class="px-5 py-3">
+              <div class="flex items-center gap-2">
+                <button class="bg-transparent border border-[#30363d] text-app-muted rounded-md px-2.5 py-1 text-[11px] hover:bg-[#1f2937] hover:text-app-text transition-colors">View</button>
+                <button *ngIf="f.status === 'Approved'" class="bg-app-primary text-white border-none rounded-md px-2.5 py-1 text-[11px] hover:bg-app-primary-hover transition-colors">Pay</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

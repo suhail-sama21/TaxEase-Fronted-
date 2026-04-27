@@ -1,0 +1,101 @@
+<div class="max-w-5xl mx-auto">
+  <div class="mb-6">
+    <h1 class="text-xl font-medium text-app-text">Make Payment</h1>
+    <p class="text-[13px] text-app-muted mt-1">Pay your outstanding tax liabilities securely.</p>
+  </div>
+
+  <div class="grid grid-cols-[1fr_340px] gap-5">
+    
+    <div class="bg-[#161b22] border border-app-border rounded-xl overflow-hidden shadow-sm">
+      <div class="px-5 py-4 border-b border-app-border">
+        <h2 class="text-[15px] font-medium text-app-text">Payment Details</h2>
+      </div>
+      
+      <div class="p-6 flex flex-col gap-5">
+        <div>
+          <label class="block text-xs text-app-muted mb-1.5">Select filing <span class="text-app-danger">*</span></label>
+          <select class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg text-app-text text-sm px-3 py-2.5 outline-none focus:border-app-primary cursor-pointer appearance-none">
+            <option>FIL-2026-001 — Q1 2026 (Due: $4,500.00)</option>
+            <option>FIL-2025-012 — Q4 2025 (Due: $3,800.00)</option>
+            <option selected>FIL-2025-011 — Q3 2025 (Due: $4,100.00)</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-xs text-app-muted mb-1.5">Amount to pay (USD)</label>
+          <input type="number" [(ngModel)]="paymentAmount" disabled class="w-full bg-[#1c2128] border border-[#30363d] rounded-lg text-app-text font-mono text-sm px-3 py-2.5 cursor-not-allowed" />
+        </div>
+        
+        <div>
+          <label class="block text-xs text-app-muted mb-2">Payment method <span class="text-app-danger">*</span></label>
+          
+          <div (click)="selectMethod('bank')" class="flex items-center gap-3 p-3.5 mb-2.5 border rounded-lg cursor-pointer transition-colors"
+               [ngClass]="selectedMethod === 'bank' ? 'border-app-primary bg-[#1f2937]' : 'border-[#30363d] bg-[#0d1117] hover:border-[#8b949e]'">
+            <div class="w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0"
+                 [ngClass]="selectedMethod === 'bank' ? 'border-app-primary' : 'border-[#8b949e]'">
+              <div *ngIf="selectedMethod === 'bank'" class="w-2 h-2 rounded-full bg-app-primary"></div>
+            </div>
+            <div>
+              <div class="text-[13px] font-medium text-app-text">Bank Transfer</div>
+              <div class="text-[11px] text-app-muted">Direct bank account debit</div>
+            </div>
+          </div>
+
+          <div (click)="selectMethod('wallet')" class="flex items-center gap-3 p-3.5 mb-2.5 border rounded-lg cursor-pointer transition-colors"
+               [ngClass]="selectedMethod === 'wallet' ? 'border-app-primary bg-[#1f2937]' : 'border-[#30363d] bg-[#0d1117] hover:border-[#8b949e]'">
+            <div class="w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0"
+                 [ngClass]="selectedMethod === 'wallet' ? 'border-app-primary' : 'border-[#8b949e]'">
+              <div *ngIf="selectedMethod === 'wallet'" class="w-2 h-2 rounded-full bg-app-primary"></div>
+            </div>
+            <div>
+              <div class="text-[13px] font-medium text-app-text">Digital Wallet</div>
+              <div class="text-[11px] text-app-muted">UPI, PayPal, or e-wallet</div>
+            </div>
+          </div>
+
+          <div (click)="selectMethod('card')" class="flex items-center gap-3 p-3.5 border rounded-lg cursor-pointer transition-colors"
+               [ngClass]="selectedMethod === 'card' ? 'border-app-primary bg-[#1f2937]' : 'border-[#30363d] bg-[#0d1117] hover:border-[#8b949e]'">
+            <div class="w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0"
+                 [ngClass]="selectedMethod === 'card' ? 'border-app-primary' : 'border-[#8b949e]'">
+              <div *ngIf="selectedMethod === 'card'" class="w-2 h-2 rounded-full bg-app-primary"></div>
+            </div>
+            <div>
+              <div class="text-[13px] font-medium text-app-text">Credit / Debit Card</div>
+              <div class="text-[11px] text-app-muted">Visa, Mastercard, Amex</div>
+            </div>
+          </div>
+        </div>
+        
+        <button (click)="processPayment()" [disabled]="isProcessing || paymentSuccess" class="w-full bg-app-primary hover:bg-app-primary-hover text-white rounded-lg py-3 text-sm font-medium transition-colors mt-2 disabled:opacity-50">
+          {{ isProcessing ? 'Processing Securely...' : 'Pay Now — ' + (paymentAmount | currency:'USD') }}
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-4">
+      
+      <div class="bg-[#161b22] border border-app-border rounded-xl">
+        <div class="px-5 py-4 border-b border-app-border">
+          <h2 class="text-[14px] font-medium text-app-text">Payment Summary</h2>
+        </div>
+        <div class="p-5 text-[13px]">
+          <div class="flex justify-between py-1.5 border-b border-[#21262d]"><span class="text-app-muted">Filing</span><span class="text-app-text font-mono">FIL-2025-011</span></div>
+          <div class="flex justify-between py-1.5 border-b border-[#21262d]"><span class="text-app-muted">Period</span><span class="text-app-text">Q3 2025</span></div>
+          <div class="flex justify-between py-1.5 border-b border-[#21262d]"><span class="text-app-muted">Tax due</span><span class="text-app-text">{{ paymentAmount | currency:'USD' }}</span></div>
+          <div class="flex justify-between py-1.5 border-b border-[#21262d]"><span class="text-app-muted">Penalty</span><span class="text-app-danger">$0.00</span></div>
+          <div class="flex justify-between pt-3 mt-1 text-[15px] font-medium"><span class="text-app-text">Total</span><span class="text-[#3fb950]">{{ paymentAmount | currency:'USD' }}</span></div>
+        </div>
+      </div>
+
+      <div *ngIf="paymentSuccess" class="bg-[#161b22] border border-[#3fb950]/30 rounded-xl p-6 text-center animate-fade-in shadow-[0_0_15px_rgba(63,185,80,0.1)]">
+        <div class="w-12 h-12 rounded-full bg-[#0d1f12] border border-[#1a3a20] flex items-center justify-center text-xl text-[#3fb950] mx-auto mb-3">✓</div>
+        <div class="text-[15px] font-medium text-app-text mb-1">Payment Successful</div>
+        <div class="text-[12px] text-app-muted mb-4 font-mono">PAY-88292 · Just now</div>
+        
+        <button (click)="goToHistory()" class="w-full bg-transparent border border-[#30363d] text-app-muted hover:text-app-text hover:bg-[#1f2937] rounded-lg py-2 text-xs transition-colors mb-2">View receipt →</button>
+        <button (click)="goToFilings()" class="w-full bg-transparent border border-[#30363d] text-app-muted hover:text-app-text hover:bg-[#1f2937] rounded-lg py-2 text-xs transition-colors">Back to filings →</button>
+      </div>
+
+    </div>
+  </div>
+</div>

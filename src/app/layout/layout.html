@@ -1,0 +1,75 @@
+<div class="flex h-screen w-full bg-app-card text-app-text font-sans overflow-hidden">
+  
+  <aside class="w-[220px] bg-app-card border-r border-app-border flex flex-col shrink-0">
+    <div class="px-5 py-4 border-b border-app-border">
+      <div class="text-lg font-medium text-app-primary tracking-tight font-display">⬡ TaxEase</div>
+      <div class="text-[10px] text-app-muted mt-0.5">Public Tax Filing System</div>
+    </div>
+
+    <nav class="flex-1 px-2.5 py-3 overflow-y-auto">
+      <a *ngFor="let item of navItems" 
+         [routerLink]="item.route"
+         routerLinkActive="bg-[#1f2937] text-app-primary"
+         [routerLinkActiveOptions]="{exact: true}"
+         class="flex items-center gap-2.5 px-2.5 py-2 rounded-md cursor-pointer text-sm text-app-muted hover:bg-[#161b22] hover:text-app-text transition-colors mb-0.5">
+        
+        <div class="w-4 h-4 bg-app-border rounded-sm opacity-80 shrink-0"></div>
+        
+        <span>{{ item.label }}</span>
+        
+        <span *ngIf="item.badge" class="ml-auto bg-[#238636] text-[#7ee787] text-[10px] px-1.5 py-px rounded-full">
+          {{ item.badge }}
+        </span>
+      </a>
+    </nav>
+
+    <div class="px-3.5 py-3 border-t border-app-border">
+      <div class="text-[11px] text-app-muted bg-[#161b22] border border-[#30363d] px-2.5 py-1 rounded-full inline-block">
+        Role: {{ userRole }}
+      </div>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col overflow-hidden">
+    
+    <header class="h-[52px] border-b border-app-border flex items-center px-5 gap-3 bg-app-card shrink-0">
+      
+      <div class="flex-1 max-w-[360px] relative">
+        <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-app-muted text-sm">⌕</span>
+        <input 
+          type="text" 
+          placeholder="Search filings, payments, documents…" 
+          class="w-full bg-[#161b22] border border-[#30363d] rounded-md text-app-text text-[13px] py-1.5 pl-8 pr-3 outline-none focus:border-app-primary transition-colors"
+        />
+      </div>
+
+      <div class="flex items-center gap-3 ml-auto">
+        <div class="flex items-center gap-1.5 bg-[#161b22] border border-[#30363d] rounded-full px-2.5 py-1 cursor-pointer">
+          <span class="text-xs text-[#e3b341]">☀</span>
+          <div class="w-3.5 h-3.5 rounded-full bg-app-primary"></div>
+          <span class="text-xs text-app-muted">☽</span>
+        </div>
+
+        <div class="w-8 h-8 rounded-md bg-[#161b22] border border-[#30363d] flex items-center justify-center cursor-pointer relative text-app-muted text-sm hover:text-app-text transition-colors">
+          🔔
+          <div *ngIf="notificationCount > 0" class="w-2 h-2 bg-app-danger rounded-full absolute top-1 right-1"></div>
+        </div>
+
+        <div class="flex items-center gap-2 cursor-pointer hover:bg-[#161b22] p-1 rounded-md transition-colors">
+          <div class="w-7 h-7 rounded-full bg-gradient-to-br from-[#1f6feb] to-app-primary flex items-center justify-center text-[11px] font-medium text-white font-display">
+            {{ userInitials }}
+          </div>
+          <div>
+            <div class="text-[13px] text-app-text leading-tight">{{ userName }}</div>
+            <div class="text-[10px] text-app-muted">{{ userRole }}</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-6 bg-[#080c12]">
+      <router-outlet></router-outlet>
+    </div>
+
+  </main>
+</div>

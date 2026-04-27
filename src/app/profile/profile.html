@@ -1,0 +1,94 @@
+<div class="max-w-4xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-xl font-medium text-app-text">Profile Management</h1>
+      <p class="text-[13px] text-app-muted mt-1">Manage your personal and contact information.</p>
+    </div>
+    <button (click)="saveProfile()" [disabled]="isSaving" class="bg-app-primary hover:bg-app-primary-hover text-white rounded-md px-4 py-2 text-[13px] font-medium transition-colors disabled:opacity-50">
+      {{ isSaving ? 'Saving...' : 'Save Changes' }}
+    </button>
+  </div>
+
+  <div class="bg-[#161b22] border border-app-border rounded-xl p-6 mb-6 flex items-center gap-5">
+    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-[#1f6feb] to-app-primary flex items-center justify-center text-2xl font-bold text-white font-display shrink-0 shadow-lg">
+      JD
+    </div>
+    <div>
+      <h2 class="text-xl font-medium text-app-text mb-1">John Doe</h2>
+      <div class="text-[13px] text-app-primary font-mono mb-1">TXP-987654321</div>
+      <div class="text-[12px] text-app-muted">Individual · Citizen · Active since 2023</div>
+    </div>
+    <div class="ml-auto">
+      <button class="bg-transparent border border-[#30363d] text-app-muted rounded-lg px-4 py-2 text-[12px] hover:bg-[#1f2937] hover:text-app-text transition-colors">
+        Change Photo
+      </button>
+    </div>
+  </div>
+
+  <div class="bg-[#161b22] border border-app-border rounded-xl overflow-hidden mb-6">
+    <div class="px-5 py-4 border-b border-app-border">
+      <h2 class="text-[15px] font-medium text-app-text">Personal Information</h2>
+    </div>
+    <div class="p-6">
+      <div class="grid grid-cols-2 gap-5">
+        <div>
+          <label class="block text-xs text-app-muted mb-1.5">Full name <span class="text-app-danger">*</span></label>
+          <input type="text" [(ngModel)]="userProfile.fullName" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg text-app-text text-sm px-3 py-2.5 outline-none focus:border-app-primary" />
+        </div>
+        <div>
+          <label class="block text-xs text-app-muted mb-1.5">Email address <span class="text-app-danger">*</span></label>
+          <input type="email" [(ngModel)]="userProfile.email" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg text-app-text text-sm px-3 py-2.5 outline-none focus:border-app-primary" />
+        </div>
+        <div>
+          <label class="block text-xs text-app-muted mb-1.5">Phone number <span class="text-app-danger">*</span></label>
+          <input type="text" [(ngModel)]="userProfile.phone" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg text-app-text text-sm px-3 py-2.5 outline-none focus:border-app-primary" />
+        </div>
+        <div>
+          <label class="block text-xs text-app-muted mb-1.5">Taxpayer type <span class="text-app-danger">*</span></label>
+          <select [(ngModel)]="userProfile.type" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg text-app-text text-sm px-3 py-2.5 outline-none focus:border-app-primary cursor-pointer appearance-none">
+            <option>Citizen</option>
+            <option>Business</option>
+            <option>Non-resident</option>
+          </select>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs text-app-muted mb-1.5">Residential address <span class="text-app-danger">*</span></label>
+          <input type="text" [(ngModel)]="userProfile.address" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg text-app-text text-sm px-3 py-2.5 outline-none focus:border-app-primary" />
+        </div>
+        <div>
+          <label class="block text-xs text-app-muted mb-1.5">Date of birth</label>
+          <input type="date" [(ngModel)]="userProfile.dob" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg text-app-text text-sm px-3 py-2.5 outline-none focus:border-app-primary" />
+        </div>
+        <div>
+          <label class="block text-xs text-app-muted mb-1.5">National ID / PAN</label>
+          <input type="text" [(ngModel)]="userProfile.pan" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg text-app-text text-sm px-3 py-2.5 outline-none focus:border-app-primary" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-[#161b22] border border-app-border rounded-xl overflow-hidden mb-6">
+    <div class="px-5 py-4 border-b border-app-border">
+      <h2 class="text-[15px] font-medium text-app-text">Security</h2>
+    </div>
+    <div class="p-6">
+      <div class="grid grid-cols-2 gap-5 mb-5">
+        <div>
+          <label class="block text-xs text-app-muted mb-1.5">Current password</label>
+          <input type="password" [(ngModel)]="security.currentPassword" placeholder="••••••••" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg text-app-text text-sm px-3 py-2.5 outline-none focus:border-app-primary" />
+        </div>
+        <div></div> <div>
+          <label class="block text-xs text-app-muted mb-1.5">New password</label>
+          <input type="password" [(ngModel)]="security.newPassword" placeholder="••••••••" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg text-app-text text-sm px-3 py-2.5 outline-none focus:border-app-primary" />
+        </div>
+        <div>
+          <label class="block text-xs text-app-muted mb-1.5">Confirm new password</label>
+          <input type="password" [(ngModel)]="security.confirmPassword" placeholder="••••••••" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg text-app-text text-sm px-3 py-2.5 outline-none focus:border-app-primary" />
+        </div>
+      </div>
+      <button (click)="updatePassword()" [disabled]="isSavingPassword || !security.currentPassword || !security.newPassword" class="bg-transparent border border-[#30363d] text-app-muted rounded-lg px-4 py-2 text-[12px] hover:bg-[#1f2937] hover:text-app-text transition-colors disabled:opacity-50">
+        {{ isSavingPassword ? 'Updating...' : 'Update Password' }}
+      </button>
+    </div>
+  </div>
+</div>
