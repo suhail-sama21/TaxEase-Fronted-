@@ -1,0 +1,62 @@
+<div class="min-h-screen w-full flex items-center justify-center bg-app-bg relative overflow-hidden font-sans">
+  <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-app-primary/5 blur-[60px] pointer-events-none"></div>
+  <div class="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-green-500/5 blur-[60px] pointer-events-none"></div>
+
+  <div class="bg-app-card border border-app-border rounded-2xl p-10 w-[420px] relative z-10 shadow-2xl">
+    <div class="text-center mb-8">
+      <div class="w-14 h-14 bg-app-primary rounded-xl flex items-center justify-center mx-auto mb-4 font-display font-bold text-xl text-white">TE</div>
+      <h1 class="font-display text-2xl font-bold text-app-text mb-1">TaxEase</h1>
+      <p class="text-sm text-app-muted">Public Tax Filing & Revenue Management</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <div>
+        <label class="block text-xs text-app-muted mb-1.5">Email address <span class="text-app-danger">*</span></label>
+        <input 
+          type="email" 
+          formControlName="email"
+          placeholder="name@example.com" 
+          class="w-full bg-[#161b22] border border-app-border rounded-lg text-app-text text-sm px-4 py-2.5 outline-none focus:border-app-primary transition-colors"
+          [class.border-app-danger]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs text-app-muted mb-1.5">Password <span class="text-app-danger">*</span></label>
+        <input 
+          type="password" 
+          formControlName="password"
+          placeholder="••••••••" 
+          class="w-full bg-[#161b22] border border-app-border rounded-lg text-app-text text-sm px-4 py-2.5 outline-none focus:border-app-primary transition-colors"
+          [class.border-app-danger]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+        />
+      </div>
+
+      <button 
+        type="submit" 
+        [disabled]="isLoading"
+        class="w-full bg-app-primary hover:bg-app-primary-hover text-white rounded-lg py-3 text-sm font-medium transition-colors mt-2 disabled:opacity-70">
+        {{ isLoading ? 'Signing in...' : 'Login' }}
+      </button>
+    </form>
+
+    <div class="text-center mt-4">
+      <a href="#" class="text-xs text-app-primary hover:underline">Forgot Password?</a>
+    </div>
+    
+    <div class="text-center mt-3 text-xs text-app-muted">
+      Don't have an account? <a routerLink="/signup" class="text-app-primary hover:underline">Sign up here</a>
+    </div>
+
+    <div class="flex gap-2 mt-6 pt-5 border-t border-app-border">
+      <button (click)="quickLogin('taxpayer')" class="flex-1 bg-[#161b22] border border-app-border rounded-lg p-2 hover:border-app-primary transition-colors">
+        <div class="text-[10px] text-app-muted">Demo</div>
+        <div class="text-xs text-app-text font-medium">Taxpayer</div>
+      </button>
+      <button (click)="quickLogin('auditor')" class="flex-1 bg-[#161b22] border border-app-border rounded-lg p-2 hover:border-app-primary transition-colors">
+        <div class="text-[10px] text-app-muted">Demo</div>
+        <div class="text-xs text-app-text font-medium">Auditor</div>
+      </button>
+    </div>
+  </div>
+</div>

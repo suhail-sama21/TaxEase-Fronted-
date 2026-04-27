@@ -1,0 +1,69 @@
+<div class="min-h-screen w-full flex items-center justify-center bg-app-bg relative overflow-hidden font-sans py-10">
+  <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-app-primary/5 blur-[60px] pointer-events-none"></div>
+
+  <div class="bg-app-card border border-app-border rounded-2xl p-10 w-[480px] relative z-10 shadow-2xl">
+    <div class="text-center mb-8">
+      <h1 class="font-display text-2xl font-bold text-app-text mb-1">Create an Account</h1>
+      <p class="text-sm text-app-muted">Join TaxEase to manage your filings</p>
+    </div>
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <div>
+        <label class="block text-xs text-app-muted mb-1.5">Full Name <span class="text-app-danger">*</span></label>
+        <input 
+          type="text" 
+          formControlName="fullName"
+          placeholder="John Doe" 
+          class="w-full bg-[#161b22] border border-app-border rounded-lg text-app-text text-sm px-4 py-2.5 outline-none focus:border-app-primary transition-colors"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs text-app-muted mb-1.5">Email address <span class="text-app-danger">*</span></label>
+        <input 
+          type="email" 
+          formControlName="email"
+          placeholder="name@example.com" 
+          class="w-full bg-[#161b22] border border-app-border rounded-lg text-app-text text-sm px-4 py-2.5 outline-none focus:border-app-primary transition-colors"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs text-app-muted mb-1.5">Password <span class="text-app-danger">*</span></label>
+          <input 
+            type="password" 
+            formControlName="password"
+            placeholder="••••••••" 
+            class="w-full bg-[#161b22] border border-app-border rounded-lg text-app-text text-sm px-4 py-2.5 outline-none focus:border-app-primary transition-colors"
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-app-muted mb-1.5">Confirm Password <span class="text-app-danger">*</span></label>
+          <input 
+            type="password" 
+            formControlName="confirmPassword"
+            placeholder="••••••••" 
+            class="w-full bg-[#161b22] border border-app-border rounded-lg text-app-text text-sm px-4 py-2.5 outline-none focus:border-app-primary transition-colors"
+            [class.border-app-danger]="signupForm.hasError('passwordMismatch') && signupForm.get('confirmPassword')?.touched"
+          />
+        </div>
+      </div>
+      
+      <div *ngIf="signupForm.hasError('passwordMismatch') && signupForm.get('confirmPassword')?.touched" class="text-xs text-app-danger mt-1">
+        Passwords do not match.
+      </div>
+
+      <button 
+        type="submit" 
+        [disabled]="isLoading"
+        class="w-full bg-app-primary hover:bg-app-primary-hover text-white rounded-lg py-3 text-sm font-medium transition-colors mt-4 disabled:opacity-70">
+        {{ isLoading ? 'Creating Account...' : 'Register' }}
+      </button>
+    </form>
+
+    <div class="text-center mt-6 text-xs text-app-muted">
+      Already have an account? <a routerLink="/login" class="text-app-primary hover:underline">Log in</a>
+    </div>
+  </div>
+</div>
