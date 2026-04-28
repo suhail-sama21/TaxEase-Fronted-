@@ -3,7 +3,7 @@ import { LoginComponent } from './login-component/login-component';
 import { SignupComponent } from './signup-component/signup-component';
 
 import { DashboardComponent } from './dashboard/dashboard';
-import { MyFilingsComponent } from './my-filings/my-filings'; // Add this import
+import { MyFilingsComponent } from './my-filings/my-filings';
 import { LayoutComponent } from './layout/layout';
 import { FileTaxesComponent } from './file-taxes/file-taxes';
 import { MakePaymentComponent } from './make-payment/make-payment';
@@ -14,10 +14,16 @@ import { RegStatusComponent } from './reg-status/reg-status';
 import { NotificationsComponent } from './notifications/notifications';
 
 export const routes: Routes = [
+  // 1. Default route now forces the user to the login page
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  
+  // 2. Public auth routes
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
+  
+  // 3. Protected App Routes (Wrapped in a 'portal' path)
   { 
-    path: '', 
+    path: 'portal', 
     component: LayoutComponent,
     children: [
       { path: 'dashboard', component: DashboardComponent },
@@ -26,10 +32,11 @@ export const routes: Routes = [
       { path: 'filings', component: MyFilingsComponent },
       { path: 'file-taxes', component: FileTaxesComponent },
       { path: 'payment', component: MakePaymentComponent }, 
-      { path: 'history', component: PaymentHistoryComponent },// Add this route
+      { path: 'history', component: PaymentHistoryComponent },
       { path: 'notifications', component: NotificationsComponent },
       { path: 'documents', component: DocumentsComponent },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+      // Default child route redirects to dashboard inside the portal
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' } 
     ]
   }
 ];
