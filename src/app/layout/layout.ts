@@ -15,16 +15,16 @@ export class LayoutComponent {
   userRole = 'Taxpayer';
   notificationCount = 2;
 
-  // Menu items for easy iteration in the template
+  // Menu items updated with the new '/portal' base path
   navItems = [
-    { label: 'Dashboard', route: '/dashboard', icon: 'dashboard-icon' },
-    { label: 'Profile', route: '/profile', icon: 'profile-icon' },
-    { label: 'Reg. Status', route: '/status', icon: 'status-icon' },
-    { label: 'Documents', route: '/documents', icon: 'docs-icon' },
-    { label: 'My Filings', route: '/filings', icon: 'filings-icon', badge: 3 },
-    { label: 'File Taxes', route: '/file-taxes', icon: 'file-icon' },
-    { label: 'Make Payment', route: '/payment', icon: 'pay-icon' },
-    { label: 'Payment History', route: '/history', icon: 'history-icon' },
-    { label: 'Notifications', route: '/notifications', icon: 'bell-icon', badge: 2 }
+    { label: 'Dashboard', route: '/portal/dashboard', icon: 'dashboard-icon' },
+    { label: 'Profile', route: '/portal/profile', icon: 'profile-icon' },
+    { label: 'Reg. Status', route: '/portal/status', icon: 'status-icon' },
+    { label: 'Documents', route: '/portal/documents', icon: 'docs-icon' },
+    { label: 'My Filings', route: '/portal/filings', icon: 'filings-icon', badge: 3 },
+    { label: 'File Taxes', route: '/portal/file-taxes', icon: 'file-icon' },
+    { label: 'Make Payment', route: '/portal/payment', icon: 'pay-icon' },
+    { label: 'Payment History', route: '/portal/history', icon: 'history-icon' },
+    { label: 'Notifications', route: '/portal/notifications', icon: 'bell-icon', badge: 2 }
   ];
 }
