@@ -1,0 +1,99 @@
+<div class="max-w-[1400px] mx-auto animate-fade-in pb-12">
+
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-white mb-1">Compliance Records</h1>
+    <p class="text-[13px] text-[#8b949e]">Search, filter, and update taxpayer compliance records.</p>
+  </div>
+
+  <div class="bg-[#161b22] border border-[#30363d] rounded-xl shadow-sm mb-6">
+
+    <div class="p-5 border-b border-[#30363d] bg-[#0d1117] rounded-t-xl flex flex-col sm:flex-row gap-4 items-center">
+      <select aria-label="Filter Status" class="w-full sm:w-48 bg-[#161b22] border border-[#30363d] rounded-lg text-white text-[13px] px-3 py-2 outline-none focus:border-[#1f6feb] cursor-pointer appearance-none">
+        <option value="">All Statuses</option>
+        <option value="Compliant">Compliant</option>
+        <option value="Non-Compliant">Non-Compliant</option>
+        <option value="Pending">Pending</option>
+      </select>
+
+      <div class="relative w-full">
+        <input type="text" placeholder="Search Filing ID or Taxpayer..." class="w-full bg-[#161b22] border border-[#30363d] rounded-lg text-white text-[13px] px-4 py-2 outline-none focus:border-[#1f6feb] placeholder-[#8b949e]" />
+      </div>
+
+      <button class="w-full sm:w-auto bg-[#1f2937] hover:bg-[#30363d] text-[#c9d1d9] border border-[#30363d] rounded-lg px-6 py-2 text-[13px] font-medium transition-colors">
+        Filter
+      </button>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-[13px] whitespace-nowrap">
+        <thead>
+          <tr class="bg-[#161b22] border-b border-[#30363d]">
+            <th class="py-4 px-5 text-[10px] font-medium uppercase text-[#8b949e] tracking-wider">Compliance ID</th>
+            <th class="py-4 px-5 text-[10px] font-medium uppercase text-[#8b949e] tracking-wider">Filing ID</th>
+            <th class="py-4 px-5 text-[10px] font-medium uppercase text-[#8b949e] tracking-wider">Taxpayer Name</th>
+            <th class="py-4 px-5 text-[10px] font-medium uppercase text-[#8b949e] tracking-wider">Type</th>
+            <th class="py-4 px-5 text-[10px] font-medium uppercase text-[#8b949e] tracking-wider">Status</th>
+            <th class="py-4 px-5 text-[10px] font-medium uppercase text-[#8b949e] tracking-wider">Created Date</th>
+            <th class="py-4 px-5 text-[10px] font-medium uppercase text-[#8b949e] tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#21262d]">
+          <tr *ngFor="let rec of records" class="hover:bg-[#1c2128] transition-colors" [class.bg-[#1c2128]]="selectedRecord?.id === rec.id">
+            <td class="py-4 px-5 font-mono text-[12px] text-[#c9d1d9]">{{ rec.id }}</td>
+            <td class="py-4 px-5 font-mono text-[12px] text-[#8b949e]">{{ rec.filingId }}</td>
+            <td class="py-4 px-5 font-medium text-white">{{ rec.taxpayer }}</td>
+            <td class="py-4 px-5 text-[#c9d1d9]">{{ rec.type }}</td>
+            <td class="py-4 px-5">
+              <span class="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border font-medium"
+                    [ngClass]="{
+                      'bg-[#0d1f12] text-[#3fb950] border-[#1a3a20]': rec.statusColor === 'green',
+                      'bg-[#1e1a0e] text-[#e3b341] border-[#3a2e0e]': rec.statusColor === 'amber',
+                      'bg-[#1e0f0f] text-[#f85149] border-[#3a1a1a]': rec.statusColor === 'red'
+                    }">
+                {{ rec.status }}
+              </span>
+            </td>
+            <td class="py-4 px-5 text-[#8b949e]">{{ rec.date }}</td>
+            <td class="py-4 px-5">
+              <button (click)="selectForUpdate(rec)" class="bg-transparent border border-[#30363d] text-[#c9d1d9] rounded-md px-4 py-1.5 text-[12px] hover:bg-[#1f2937] hover:text-white transition-colors">
+                Update
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="selectedRecord" class="bg-[#161b22] border border-[#30363d] rounded-xl shadow-lg animate-fade-in overflow-hidden">
+    <div class="px-6 py-4 border-b border-[#30363d] bg-[#0d1117]">
+      <h2 class="text-[16px] font-bold text-white">Update Compliance Record: <span class="text-[#1f6feb]">{{ selectedRecord.id }}</span></h2>
+    </div>
+
+    <div class="p-6">
+      <div class="mb-5 max-w-sm">
+        <label class="block text-[12px] font-medium text-white mb-2">Update Status <span class="text-[#f85149]">*</span></label>
+        <select [(ngModel)]="updateData.status" aria-label="Update Status" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg text-white text-[13px] px-3 py-2.5 outline-none focus:border-[#1f6feb] cursor-pointer appearance-none">
+          <option value="Compliant">Compliant</option>
+          <option value="Non-Compliant">Non-Compliant</option>
+          <option value="Pending">Pending</option>
+        </select>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-[12px] font-medium text-white mb-2">Reason / Notes <span class="text-[#f85149]">*</span></label>
+        <textarea [(ngModel)]="updateData.notes" rows="4" placeholder="Provide justification for this status update..." class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg text-white text-[13px] px-4 py-3 outline-none focus:border-[#1f6feb] placeholder-[#8b949e] resize-y"></textarea>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#30363d]">
+        <button (click)="cancelUpdate()" class="bg-transparent border border-[#30363d] text-[#c9d1d9] rounded-lg px-5 py-2 text-[13px] font-medium hover:bg-[#1f2937] hover:text-white transition-colors">
+          Cancel
+        </button>
+        <button (click)="saveUpdate()" [disabled]="!updateData.notes" class="bg-[#1f6feb] hover:bg-[#388bfd] text-white rounded-lg px-6 py-2 text-[13px] font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          Save Update
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
