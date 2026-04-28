@@ -12,7 +12,7 @@ export class RegStatusComponent {
   regDate = 'March 1, 2026';
   lastUpdated = 'March 5, 2026';
 
-  // Mock data for the timeline
+  // Timeline data
   timelineSteps = [
     { title: 'Application Submitted', date: 'March 1, 2026', status: 'completed' },
     { title: 'Documents Received', date: 'March 2, 2026', status: 'completed' },
@@ -20,7 +20,7 @@ export class RegStatusComponent {
     { title: 'ID Assigned', date: 'Pending', status: 'upcoming' }
   ];
 
-  // Mock data for the required documents table
+  // Required documents table data
   requiredDocs = [
     { type: 'ID Proof', date: '2026-03-02', status: 'Verified', statusColor: 'green' },
     { type: 'PAN Card', date: '2026-03-02', status: 'Verified', statusColor: 'green' },
