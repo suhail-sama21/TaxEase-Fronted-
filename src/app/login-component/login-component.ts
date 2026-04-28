@@ -33,7 +33,7 @@ export class LoginComponent {
     console.log('Sending to AuthController:', payload);
     setTimeout(() => {
       this.isLoading = false;
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/portal/dashboard']);
     }, 1000);
   }
 
