@@ -14,6 +14,10 @@ export class LayoutComponent {
   userInitials = 'JD';
   userRole = 'Taxpayer';
   notificationCount = 2;
+  isDarkMode = true;
+  toggleTheme() {
+    this.isDarkMode = !this.isDarkMode;
+  }
 
   // Menu items updated with the new '/portal' base path
   navItems = [
