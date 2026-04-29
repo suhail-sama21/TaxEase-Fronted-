@@ -20,16 +20,15 @@ export class PaymentMetricsComponent {
     labels: ['Credit Card', 'UPI / Wallet', 'Net Banking', 'Wire'],
     datasets: [{
       data: [1245, 3420, 850, 120],
-      backgroundColor: ['#2563eb', '#8b5cf6', '#10b981', '#f59e0b'], // Modern colors
-      borderColor: '#ffffff', 
-      borderWidth: 3
+      backgroundColor: ['#2563eb', '#8b5cf6', '#10b981', '#f59e0b'],
+      borderWidth: 0
     }]
   };
 
   public methodChartOptions: ChartOptions<'pie'> = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { position: 'right', labels: { color: '#475569' } } }
+    plugins: { legend: { position: 'right', labels: { color: '#8b949e' } } }
   };
 
   public trendChartData: ChartConfiguration<'bar'>['data'] = {
@@ -43,10 +42,10 @@ export class PaymentMetricsComponent {
   public trendChartOptions: ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { position: 'top', labels: { color: '#475569' } } },
+    plugins: { legend: { position: 'top', labels: { color: '#8b949e' } } },
     scales: {
-      x: { stacked: true, grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } },
-      y: { stacked: true, grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } }
+      x: { stacked: true, grid: { color: 'rgba(139, 148, 158, 0.2)' }, ticks: { color: '#8b949e' } },
+      y: { stacked: true, grid: { color: 'rgba(139, 148, 158, 0.2)' }, ticks: { color: '#8b949e' } }
     }
   };
 
