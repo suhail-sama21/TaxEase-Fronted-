@@ -1,61 +1,61 @@
-<div class="min-h-screen w-full flex items-center justify-center bg-app-bg relative overflow-hidden font-sans">
-  <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-app-primary/5 blur-[60px] pointer-events-none"></div>
-  <div class="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-green-500/5 blur-[60px] pointer-events-none"></div>
+<div class="min-h-screen w-full flex items-center justify-center bg-(--theme-bg) relative overflow-hidden font-sans transition-colors duration-300">
+  <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-[#1f6feb]/5 blur-[60px] pointer-events-none transition-colors duration-300"></div>
+  <div class="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-[#3fb950]/5 blur-[60px] pointer-events-none transition-colors duration-300"></div>
 
-  <div class="bg-app-card border border-app-border rounded-2xl p-10 w-[420px] relative z-10 shadow-2xl">
+  <div class="bg-(--theme-card) border border-(--theme-border) rounded-2xl p-10 w-420px relative z-10 shadow-2xl transition-colors duration-300">
     <div class="text-center mb-8">
-      <div class="w-14 h-14 bg-app-primary rounded-xl flex items-center justify-center mx-auto mb-4 font-display font-bold text-xl text-white">TE</div>
-      <h1 class="font-display text-2xl font-bold text-app-text mb-1">TaxEase</h1>
-      <p class="text-sm text-app-muted">Public Tax Filing & Revenue Management</p>
+      <div class="w-14 h-14 bg-[#1f6feb] rounded-xl flex items-center justify-center mx-auto mb-4 font-display font-bold text-xl text-white transition-colors duration-300">TE</div>
+      <h1 class="font-display text-2xl font-bold text-(--theme-text) mb-1 transition-colors duration-300">TaxEase</h1>
+      <p class="text-sm text-(--theme-muted) transition-colors duration-300">Public Tax Filing & Revenue Management</p>
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
       <div>
-        <label class="block text-xs text-app-muted mb-1.5">Email address <span class="text-app-danger">*</span></label>
+        <label class="block text-xs text-(--theme-muted) mb-1.5 transition-colors duration-300">Email address <span class="text-[#f85149]">*</span></label>
         <input 
           type="email" 
           formControlName="email"
           placeholder="name@example.com" 
-          class="w-full bg-[#161b22] border border-app-border rounded-lg text-app-text text-sm px-4 py-2.5 outline-none focus:border-app-primary transition-colors"
-          [class.border-app-danger]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+          class="w-full bg-(--theme-surface) border border-(--theme-border) rounded-lg text-(--theme-text) text-sm px-4 py-2.5 outline-none focus:border-[#1f6feb] transition-colors duration-300"
+          [class.border-[#f85149]]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
         />
       </div>
 
       <div>
-        <label class="block text-xs text-app-muted mb-1.5">Password <span class="text-app-danger">*</span></label>
+        <label class="block text-xs text-(--theme-muted) mb-1.5 transition-colors duration-300">Password <span class="text-[#f85149]">*</span></label>
         <input 
           type="password" 
           formControlName="password"
           placeholder="••••••••" 
-          class="w-full bg-[#161b22] border border-app-border rounded-lg text-app-text text-sm px-4 py-2.5 outline-none focus:border-app-primary transition-colors"
-          [class.border-app-danger]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+          class="w-full bg-(--theme-surface) border border-(--theme-border) rounded-lg text-(--theme-text) text-sm px-4 py-2.5 outline-none focus:border-[#1f6feb] transition-colors duration-300"
+          [class.border-[#f85149]]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
         />
       </div>
 
       <button 
         type="submit" 
         [disabled]="isLoading"
-        class="w-full bg-app-primary hover:bg-app-primary-hover text-white rounded-lg py-3 text-sm font-medium transition-colors mt-2 disabled:opacity-70">
+        class="w-full bg-[#1f6feb] hover:bg-[#0969da] text-white rounded-lg py-3 text-sm font-medium transition-all duration-300 mt-2 disabled:opacity-70">
         {{ isLoading ? 'Signing in...' : 'Login' }}
       </button>
     </form>
 
     <div class="text-center mt-4">
-      <a href="#" class="text-xs text-app-primary hover:underline">Forgot Password?</a>
+      <a href="#" class="text-xs text-[#1f6feb] hover:underline transition-colors duration-300">Forgot Password?</a>
     </div>
     
-    <div class="text-center mt-3 text-xs text-app-muted">
-      Don't have an account? <a routerLink="/signup" class="text-app-primary hover:underline">Sign up here</a>
+    <div class="text-center mt-3 text-xs text-(--theme-muted) transition-colors duration-300">
+      Don't have an account? <a routerLink="/signup" class="text-[#1f6feb] hover:underline transition-colors duration-300">Sign up here</a>
     </div>
 
-    <div class="flex gap-2 mt-6 pt-5 border-t border-app-border">
-      <button (click)="quickLogin('taxpayer')" class="flex-1 bg-[#161b22] border border-app-border rounded-lg p-2 hover:border-app-primary transition-colors">
-        <div class="text-[10px] text-app-muted">Demo</div>
-        <div class="text-xs text-app-text font-medium">Taxpayer</div>
+    <div class="flex gap-2 mt-6 pt-5 border-t border-(--theme-border) transition-colors duration-300">
+      <button (click)="quickLogin('taxpayer')" class="flex-1 bg-(--theme-surface) border border-(--theme-border) rounded-lg p-2 hover:border-[#1f6feb] transition-colors duration-300 cursor-pointer">
+        <div class="text-[10px] text-(--theme-muted) transition-colors duration-300">Demo</div>
+        <div class="text-xs text-(--theme-text) font-medium transition-colors duration-300">Taxpayer</div>
       </button>
-      <button (click)="quickLogin('auditor')" class="flex-1 bg-[#161b22] border border-app-border rounded-lg p-2 hover:border-app-primary transition-colors">
-        <div class="text-[10px] text-app-muted">Demo</div>
-        <div class="text-xs text-app-text font-medium">Auditor</div>
+      <button (click)="quickLogin('auditor')" class="flex-1 bg-(--theme-surface) border border-(--theme-border) rounded-lg p-2 hover:border-[#1f6feb] transition-colors duration-300 cursor-pointer">
+        <div class="text-[10px] text-(--theme-muted) transition-colors duration-300">Demo</div>
+        <div class="text-xs text-(--theme-text) font-medium transition-colors duration-300">Auditor</div>
       </button>
     </div>
   </div>

@@ -8,13 +8,16 @@ import { CommonModule } from '@angular/common';
   templateUrl: './my-filings.html'
 })
 export class MyFilingsComponent {
-  // Mock data to match your UI design until backend integration
+  // Updated mock data to match TaxFiling entity and ResponseDTO
   filings = [
-    { id: 'FIL-2026-001', period: 'Q1 2026', declared: '$45,000', tax: '$4,500', submitted: '2026-03-01', status: 'Approved', statusColor: 'green' },
-    { id: 'FIL-2026-002', period: 'Q2 2026', declared: '$52,000', tax: '$5,200', submitted: '2026-03-05', status: 'Submitted', statusColor: 'blue' },
-    { id: 'FIL-2025-012', period: 'Q4 2025', declared: '$38,000', tax: '$3,800', submitted: '2025-12-15', status: 'Approved', statusColor: 'green' },
-    { id: 'FIL-2025-011', period: 'Q3 2025', declared: '$41,000', tax: '$4,100', submitted: '2025-09-20', status: 'Approved', statusColor: 'green' },
-    { id: 'FIL-2025-010', period: 'Q2 2025', declared: '$35,000', tax: '$3,500', submitted: '2025-06-18', status: 'Rejected', statusColor: 'red' },
-    { id: 'FIL-2025-009', period: 'Q1 2025', declared: '$39,000', tax: '$3,900', submitted: '2025-03-10', status: 'Approved', statusColor: 'green' }
+    { id: 101, period: 'FY2025-26', amountDeclared: 45000, submittedDate: '2026-03-01T10:00:00Z', status: 'Approved', statusColor: 'green' },
+    { id: 102, period: 'FY2025-26', amountDeclared: 52000, submittedDate: '2026-03-05T14:30:00Z', status: 'Pending', statusColor: 'blue' },
+    { id: 85, period: 'FY2024-25', amountDeclared: 38000, submittedDate: '2025-12-15T09:00:00Z', status: 'Approved', statusColor: 'green' },
+    { id: 74, period: 'FY2024-25', amountDeclared: 35000, submittedDate: '2025-06-18T11:20:00Z', status: 'Rejected', statusColor: 'red' }
   ];
+
+  // Helper to calculate tax due (consistent with 10% frontend logic)
+  calculateTax(amount: number): number {
+    return amount * 0.10;
+  }
 }

@@ -13,9 +13,13 @@ export class SignupComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
 
+  // Updated to match your exact backend payload requirements
   signupForm: FormGroup = this.fb.group({
-    fullName: ['', Validators.required],
+    name: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
+    phone: ['', Validators.required],
+    address: ['', Validators.required],
+    contactInfo: [''], // Optional, or add Validators.required if mandatory
     password: ['', [Validators.required, Validators.minLength(8)]],
     confirmPassword: ['', Validators.required],
     role: ['TAXPAYER', Validators.required]
@@ -36,9 +40,11 @@ export class SignupComponent {
     }
 
     this.isLoading = true;
+    // Strip confirmPassword before sending to the server
     const { confirmPassword, ...registerPayload } = this.signupForm.value;
     
     console.log('Sending Registration to IdentityService:', registerPayload);
+    
     setTimeout(() => {
       this.isLoading = false;
       this.router.navigate(['/login']);
