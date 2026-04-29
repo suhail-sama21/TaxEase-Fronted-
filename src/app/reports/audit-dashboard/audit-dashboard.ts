@@ -16,14 +16,13 @@ export class AuditDashboardComponent {
   flaggedCases: number = 14;
   pendingReviews: number = 8;
 
-  // Light Theme Doughnut Chart
+  // Universal Theme Doughnut Chart
   public statusChartData: ChartConfiguration<'doughnut'>['data'] = {
     labels: ['Passed', 'Flagged', 'Under Review'],
     datasets: [{
       data: [142, 14, 8],
-      backgroundColor: ['#10b981', '#ef4444', '#f59e0b'], // Modern Green, Red, Amber
-      borderColor: '#ffffff', 
-      borderWidth: 3
+      backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
+      borderWidth: 0 
     }]
   };
 
@@ -31,18 +30,18 @@ export class AuditDashboardComponent {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { position: 'right', labels: { color: '#475569', padding: 20 } }
+      legend: { position: 'right', labels: { color: '#8b949e', padding: 20 } }
     },
     cutout: '75%' 
   };
 
-  // Light Theme Bar Chart
+  // Universal Theme Bar Chart
   public volumeChartData: ChartConfiguration<'bar'>['data'] = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr'],
     datasets: [{ 
       data: [25, 32, 45, 54], 
       label: 'Audits Conducted', 
-      backgroundColor: '#2563eb', // Modern Blue
+      backgroundColor: '#2563eb', 
       borderRadius: 6
     }]
   };
@@ -52,8 +51,8 @@ export class AuditDashboardComponent {
     maintainAspectRatio: false,
     plugins: { legend: { display: false } },
     scales: {
-      x: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } },
-      y: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } }
+      x: { grid: { color: 'rgba(139, 148, 158, 0.2)' }, ticks: { color: '#8b949e' } },
+      y: { grid: { color: 'rgba(139, 148, 158, 0.2)' }, ticks: { color: '#8b949e' } }
     }
   };
 
