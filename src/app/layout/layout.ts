@@ -29,6 +29,10 @@ export class LayoutComponent {
     { label: 'File Taxes', route: '/portal/file-taxes', icon: 'file-icon' },
     { label: 'Make Payment', route: '/portal/payment', icon: 'pay-icon' },
     { label: 'Payment History', route: '/portal/history', icon: 'history-icon' },
-    { label: 'Notifications', route: '/portal/notifications', icon: 'bell-icon', badge: 2 }
+    { label: 'Notifications', route: '/portal/notifications', icon: 'bell-icon', badge: 2 },
+    { label: 'Revenue Dashboard', route: '/portal/reports/revenue', icon: 'chart-icon' },
+    { label: 'Audit Dashboard', route: '/portal/reports/audit', icon: 'shield-icon' },
+    { label: 'Payment Analytics', route: '/portal/reports/payments', icon: 'pay-icon' },
+    { label: 'Report Exports', route: '/portal/reports/download', icon: 'download-icon' }
   ];
 }
