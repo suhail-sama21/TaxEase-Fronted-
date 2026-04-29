@@ -12,6 +12,10 @@ import { DocumentsComponent } from './documents/documents';
 import { ProfileComponent } from './profile/profile';
 import { RegStatusComponent } from './reg-status/reg-status';
 import { NotificationsComponent } from './notifications/notifications';
+import { RevenueDashboardComponent } from './reports/revenue-dashboard/revenue-dashboard';
+import { AuditDashboardComponent } from './reports/audit-dashboard/audit-dashboard';
+import { PaymentMetricsComponent } from './reports/payment-metrics/payment-metrics';
+import { ReportDownloadComponent } from './reports/report-download/report-download';
 
 export const routes: Routes = [
   // 1. Default route now forces the user to the login page
@@ -35,8 +39,13 @@ export const routes: Routes = [
       { path: 'history', component: PaymentHistoryComponent },
       { path: 'notifications', component: NotificationsComponent },
       { path: 'documents', component: DocumentsComponent },
+      { path: 'reports/revenue', component: RevenueDashboardComponent },
+      { path: 'reports/audit', component: AuditDashboardComponent },
+      { path: 'reports/payments', component: PaymentMetricsComponent },
+      { path: 'reports/download', component: ReportDownloadComponent },
       // Default child route redirects to dashboard inside the portal
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' } 
+      
     ]
   }
 ];
