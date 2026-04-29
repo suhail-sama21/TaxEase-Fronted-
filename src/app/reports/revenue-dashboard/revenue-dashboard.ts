@@ -24,27 +24,34 @@ export class RevenueDashboardComponent {
       { 
         data: [3.2, 3.8, 4.1, 3.1], 
         label: 'Collected ($M)', 
-        backgroundColor: '#2563eb', // Modern Blue
+        backgroundColor: '#2563eb', 
         borderRadius: 6
       },
       { 
         data: [3.5, 3.5, 4.0, 4.0], 
         label: 'Target ($M)', 
-        backgroundColor: '#cbd5e1', // Light Slate
+        backgroundColor: '#94a3b8', 
         borderRadius: 6
       }
     ]
   };
 
+  // FIX: Universal neutral colors for both themes
   public barChartOptions: ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { labels: { color: '#475569' } } // Slate-600 text
+      legend: { labels: { color: '#8b949e' } } 
     },
     scales: {
-      x: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } },
-      y: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } }
+      x: { 
+        grid: { color: 'rgba(139, 148, 158, 0.2)' },
+        ticks: { color: '#8b949e' } 
+      },
+      y: { 
+        grid: { color: 'rgba(139, 148, 158, 0.2)' }, 
+        ticks: { color: '#8b949e' } 
+      }
     }
   };
 
@@ -54,9 +61,8 @@ export class RevenueDashboardComponent {
     datasets: [
       {
         data: [8.5, 4.2, 1.5],
-        backgroundColor: ['#2563eb', '#38bdf8', '#fbbf24'], // Blue, Light Blue, Amber
-        borderColor: '#ffffff', // White border for clean cut
-        borderWidth: 3
+        backgroundColor: ['#2563eb', '#38bdf8', '#fbbf24'],
+        borderWidth: 0 
       }
     ]
   };
@@ -65,7 +71,7 @@ export class RevenueDashboardComponent {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { position: 'bottom', labels: { color: '#475569', padding: 20 } }
+      legend: { position: 'bottom', labels: { color: '#8b949e', padding: 20 } }
     },
     cutout: '75%' 
   };

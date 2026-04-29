@@ -22,7 +22,6 @@ export class ReportDownloadComponent {
     auditFindings: false
   };
 
-  // PUDHUSA ADD PANNATHU: Mock Data for Recent Reports Table
   recentReports = [
     { id: 'REP-0091', name: 'Q1 2026 Revenue Summary', category: 'Revenue', date: '2026-04-20', status: 'Ready', statusColor: 'green' },
     { id: 'REP-0092', name: 'Failed Transactions Log', category: 'Payments', date: '2026-04-18', status: 'Ready', statusColor: 'green' },
