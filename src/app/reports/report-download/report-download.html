@@ -1,34 +1,34 @@
 <div class="space-y-6 pb-8">
-  <div class="flex items-center justify-between bg-white p-6 rounded-2xl border border-slate-200 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
+  <div class="flex items-center justify-between bg-(--theme-card) p-6 rounded-2xl border border-(--theme-border)shadow-sm animate-in fade-in slide-in-from-top-4 transition-colors duration-300">
     <div class="flex items-center gap-4">
-      <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-2xl shadow-inner">📥</div>
+      <div class="w-12 h-12 bg-[#e3b341]/10 text-[#e3b341] rounded-xl flex items-center justify-center text-2xl shadow-inner transition-colors duration-300">📥</div>
       <div>
-        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Report Exports</h1>
-        <p class="text-sm text-slate-500 mt-0.5">Generate and download custom data extracts</p>
+        <h1 class="text-2xl font-bold text-(--theme-text) tracking-tight transition-colors duration-300">Report Exports</h1>
+        <p class="text-sm text-(--theme-muted) mt-0.5 transition-colors duration-300">Generate and download custom data extracts</p>
       </div>
     </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-2">
     
-    <div class="lg:col-span-1 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm h-fit hover:shadow-md transition-shadow duration-300">
-      <h2 class="text-base font-bold text-slate-800 mb-5">Generate New Report</h2>
+    <div class="lg:col-span-1 bg-(--theme-card) border border-(--theme-border) rounded-2xl p-6 shadow-sm h-fit hover:shadow-md transition-all duration-300">
+      <h2 class="text-base font-bold text-(--theme-text) mb-5 transition-colors duration-300">Generate New Report</h2>
       
       <form (ngSubmit)="downloadReport()">
         <div class="space-y-4 mb-5">
           <div>
-            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Start Date</label>
-            <input type="date" [(ngModel)]="startDate" name="startDate" required class="w-full bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-sm py-2.5 px-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            <label class="block text-xs font-semibold text-(--theme-muted) uppercase tracking-wide mb-2 transition-colors duration-300">Start Date</label>
+            <input type="date" [(ngModel)]="startDate" name="startDate" required class="w-full bg-(--theme-surface) border border-(--theme-border) rounded-lg text-(--theme-text) text-sm py-2.5 px-3 outline-none focus:ring-2 focus:ring-[#1f6feb] transition-colors duration-300 scheme-light dark:scheme-dark">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">End Date</label>
-            <input type="date" [(ngModel)]="endDate" name="endDate" required class="w-full bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-sm py-2.5 px-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            <label class="block text-xs font-semibold text-(--theme-muted) uppercase tracking-wide mb-2 transition-colors duration-300">End Date</label>
+            <input type="date" [(ngModel)]="endDate" name="endDate" required class="w-full bg-(--theme-surface) border border-(--theme-border) rounded-lg text-(--theme-text) text-sm py-2.5 px-3 outline-none focus:ring-2 focus:ring-[#1f6feb] transition-colors duration-300 scheme-light dark:scheme-dark">
           </div>
         </div>
 
         <div class="mb-5">
-          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Category</label>
-          <select [(ngModel)]="reportType" name="reportType" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-slate-900 text-sm py-2.5 px-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+          <label class="block text-xs font-semibold text-(--theme-muted) uppercase tracking-wide mb-2 transition-colors duration-300">Category</label>
+          <select [(ngModel)]="reportType" name="reportType" class="w-full bg-(--theme-surface) border border-(--theme-border) rounded-lg text-(--theme-text) text-sm py-2.5 px-3 outline-none focus:ring-2 focus:ring-[#1f6feb] transition-colors duration-300 cursor-pointer">
             <option value="Revenue">Revenue Analysis</option>
             <option value="Audit">Audit Compliance</option>
             <option value="Payments">Payment Gateway Stats</option>
@@ -36,28 +36,36 @@
         </div>
 
         <div class="mb-6">
-          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Include Metrics</label>
-          <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <label class="flex items-center gap-3 text-sm text-slate-700 cursor-pointer font-medium hover:text-blue-600 transition-colors"><input type="checkbox" [(ngModel)]="metrics.totalVolume" name="totalVolume" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"> Total Volume</label>
-            <label class="flex items-center gap-3 text-sm text-slate-700 cursor-pointer font-medium hover:text-blue-600 transition-colors"><input type="checkbox" [(ngModel)]="metrics.successRate" name="successRate" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"> Success Rates</label>
-            <label class="flex items-center gap-3 text-sm text-slate-700 cursor-pointer font-medium hover:text-blue-600 transition-colors"><input type="checkbox" [(ngModel)]="metrics.failureReasons" name="failureReasons" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"> Failure Reasons</label>
-            <label class="flex items-center gap-3 text-sm text-slate-700 cursor-pointer font-medium hover:text-blue-600 transition-colors"><input type="checkbox" [(ngModel)]="metrics.auditFindings" name="auditFindings" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"> Audit Discrepancies</label>
+          <label class="block text-xs font-semibold text-(--theme-muted) uppercase tracking-wide mb-3 transition-colors duration-300">Include Metrics</label>
+          <div class="space-y-3 bg-(--theme-surface) p-4 rounded-xl border border-(--theme-border) transition-colors duration-300">
+            <label class="flex items-center gap-3 text-sm text-(--theme-text) cursor-pointer font-medium hover:text-[#1f6feb] transition-colors duration-300">
+              <input type="checkbox" [(ngModel)]="metrics.totalVolume" name="totalVolume" class="w-4 h-4 text-[#1f6feb] rounded border-(--theme-border) focus:ring-[#1f6feb] bg-(--theme-bg) transition-colors duration-300"> Total Volume
+            </label>
+            <label class="flex items-center gap-3 text-sm text-(--theme-text) cursor-pointer font-medium hover:text-[#1f6feb] transition-colors duration-300">
+              <input type="checkbox" [(ngModel)]="metrics.successRate" name="successRate" class="w-4 h-4 text-[#1f6feb] rounded border-(--theme-border) focus:ring-[#1f6feb] bg-(--theme-bg) transition-colors duration-300"> Success Rates
+            </label>
+            <label class="flex items-center gap-3 text-sm text-(--theme-text) cursor-pointer font-medium hover:text-[#1f6feb] transition-colors duration-300">
+              <input type="checkbox" [(ngModel)]="metrics.failureReasons" name="failureReasons" class="w-4 h-4 text-[#1f6feb] rounded border-(--theme-border) focus:ring-[#1f6feb] bg-(--theme-bg) transition-colors duration-300"> Failure Reasons
+            </label>
+            <label class="flex items-center gap-3 text-sm text-(--theme-text) cursor-pointer font-medium hover:text-[#1f6feb] transition-colors duration-300">
+              <input type="checkbox" [(ngModel)]="metrics.auditFindings" name="auditFindings" class="w-4 h-4 text-[#1f6feb] rounded border-(--theme-border) focus:ring-[#1f6feb] bg-(--theme-bg) transition-colors duration-300"> Audit Discrepancies
+            </label>
           </div>
         </div>
 
-        <button type="submit" class="w-full bg-blue-600 text-white border-none rounded-lg px-4 py-3 text-sm font-semibold shadow-sm hover:bg-blue-700 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2">
+        <button type="submit" class="w-full bg-[#1f6feb] text-white border-none rounded-lg px-4 py-3 text-sm font-semibold shadow-sm hover:bg-[#0969da] hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2">
           Generate Data Extract ⚡
         </button>
       </form>
     </div>
 
-    <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl overflow-hidden h-fit shadow-sm hover:shadow-md transition-shadow duration-300">
-      <div class="px-6 py-5 border-b border-slate-200 bg-slate-50/50">
-        <span class="text-base font-bold text-slate-800">Recent Exports History</span>
+    <div class="lg:col-span-2 bg-(--theme-card) border border-(--theme-border) rounded-2xl overflow-hidden h-fit shadow-sm hover:shadow-md transition-all duration-300">
+      <div class="px-6 py-5 border-b border-(--theme-border) bg-(--theme-surface) transition-colors duration-300">
+        <span class="text-base font-bold text-(--theme-text) transition-colors duration-300">Recent Exports History</span>
       </div>
       
       <table class="w-full text-sm text-left">
-        <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-semibold border-b border-slate-200">
+        <thead class="bg-(--theme-surface) text-(--theme-muted) uppercase text-[11px] font-semibold border-b border-(--theme-border) transition-colors duration-300">
           <tr>
             <th class="px-6 py-3">Report ID</th>
             <th class="px-6 py-3">Name & Category</th>
@@ -66,29 +74,29 @@
             <th class="px-6 py-3 text-right">Action</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-100">
-          <tr *ngFor="let rep of recentReports" class="hover:bg-slate-50 transition-colors">
-            <td class="px-6 py-4 font-mono text-slate-500 text-xs">{{ rep.id }}</td>
+        <tbody class="divide-y divide-(--theme-border)">
+          <tr *ngFor="let rep of recentReports" class="hover:bg-(--theme-surface) transition-colors duration-300">
+            <td class="px-6 py-4 font-mono text-(--theme-muted) text-xs transition-colors duration-300">{{ rep.id }}</td>
             <td class="px-6 py-4">
-              <div class="font-bold text-slate-900">{{ rep.name }}</div>
-              <div class="text-xs font-medium text-slate-500 mt-0.5">{{ rep.category }}</div>
+              <div class="font-bold text-(--theme-text) transition-colors duration-300">{{ rep.name }}</div>
+              <div class="text-xs font-medium text-(--theme-muted) mt-0.5 transition-colors duration-300">{{ rep.category }}</div>
             </td>
-            <td class="px-6 py-4 text-slate-600 font-medium">{{ rep.date }}</td>
+            <td class="px-6 py-4 text-(--theme-muted) font-medium transition-colors duration-300">{{ rep.date }}</td>
             <td class="px-6 py-4">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border transition-colors duration-300"
                   [ngClass]="{
-                    'bg-emerald-100 text-emerald-800': rep.statusColor === 'green',
-                    'bg-blue-100 text-blue-800': rep.statusColor === 'blue',
-                    'bg-amber-100 text-amber-800': rep.statusColor === 'amber'
+                    'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/30': rep.statusColor === 'green',
+                    'bg-[#1f6feb]/10 text-[#1f6feb] border-[#1f6feb]/30': rep.statusColor === 'blue',
+                    'bg-[#e3b341]/10 text-[#e3b341] border-[#e3b341]/30': rep.statusColor === 'amber'
                   }">
                 {{ rep.status }}
               </span>
             </td>
             <td class="px-6 py-4 text-right">
-              <button *ngIf="rep.status === 'Ready'" class="bg-white border border-slate-300 text-slate-700 font-medium rounded-lg px-3 py-1.5 text-xs hover:bg-slate-50 hover:text-blue-600 transition-colors shadow-sm">
+              <button *ngIf="rep.status === 'Ready'" class="bg-transparent border border-(--theme-border) text-(--theme-text) font-medium rounded-lg px-3 py-1.5 text-xs hover:bg-(--theme-surface) hover:text-[#1f6feb] hover:border-[#1f6feb] transition-colors duration-300 shadow-sm">
                 Download CSV
               </button>
-              <span *ngIf="rep.status !== 'Ready'" class="text-xs text-slate-400 font-medium tracking-wide">PROCESSING...</span>
+              <span *ngIf="rep.status !== 'Ready'" class="text-xs text-(--theme-muted) font-medium tracking-wide opacity-80 transition-colors duration-300">PROCESSING...</span>
             </td>
           </tr>
         </tbody>
