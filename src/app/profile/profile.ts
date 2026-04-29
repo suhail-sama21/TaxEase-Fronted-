@@ -6,7 +6,8 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-profile',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './profile.html'
+  templateUrl: './profile.html',
+  styleUrls: ['./profile.css']
 })
 export class ProfileComponent {
   isSaving = false;
