@@ -34,7 +34,6 @@ export const routes: Routes = [
       { path: 'profile', component: ProfileComponent },
       { path: 'status', component: RegStatusComponent },
       { path: 'filings', component: MyFilingsComponent },
-      { path: 'filings/:id', component: MyFilingsComponent },
       { path: 'file-taxes', component: FileTaxesComponent },
       { path: 'payment', component: MakePaymentComponent },
       { path: 'history', component: PaymentHistoryComponent },
