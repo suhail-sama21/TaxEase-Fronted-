@@ -1,0 +1,344 @@
+/* Profile Component Animations & Styles */
+
+/* Fade-in animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Pulse animation for avatar */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Subtle float animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Glow animation for interactive elements */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(31, 111, 235, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(31, 111, 235, 0.5);
+  }
+}
+
+/* Success checkmark animation */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.5) rotateZ(-45deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotateZ(0deg);
+  }
+}
+
+/* Utility animation classes */
+.animate-fadeInDown {
+  animation: fadeInDown 0.6s ease-out;
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 0.6s ease-out;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.6s ease-out;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Staggered animation delays */
+.animate-fadeInUp[style*="animation-delay: 0.1s"] {
+  animation-delay: 0.1s;
+}
+
+.animate-fadeInUp[style*="animation-delay: 0.2s"] {
+  animation-delay: 0.2s;
+}
+
+/* Avatar badge animation */
+.absolute.-bottom-2.-right-2 {
+  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s backwards;
+}
+
+/* Input focus state with smooth transition */
+input:focus,
+select:focus,
+textarea:focus {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Group hover effects for enhanced UX */
+.group:hover input,
+.group:hover select,
+.group:hover textarea {
+  transition: all 0.3s ease;
+}
+
+/* Smooth theme transitions */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Button press effect */
+button:active {
+  transform: scale(0.98);
+}
+
+/* Card hover lift effect */
+.hover\:shadow-xl {
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+.hover\:shadow-xl:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Input validation states */
+input:valid,
+select:valid {
+  border-color: #3fb950;
+}
+
+input:invalid:not(:placeholder-shown),
+select:invalid:not(:placeholder-shown) {
+  border-color: #f85149;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--theme-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--theme-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-muted);
+}
+
+/* Smooth spin animation for loaders */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Ripple effect on button click */
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 100%;
+  transform: scale(1);
+  transform-origin: 50%;
+  pointer-events: none;
+}
+
+/* Enhanced form label styling */
+label {
+  display: block;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+/* Success icon visibility with animation */
+.group-focus-within svg.text-\[\#3fb950\] {
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Prevent layout shift on focus */
+input,
+select,
+textarea {
+  box-sizing: border-box;
+}
+
+/* Profile card gradient animation on hover */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.profile-card-hover {
+  background-size: 200% 200%;
+  background-position: 0% 50%;
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, background-position 0.3s ease-out;
+}
+
+.profile-card-hover:hover {
+  background-position: 100% 50%;
+}
+
+/* Enhanced section header styling */
+.px-8.py-6.border-b {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+/* Button group spacing */
+.flex.gap-3 button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.flex.gap-3 button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+/* Icon rotation on hover */
+.group-hover\/btn svg {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Password field security indicator */
+input[type="password"]::placeholder {
+  letter-spacing: 2px;
+}
+
+/* Accessibility: Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark mode specific styles (already supported via CSS variables) */
+:root.dark-mode {
+  --theme-bg: #0d1117;
+  --theme-surface: #161b22;
+  --theme-card: #1c2128;
+  --theme-border: #30363d;
+  --theme-text: #c9d1d9;
+  --theme-muted: #8b949e;
+}
+
+/* Light mode styles */
+:root {
+  --theme-bg: #ffffff;
+  --theme-surface: #f6f8fa;
+  --theme-card: #ffffff;
+  --theme-border: #d0d7de;
+  --theme-text: #24292f;
+  --theme-muted: #57606a;
+}
+
+/* Profile container smooth transitions */
+.min-h-screen {
+  transition: background-color 0.3s ease;
+}
+
+/* Sticky header shadow on scroll */
+.sticky.top-0 {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Focus visible outline for accessibility */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #1f6feb;
+  outline-offset: 2px;
+}

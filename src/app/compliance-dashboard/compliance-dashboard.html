@@ -1,0 +1,268 @@
+<div class="max-w-[1400px] mx-auto animate-fade-in">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-[var(--theme-text)] transition-colors duration-300 mb-1">
+        Compliance Dashboard
+      </h1>
+      <p class="text-[13px] text-[var(--theme-muted)] transition-colors duration-300">
+        Overview of taxpayer compliance and policy adherence · FY 2026
+      </p>
+    </div>
+    <button
+      (click)="runNewCheck()"
+      class="bg-transparent text-[var(--theme-text)] font-medium text-[13px] hover:text-[#1f6feb] transition-colors duration-300 flex items-center gap-2"
+    >
+      + New Check ↗
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
+    <div
+      class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl p-5 relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-[#e3b341]"
+    >
+      <div class="flex justify-between items-start mb-2">
+        <div
+          class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300 uppercase tracking-wider font-semibold"
+        >
+          Total Checks (YTD)
+        </div>
+        <div class="text-[var(--theme-muted)] transition-colors duration-300">📄</div>
+      </div>
+      <div class="text-3xl font-bold text-[var(--theme-text)] transition-colors duration-300 mb-2">
+        {{ metrics.totalChecks | number }}
+      </div>
+      <div class="text-[12px] text-[#3fb950] flex items-center gap-1">
+        <span>▲</span> 14% since last quarter
+      </div>
+    </div>
+
+    <div
+      class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl p-5 relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-[#1f6feb]"
+    >
+      <div class="flex justify-between items-start mb-2">
+        <div
+          class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300 uppercase tracking-wider font-semibold"
+        >
+          Pending Reviews
+        </div>
+        <div class="text-[#e3b341]">⏳</div>
+      </div>
+      <div class="text-3xl font-bold text-[var(--theme-text)] transition-colors duration-300 mb-2">
+        {{ metrics.pendingReviews }}
+      </div>
+      <div
+        class="text-[12px] text-[var(--theme-muted)] transition-colors duration-300 flex items-center gap-1"
+      >
+        <span>—</span> Requires officer attention
+      </div>
+    </div>
+
+    <div
+      class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl p-5 relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-[#f85149]"
+    >
+      <div class="flex justify-between items-start mb-2">
+        <div
+          class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300 uppercase tracking-wider font-semibold"
+        >
+          Non-Compliant
+        </div>
+        <div class="text-[#f85149]">⚠</div>
+      </div>
+      <div class="text-3xl font-bold text-[var(--theme-text)] transition-colors duration-300 mb-2">
+        {{ metrics.nonCompliant }}
+      </div>
+      <div class="text-[12px] text-[#f85149] flex items-center gap-1">
+        <span>▲</span> Active violations found
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+    <button
+      class="bg-[var(--theme-card)] border border-[var(--theme-border)] hover:border-[var(--theme-muted)] transition-colors duration-300 rounded-xl p-4 flex items-center gap-4 text-left"
+    >
+      <div
+        class="w-8 h-8 rounded bg-[var(--theme-surface)] transition-colors duration-300 flex items-center justify-center text-[16px]"
+      >
+        📊
+      </div>
+      <div>
+        <div
+          class="text-[13px] font-bold text-[var(--theme-text)] transition-colors duration-300 mb-0.5"
+        >
+          Generate Report
+        </div>
+        <div class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300">
+          Export compliance data
+        </div>
+      </div>
+    </button>
+    <button
+      class="bg-[var(--theme-card)] border border-[var(--theme-border)] hover:border-[var(--theme-muted)] transition-colors duration-300 rounded-xl p-4 flex items-center gap-4 text-left"
+    >
+      <div
+        class="w-8 h-8 rounded bg-[var(--theme-surface)] transition-colors duration-300 flex items-center justify-center text-[16px]"
+      >
+        ⚖
+      </div>
+      <div>
+        <div
+          class="text-[13px] font-bold text-[var(--theme-text)] transition-colors duration-300 mb-0.5"
+        >
+          Review Policies
+        </div>
+        <div class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300">
+          Update rule engine
+        </div>
+      </div>
+    </button>
+    <button
+      class="bg-[var(--theme-card)] border border-[var(--theme-border)] hover:border-[var(--theme-muted)] transition-colors duration-300 rounded-xl p-4 flex items-center gap-4 text-left"
+    >
+      <div
+        class="w-8 h-8 rounded bg-[var(--theme-surface)] transition-colors duration-300 flex items-center justify-center text-[16px]"
+      >
+        ✉
+      </div>
+      <div>
+        <div
+          class="text-[13px] font-bold text-[var(--theme-text)] transition-colors duration-300 mb-0.5"
+        >
+          Send Notices
+        </div>
+        <div class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300">
+          Alert non-compliant users
+        </div>
+      </div>
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+    <div
+      class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl overflow-hidden shadow-sm h-fit"
+    >
+      <div
+        class="px-5 py-4 border-b border-[var(--theme-border)] transition-colors duration-300 flex items-center justify-between"
+      >
+        <span class="text-[15px] font-bold text-[var(--theme-text)] transition-colors duration-300"
+          >Recent Compliance Checks</span
+        >
+        <button
+          class="text-[12px] text-[var(--theme-text)] hover:text-[#1f6feb] transition-colors duration-300 font-medium"
+        >
+          View all →
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-[13px] whitespace-nowrap">
+          <thead>
+            <tr class="border-b border-[var(--theme-border)] transition-colors duration-300">
+              <th
+                class="py-3 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
+              >
+                Record ID
+              </th>
+              <th
+                class="py-3 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
+              >
+                Taxpayer
+              </th>
+              <th
+                class="py-3 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
+              >
+                Type
+              </th>
+              <th
+                class="py-3 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
+              >
+                Date
+              </th>
+              <th
+                class="py-3 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
+              >
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[var(--theme-border)] transition-colors duration-300">
+            <tr
+              *ngFor="let check of recentChecks"
+              class="hover:bg-[var(--theme-surface)] transition-colors duration-300"
+            >
+              <td
+                class="py-4 px-5 font-mono text-[12px] text-[var(--theme-text)] transition-colors duration-300"
+              >
+                {{ check.id }}
+              </td>
+              <td class="py-4 px-5">
+                <div class="font-medium text-[var(--theme-text)] transition-colors duration-300">
+                  {{ check.taxpayer }}
+                </div>
+                <div
+                  class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300 font-mono"
+                >
+                  {{ check.taxpayerId }}
+                </div>
+              </td>
+              <td class="py-4 px-5 text-[var(--theme-text)] transition-colors duration-300">
+                {{ check.type }}
+              </td>
+              <td class="py-4 px-5 text-[var(--theme-muted)] transition-colors duration-300">
+                {{ check.date }}
+              </td>
+              <td class="py-4 px-5">
+                <span
+                  class="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border font-medium transition-colors duration-300"
+                  [ngClass]="{
+                    'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/20':
+                      check.statusColor === 'green',
+                    'bg-[#e3b341]/10 text-[#e3b341] border-[#e3b341]/20':
+                      check.statusColor === 'amber',
+                    'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/20':
+                      check.statusColor === 'red',
+                  }"
+                >
+                  {{ check.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-6">
+      <div
+        class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl overflow-hidden shadow-sm"
+      >
+        <div
+          class="px-5 py-4 border-b border-[var(--theme-border)] transition-colors duration-300 flex items-center justify-between"
+        >
+          <span
+            class="text-[14px] font-bold text-[var(--theme-text)] transition-colors duration-300"
+            >System Health Score</span
+          >
+          <span class="text-[18px] font-bold text-[#3fb950]">94%</span>
+        </div>
+        <div class="p-5">
+          <p class="text-[12px] text-[var(--theme-muted)] transition-colors duration-300 mb-4">
+            Overall taxpayer compliance rate based on recent audits and automated checks.
+          </p>
+
+          <div
+            class="w-full bg-[var(--theme-bg)] transition-colors duration-300 rounded-full h-2 mb-2 overflow-hidden border border-[var(--theme-border)]"
+          >
+            <div class="bg-[#3fb950] h-2 rounded-full" style="width: 94%"></div>
+          </div>
+          <div
+            class="flex justify-between text-[11px] text-[var(--theme-muted)] transition-colors duration-300"
+          >
+            <span>0%</span>
+            <span>Target: 95%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

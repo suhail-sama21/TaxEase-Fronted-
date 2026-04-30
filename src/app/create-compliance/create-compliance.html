@@ -1,0 +1,158 @@
+<div class="max-w-4xl mx-auto animate-fade-in pb-10">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-[var(--theme-text)] transition-colors duration-300 mb-1">
+      Create Compliance Record
+    </h1>
+    <p class="text-[13px] text-[var(--theme-muted)] transition-colors duration-300">
+      Create a compliance check for either a tax filing or a payment.
+    </p>
+  </div>
+
+  <div
+    class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl overflow-hidden shadow-sm"
+  >
+    <div class="p-8">
+      <!-- Accent Info Box: Retains the primary blue accent but updates text to theme variables -->
+      <div
+        class="mb-8 p-4 bg-[#1f6feb]/10 border border-[#1f6feb]/20 rounded-lg text-[12px] text-[var(--theme-text)] transition-colors duration-300 leading-relaxed border-dashed"
+      >
+        Backend rule: if type is
+        <span class="font-bold text-[var(--theme-text)] transition-colors duration-300">Filing</span
+        >, filing ID is required and payment ID must be empty. If type is
+        <span class="font-bold text-[var(--theme-text)] transition-colors duration-300"
+          >Payment</span
+        >, payment ID is required and filing ID must be empty.
+      </div>
+
+      <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="col-span-2">
+          <label
+            class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2"
+            >Taxpayer ID <span class="text-[#f85149]">*</span></label
+          >
+          <input
+            type="text"
+            [(ngModel)]="formData.taxpayerId"
+            placeholder="Enter taxpayer ID, e.g. 1"
+            class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] px-4 py-2.5 outline-none focus:border-[#1f6feb] transition-colors duration-300"
+          />
+          <p class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300 mt-1.5">
+            This will be verified through taxpayer service.
+          </p>
+        </div>
+
+        <div>
+          <label
+            class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2"
+            >Compliance Type <span class="text-[#f85149]">*</span></label
+          >
+          <select
+            [(ngModel)]="formData.complianceType"
+            (change)="onTypeChange()"
+            aria-label="Compliance Type"
+            class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-2.5 outline-none focus:border-[#1f6feb] cursor-pointer appearance-none transition-colors duration-300"
+          >
+            <option value="" disabled selected>Select type</option>
+            <option value="Filing">Filing</option>
+            <option value="Payment">Payment</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2"
+            >Result <span class="text-[#f85149]">*</span></label
+          >
+          <select
+            [(ngModel)]="formData.result"
+            aria-label="Result"
+            class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-2.5 outline-none focus:border-[#1f6feb] cursor-pointer appearance-none transition-colors duration-300"
+          >
+            <option value="" disabled selected>Select result</option>
+            <option value="Compliant">Compliant</option>
+            <option value="Non-Compliant">Non-Compliant</option>
+            <option value="Pending">Pending</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2"
+            [class.text-[var(--theme-muted)]]="formData.complianceType !== 'Filing'"
+            >Filing ID</label
+          >
+          <input
+            type="text"
+            [(ngModel)]="formData.filingId"
+            [disabled]="formData.complianceType !== 'Filing'"
+            placeholder="Required only for Filing type"
+            class="w-full border rounded-lg text-[var(--theme-text)] text-[13px] px-4 py-2.5 outline-none transition-colors duration-300"
+            [ngClass]="
+              formData.complianceType === 'Filing'
+                ? 'bg-[var(--theme-bg)] border-[var(--theme-border)] focus:border-[#1f6feb]'
+                : 'bg-[var(--theme-surface)] border-[var(--theme-border)] text-[var(--theme-muted)] cursor-not-allowed opacity-60'
+            "
+          />
+        </div>
+
+        <div>
+          <label
+            class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2"
+            [class.text-[var(--theme-muted)]]="formData.complianceType !== 'Payment'"
+            >Payment ID</label
+          >
+          <input
+            type="text"
+            [(ngModel)]="formData.paymentId"
+            [disabled]="formData.complianceType !== 'Payment'"
+            placeholder="Required only for Payment type"
+            class="w-full border rounded-lg text-[var(--theme-text)] text-[13px] px-4 py-2.5 outline-none transition-colors duration-300"
+            [ngClass]="
+              formData.complianceType === 'Payment'
+                ? 'bg-[var(--theme-bg)] border-[var(--theme-border)] focus:border-[#1f6feb]'
+                : 'bg-[var(--theme-surface)] border-[var(--theme-border)] text-[var(--theme-muted)] cursor-not-allowed opacity-60'
+            "
+          />
+        </div>
+
+        <div class="col-span-2">
+          <label
+            class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2"
+            >Notes</label
+          >
+          <textarea
+            [(ngModel)]="formData.notes"
+            rows="4"
+            placeholder="Enter compliance notes or reason..."
+            class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] px-4 py-3 outline-none focus:border-[#1f6feb] placeholder-[var(--theme-muted)] resize-y transition-colors duration-300"
+          ></textarea>
+        </div>
+      </div>
+
+      <div
+        class="flex items-center justify-end gap-3 pt-6 border-t border-[var(--theme-border)] transition-colors duration-300"
+      >
+        <button
+          (click)="cancel()"
+          class="px-6 py-2 border border-[var(--theme-border)] rounded-lg text-[13px] font-medium text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors duration-300"
+        >
+          Cancel
+        </button>
+        <!-- Primary call to action retains brand accent color but gains the transition class -->
+        <button
+          (click)="createRecord()"
+          [disabled]="!isFormValid()"
+          class="bg-[#1f6feb] hover:bg-[#388bfd] text-white rounded-lg px-6 py-2 text-[13px] font-medium transition-all duration-300 shadow-lg shadow-blue-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Create Record
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer
+    class="text-center text-[var(--theme-muted)] transition-colors duration-300 text-[12px] mt-8"
+  >
+    TaxEase © 2026 — Public Tax Filing System
+  </footer>
+</div>

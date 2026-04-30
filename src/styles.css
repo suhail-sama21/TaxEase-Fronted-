@@ -2,9 +2,29 @@
 
 @import 'tailwindcss';
 
-html, body {
-  height: 100%;
+:root {
+  --theme-bg: #f9fafb;       /* Light gray app background */
+  --theme-surface: #ffffff;  /* White sidebar/header */
+  --theme-card: #ffffff;     /* White cards */
+  --theme-border: #e5e7eb;   /* Light gray borders */
+  --theme-text: #111827;     /* Almost black text */
+  --theme-muted: #6b7280;    /* Gray text */
+}
+
+/* 2. DARK MODE COLORS */
+.dark-mode {
+  --theme-bg: #080c12;       /* Very dark app background */
+  --theme-surface: #0d1117;  /* Slightly lighter sidebar */
+  --theme-card: #161b22;     /* Dark card background */
+  --theme-border: #30363d;   /* Dark border */
+  --theme-text: #e6edf3;     /* Off-white text */
+  --theme-muted: #8b949e;    /* Dark gray text */
+}
+
+/* Base body styling */
+body {
+  background-color: var(--theme-bg);
+  color: var(--theme-text);
   margin: 0;
-  background-color: #080c12; /* Fallback dark mode background */
-  color: #e6edf3;
+  height: 100%;
 }
