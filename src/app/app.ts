@@ -12,7 +12,7 @@ import { ComplianceDashboard } from './compliance-dashboard/compliance-dashboard
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, AuditCasesComponent],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrls: ['./app.css'],
 })
