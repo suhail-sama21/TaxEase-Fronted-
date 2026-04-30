@@ -3,11 +3,19 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
+<<<<<<< HEAD
+<<<<<<< HEAD
+    "analytics": "9e8f7609-4b63-463b-8ffc-5265ad3edd9c"
+=======
+    "analytics": "32a14a08-bb79-4232-a5dc-0ec91f68896f"
+>>>>>>> 4c4f9bfc0d0f57dddabee32cb4d4f5be7785b51e
+=======
 <<<<<<< Updated upstream
     "analytics": "32a14a08-bb79-4232-a5dc-0ec91f68896f"
 =======
     "analytics": "a1a90877-2c86-49f1-8352-62697fd11e01"
 >>>>>>> Stashed changes
+>>>>>>> a520e1d5c743c22901e54dd82da55f78c319bccd
   },
   "newProjectRoot": "projects",
   "projects": {
