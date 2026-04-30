@@ -145,11 +145,6 @@
             <th
               class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
             >
-              Priority
-            </th>
-            <th
-              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
-            >
               Status
             </th>
             <th
@@ -192,16 +187,7 @@
             <td class="py-3 px-5 text-[var(--theme-text)] transition-colors duration-300">
               {{ audit.type }}
             </td>
-            <td
-              class="py-3 px-5 font-medium transition-colors duration-300"
-              [ngClass]="{
-                'text-[#f85149]': audit.priority === 'High',
-                'text-[#e3b341]': audit.priority === 'Medium',
-                'text-[var(--theme-muted)]': audit.priority === 'Low',
-              }"
-            >
-              {{ audit.priority }}
-            </td>
+
             <td class="py-3 px-5">
               <span
                 class="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border font-medium transition-colors duration-300"

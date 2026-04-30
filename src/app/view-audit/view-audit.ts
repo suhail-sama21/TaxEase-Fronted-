@@ -46,6 +46,10 @@ export class ViewAuditComponent {
     alert(`Opening edit modal for Audit ID: ${this.auditData.id}`);
   }
 
+  exportPdf() {
+    window.print();
+  }
+
   // --- NEW: Closing Methods ---
 
   // Toggles the closing form
