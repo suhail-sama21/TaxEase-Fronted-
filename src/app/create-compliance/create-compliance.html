@@ -23,7 +23,13 @@
           >Payment</span
         >, payment ID is required and filing ID must be empty.
       </div>
-
+      <!-- Display error messages from the backend -->
+      <div
+        *ngIf="errorMessage"
+        class="mb-6 p-4 bg-[#f85149]/10 border border-[#f85149]/20 rounded-lg text-[13px] text-[#f85149] flex items-center gap-2 transition-colors duration-300"
+      >
+        <span class="font-bold">Error:</span> {{ errorMessage }}
+      </div>
       <div class="grid grid-cols-2 gap-6 mb-6">
         <div class="col-span-2">
           <label
@@ -141,10 +147,10 @@
         <!-- Primary call to action retains brand accent color but gains the transition class -->
         <button
           (click)="createRecord()"
-          [disabled]="!isFormValid()"
+          [disabled]="!isFormValid() || isLoading"
           class="bg-[#1f6feb] hover:bg-[#388bfd] text-white rounded-lg px-6 py-2 text-[13px] font-medium transition-all duration-300 shadow-lg shadow-blue-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Create Record
+          {{ isLoading ? 'Creating...' : 'Create Record' }}
         </button>
       </div>
     </div>
