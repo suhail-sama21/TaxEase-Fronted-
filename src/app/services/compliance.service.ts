@@ -13,7 +13,7 @@ import {
   providedIn: 'root',
 })
 export class ComplianceService {
-  private apiUrl = 'http://localhost:8080/api/compliance';
+  private apiUrl = 'http://localhost:8088/api/compliance';
 
   constructor(private http: HttpClient) {}
 
