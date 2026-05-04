@@ -2,27 +2,24 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
- 
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
-  let localStorageToken = localStorage.getItem('token');
- 
-  let parsedToken;
-  if (localStorageToken) {
-    parsedToken= JSON.parse(localStorageToken);
-    console.log(parsedToken)
-  }
- 
+
+  // Grab the raw token string directly from local storage
+  const token = localStorage.getItem('token');
+
   let authReq = req;
- 
-  if (parsedToken) {
+
+  // If the token exists, attach it to the Authorization header
+  if (token) {
     authReq = req.clone({
       setHeaders: {
-        Authorization: `Bearer ${parsedToken}`,
+        Authorization: `Bearer ${token}`,
       },
     });
   }
- 
+
   return next(authReq).pipe(
     catchError((error) => {
       if (error.status === 401 || error.status === 403) {
@@ -33,5 +30,3 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     }),
   );
 };
- 
- 
