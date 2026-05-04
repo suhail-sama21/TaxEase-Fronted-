@@ -19,7 +19,7 @@ interface User{
 })
 export class UserService {
   constructor(private http: HttpClient){}
-  apiURL = environment.apiUrl + "/users";
+  apiURL = 'http://localhost:8081/api/users'
 
   
   getUser(sub: string): Observable<User>{
