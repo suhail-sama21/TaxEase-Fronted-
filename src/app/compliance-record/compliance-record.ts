@@ -1,35 +1,55 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ComplianceService } from '../services/compliance.service';
+import { ComplianceResponse, UpdateComplianceRequest } from '../models/compliance.model';
 
 @Component({
   selector: 'app-compliance-record',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './compliance-record.html'
+  templateUrl: './compliance-record.html',
 })
-export class ComplianceRecordComponent {
+export class ComplianceRecordComponent implements OnInit {
+  records: ComplianceResponse[] = [];
 
-  // Mock data matching the screenshot's table
-  records = [
-    { id: 'CMP-1042', filingId: 'FIL-2026-089', taxpayer: 'Acme Corp', type: 'Filing', status: 'Compliant', statusColor: 'green', date: '2026-03-01' },
-    { id: 'CMP-1043', filingId: 'FIL-2026-088', taxpayer: 'John Doe', type: 'Payment', status: 'Non-Compliant', statusColor: 'red', date: '2026-03-02' },
-    { id: 'CMP-1044', filingId: 'FIL-2026-085', taxpayer: 'TechFlow LLC', type: 'Filing', status: 'Pending', statusColor: 'amber', date: '2026-03-03' }
-  ];
-
-  // State for the update form
-  selectedRecord: any = null;
-  updateData = {
-    status: '',
-    notes: ''
+  selectedRecord: ComplianceResponse | null = null;
+  updateData: UpdateComplianceRequest = {
+    result: '',
+    notes: '',
   };
+  isLoading = false;
 
-  // Triggered when clicking "Update" in the table
-  selectForUpdate(record: any) {
+  // Inject the service
+  constructor(private complianceService: ComplianceService) {}
+
+  // Fetch data automatically when the page loads
+  ngOnInit(): void {
+    this.loadRecords();
+  }
+
+  loadRecords() {
+    this.complianceService.getAllCompliance().subscribe({
+      next: (data) => {
+        this.records = data;
+      },
+      error: (err) => console.error('Failed to load records:', err),
+    });
+  }
+
+  // Utility method to dynamically assign colors based on the DB result
+  getStatusColor(result: string): string {
+    if (result === 'Compliant') return 'green';
+    if (result === 'Non-Compliant') return 'red';
+    return 'amber'; // Pending or default
+  }
+
+  selectForUpdate(record: ComplianceResponse) {
     this.selectedRecord = record;
-    this.updateData = { status: record.status, notes: '' };
+    // Pre-fill the form with existing data
+    this.updateData = { result: record.result, notes: record.notes || '' };
 
-    // Smooth scroll to the update form
+    // Smooth scroll to the form
     setTimeout(() => {
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }, 100);
@@ -40,17 +60,28 @@ export class ComplianceRecordComponent {
   }
 
   saveUpdate() {
-    if (this.selectedRecord && this.updateData.status) {
-      // Update the mock data state
-      this.selectedRecord.status = this.updateData.status;
+    if (this.selectedRecord && this.updateData.result) {
+      this.isLoading = true;
 
-      // Map the color based on the new status
-      if (this.updateData.status === 'Compliant') this.selectedRecord.statusColor = 'green';
-      else if (this.updateData.status === 'Non-Compliant') this.selectedRecord.statusColor = 'red';
-      else this.selectedRecord.statusColor = 'amber';
+      // Make the API PUT call
+      this.complianceService.updateCompliance(this.selectedRecord.id, this.updateData).subscribe({
+        next: (updatedRecord) => {
+          // Update the local array so the UI refreshes instantly without reloading the page
+          const index = this.records.findIndex((r) => r.id === updatedRecord.id);
+          if (index !== -1) {
+            this.records[index] = updatedRecord;
+          }
 
-      alert(`Successfully updated status for ${this.selectedRecord.id}`);
-      this.selectedRecord = null; // Close the form
+          alert(`Successfully updated status for Record ID: ${updatedRecord.id}`);
+          this.selectedRecord = null; // Close the form
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Failed to update record:', err);
+          alert('Error updating record.');
+          this.isLoading = false;
+        },
+      });
     }
   }
 }

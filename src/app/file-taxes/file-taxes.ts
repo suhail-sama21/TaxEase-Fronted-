@@ -2,12 +2,13 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TaxFilingService } from '../service/tax-filing.service'; // Ensure this path is correct
 
 // Interface matching com.cognizant.taxFilingService.dto.requestdto.TaxFilingRequestDTO
 export interface TaxFilingRequestDTO {
   taxpayerId: number;
   period: string;
-  amountDeclared: number; // Maps to BigDecimal in Java
+  amountDeclared: number;
 }
 
 @Component({
@@ -31,7 +32,7 @@ export class FileTaxesComponent {
     other: null as number | null
   };
 
-  // Constants to match Backend constraints (Regex: ^FY\d{4}-\d{2}$)
+  // Constants to match Backend constraints
   readonly taxpayerId = 987654321;
   readonly period = "FY2025-26";
 
@@ -40,7 +41,11 @@ export class FileTaxesComponent {
     accuracy: false
   };
 
-  constructor(private router: Router) {}
+  // Inject the service in the constructor
+  constructor(
+    private router: Router,
+    private taxFilingService: TaxFilingService
+  ) {}
 
   // Calculation for the amountDeclared field
   get taxableIncome(): number {
@@ -51,7 +56,7 @@ export class FileTaxesComponent {
   }
 
   get taxDue(): number {
-    return this.taxableIncome * 0.10; // 10% Flat Rate logic
+    return this.taxableIncome * 0.10;
   }
 
   nextStep() {
@@ -62,10 +67,10 @@ export class FileTaxesComponent {
     if (this.currentStep > 1) this.currentStep--;
   }
 
+  // FIXED: Single, clean method calling the backend service
   submitFiling() {
     this.isSubmitting = true;
 
-    // Construct the DTO for the Backend API
     const filingRequest: TaxFilingRequestDTO = {
       taxpayerId: this.taxpayerId,
       period: this.period,
@@ -74,16 +79,26 @@ export class FileTaxesComponent {
 
     console.log("Submitting to /api/filings/submit:", filingRequest);
 
-    // Simulate the TaxFilingController response
-    setTimeout(() => {
-      this.isSubmitting = false;
-      this.generatedFilingId = Math.floor(Math.random() * 5000) + 100;
-      this.filingStatus = "Pending"; // Default status from Entity
-      this.currentStep = 5;
-    }, 1500);
+    this.taxFilingService.submitFiling(filingRequest).subscribe({
+      next: (res) => {
+        // 'res' here is the TaxFilingResponseDTO from your Java Backend
+        this.generatedFilingId = res.id;
+        this.filingStatus = res.status;
+        this.currentStep = 5; // Move to the success step
+        this.isSubmitting = false;
+      },
+      error: (err) => {
+        console.error("Submission failed:", err);
+        this.isSubmitting = false;
+        alert("There was an error submitting your taxes. Please check the console.");
+      }
+    });
   }
 
   goToPayment() {
-    this.router.navigate(['/payment']);
+    // Navigating to the payment route with the generated ID
+    this.router.navigate(['/portal/payment'], {
+      queryParams: { id: this.generatedFilingId, amount: this.taxDue }
+    });
   }
 }
