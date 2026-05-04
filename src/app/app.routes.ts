@@ -20,14 +20,14 @@ import { ReportDownloadComponent } from './reports/report-download/report-downlo
 export const routes: Routes = [
   // 1. Default route now forces the user to the login page
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-  
+
   // 2. Public auth routes
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
-  
+
   // 3. Protected App Routes (Wrapped in a 'portal' path)
-  { 
-    path: 'portal', 
+  {
+    path: 'portal',
     component: LayoutComponent,
     children: [
       { path: 'dashboard', component: DashboardComponent },
@@ -35,7 +35,7 @@ export const routes: Routes = [
       { path: 'status', component: RegStatusComponent },
       { path: 'filings', component: MyFilingsComponent },
       { path: 'file-taxes', component: FileTaxesComponent },
-      { path: 'payment', component: MakePaymentComponent }, 
+      { path: 'payment', component: MakePaymentComponent },
       { path: 'history', component: PaymentHistoryComponent },
       { path: 'notifications', component: NotificationsComponent },
       { path: 'documents', component: DocumentsComponent },
@@ -44,8 +44,8 @@ export const routes: Routes = [
       { path: 'reports/payments', component: PaymentMetricsComponent },
       { path: 'reports/download', component: ReportDownloadComponent },
       // Default child route redirects to dashboard inside the portal
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' } 
-      
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+
     ]
   }
 ];

@@ -32,12 +32,15 @@
         />
       </div>
 
-      <button 
-        type="submit" 
-        [disabled]="isLoading"
-        class="w-full bg-[#1f6feb] hover:bg-[#0969da] text-white rounded-lg py-3 text-sm font-medium transition-all duration-300 mt-2 disabled:opacity-70">
-        {{ isLoading ? 'Signing in...' : 'Login' }}
-      </button>
+     <button 
+       type="submit" 
+       [disabled]="(isLoading$ | async)"
+       class="w-full bg-[#1f6feb] hover:bg-[#0969da] text-white rounded-lg py-3 text-sm font-medium transition-all duration-300 mt-2 disabled:opacity-70">
+       {{ (isLoading$ | async) ? 'Signing in...' : 'Login' }}
+     </button>
+     <div *ngIf="error$ | async as errorMessage" class="text-[#f85149] text-xs mt-2 transition-colors duration-300">
+       {{ errorMessage }}
+     </div>
     </form>
 
     <div class="text-center mt-4">

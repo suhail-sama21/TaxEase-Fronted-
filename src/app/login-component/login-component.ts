@@ -1,8 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-//
+import { RouterModule } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { selectError, selectIsLoading } from '../stores/authStore/auth.features';
+
+import * as AuthActions from '../stores/authStore/auth.action';
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -11,14 +15,16 @@ import { Router, RouterModule } from '@angular/router';
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);
-  private router = inject(Router);
+  private store = inject(Store); // Inject the NgRx Store instead of the Router
 
   loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
-  isLoading = false;
+  // Tap into the NgRx Store state as Observables
+  isLoading$ = this.store.select(selectIsLoading);
+  error$ = this.store.select(selectError);
 
   onSubmit() {
     if (this.loginForm.invalid) {
@@ -26,15 +32,13 @@ export class LoginComponent {
       return;
     }
 
-    this.isLoading = true;
-    const payload = this.loginForm.value;
-    
-    // Simulate API call to backend
-    console.log('Sending to AuthController:', payload);
-    setTimeout(() => {
-      this.isLoading = false;
-      this.router.navigate(['/portal/dashboard']);
-    }, 1000);
+    const formData = this.loginForm.value;
+
+    console.log(formData)
+
+    // Dispatch the Login Action!
+    // The AuthEffects will catch this, call the backend, and handle the redirect automatically.
+    this.store.dispatch(AuthActions.login({credentials: formData }));
   }
 
   quickLogin(role: string) {
@@ -43,11 +47,13 @@ export class LoginComponent {
       admin: 'admin@taxease.gov',
       auditor: 'auditor@taxease.gov'
     };
-    
+
     this.loginForm.patchValue({
       email: emails[role],
       password: 'demoPassword123'
     });
+
+    // Trigger the submission with the patched values
     this.onSubmit();
   }
 }
