@@ -33,9 +33,9 @@ export class LoginComponent {
     }
 
     const formData = this.loginForm.value;
-   
+
     console.log(formData)
-    
+
     // Dispatch the Login Action!
     // The AuthEffects will catch this, call the backend, and handle the redirect automatically.
     this.store.dispatch(AuthActions.login({credentials: formData }));
@@ -47,12 +47,12 @@ export class LoginComponent {
       admin: 'admin@taxease.gov',
       auditor: 'auditor@taxease.gov'
     };
-    
+
     this.loginForm.patchValue({
       email: emails[role],
       password: 'demoPassword123'
     });
-    
+
     // Trigger the submission with the patched values
     this.onSubmit();
   }
