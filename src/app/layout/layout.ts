@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
   selector: 'app-layout',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './layout.html'
+  templateUrl: './layout.html',
 })
 export class LayoutComponent {
   // Hardcoded for now, but you will later populate this from your IdentityService
@@ -33,6 +33,12 @@ export class LayoutComponent {
     { label: 'Revenue Dashboard', route: '/portal/reports/revenue', icon: 'chart-icon' },
     { label: 'Audit Dashboard', route: '/portal/reports/audit', icon: 'shield-icon' },
     { label: 'Payment Analytics', route: '/portal/reports/payments', icon: 'pay-icon' },
-    { label: 'Report Exports', route: '/portal/reports/download', icon: 'download-icon' }
+    { label: 'Report Exports', route: '/portal/reports/download', icon: 'download-icon' },
+    { label: 'Compliance Hub', route: '/portal/compliance-dashboard', icon: 'shield-icon' },
+    { label: 'Compliance Records', route: '/portal/compliance-records', icon: 'folder-icon' },
+    { label: 'Create Record', route: '/portal/create-compliance', icon: 'plus-icon' },
+    { label: 'Audit Cases', route: '/portal/audit-cases', icon: 'search-icon' },
+    { label: 'Create Audit', route: '/portal/create-audit', icon: 'plus-circle-icon' },
+    { label: 'View Audit', route: '/portal/view-audit', icon: 'plus-square-icon' },
   ];
 }

@@ -1,0 +1,232 @@
+<div class="max-w-[1400px] mx-auto animate-fade-in pb-10">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-[var(--theme-text)] transition-colors duration-300 mb-1">
+        Audit Cases
+      </h1>
+      <p class="text-[13px] text-[var(--theme-muted)] transition-colors duration-300">
+        Manage and track all audit cases
+      </p>
+    </div>
+    <!-- Primary action button using accent colors -->
+    <button
+      (click)="createNewAudit()"
+      class="bg-[#1f6feb] hover:bg-[#388bfd] text-white rounded-lg px-4 py-2.5 text-[13px] font-semibold transition-colors duration-300 flex items-center gap-2"
+    >
+      + Create New Audit
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-6">
+    <div
+      class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl p-5"
+    >
+      <div class="flex justify-between items-start mb-2">
+        <div
+          class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300 uppercase tracking-wider font-semibold"
+        >
+          Total Cases
+        </div>
+        <div class="text-[var(--theme-muted)] transition-colors duration-300">🗂️</div>
+      </div>
+      <div class="text-3xl font-bold text-[var(--theme-text)] transition-colors duration-300">
+        {{ metrics.total }}
+      </div>
+    </div>
+
+    <div
+      class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl p-5"
+    >
+      <div class="flex justify-between items-start mb-2">
+        <div
+          class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300 uppercase tracking-wider font-semibold"
+        >
+          Open
+        </div>
+        <div class="text-[#1f6feb]">📂</div>
+      </div>
+      <div class="text-3xl font-bold text-[var(--theme-text)] transition-colors duration-300">
+        {{ metrics.open }}
+      </div>
+    </div>
+
+    <div
+      class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl p-5"
+    >
+      <div class="flex justify-between items-start mb-2">
+        <div
+          class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300 uppercase tracking-wider font-semibold"
+        >
+          In Progress
+        </div>
+        <div class="text-[#e3b341]">⏱️</div>
+      </div>
+      <div class="text-3xl font-bold text-[var(--theme-text)] transition-colors duration-300">
+        {{ metrics.inProgress }}
+      </div>
+    </div>
+
+    <div
+      class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl p-5"
+    >
+      <div class="flex justify-between items-start mb-2">
+        <div
+          class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300 uppercase tracking-wider font-semibold"
+        >
+          Closed
+        </div>
+        <div class="text-[#3fb950]">☑️</div>
+      </div>
+      <div class="text-3xl font-bold text-[var(--theme-text)] transition-colors duration-300">
+        {{ metrics.closed }}
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl overflow-hidden shadow-sm"
+  >
+    <div
+      class="p-4 border-b border-[var(--theme-border)] bg-[var(--theme-bg)] transition-colors duration-300 flex flex-col sm:flex-row gap-4 items-center"
+    >
+      <select
+        aria-label="Status"
+        class="w-full sm:w-40 bg-[var(--theme-surface)] border border-[var(--theme-border)] transition-colors duration-300 rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-2 outline-none focus:border-[#1f6feb] appearance-none"
+      >
+        <option>All Statuses</option>
+      </select>
+      <select
+        aria-label="Priority"
+        class="w-full sm:w-40 bg-[var(--theme-surface)] border border-[var(--theme-border)] transition-colors duration-300 rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-2 outline-none focus:border-[#1f6feb] appearance-none"
+      >
+        <option>All Priorities</option>
+      </select>
+      <select
+        aria-label="Type"
+        class="w-full sm:w-40 bg-[var(--theme-surface)] border border-[var(--theme-border)] transition-colors duration-300 rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-2 outline-none focus:border-[#1f6feb] appearance-none"
+      >
+        <option>All Types</option>
+      </select>
+      <div class="relative w-full flex-1">
+        <input
+          type="text"
+          placeholder="Search Audit ID or Filing ID..."
+          class="w-full bg-[var(--theme-surface)] border border-[var(--theme-border)] transition-colors duration-300 rounded-lg text-[var(--theme-text)] text-[13px] px-4 py-2 outline-none focus:border-[#1f6feb] placeholder-[var(--theme-muted)]"
+        />
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-[13px] whitespace-nowrap">
+        <thead>
+          <tr
+            class="bg-[var(--theme-card)] border-b border-[var(--theme-border)] transition-colors duration-300"
+          >
+            <th
+              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
+            >
+              Audit ID
+            </th>
+            <th
+              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
+            >
+              Filing ID
+            </th>
+            <th
+              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
+            >
+              Taxpayer
+            </th>
+            <th
+              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
+            >
+              Audit Type
+            </th>
+            <th
+              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
+            >
+              Status
+            </th>
+            <th
+              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
+            >
+              Created Date
+            </th>
+            <th
+              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
+            >
+              Assigned To
+            </th>
+            <th
+              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[var(--theme-border)] transition-colors duration-300">
+          <tr
+            *ngFor="let audit of auditCases"
+            class="hover:bg-[var(--theme-surface)] transition-colors duration-300"
+          >
+            <td
+              class="py-3 px-5 font-mono text-[12px] text-[var(--theme-text)] transition-colors duration-300"
+            >
+              {{ audit.id }}
+            </td>
+            <td
+              class="py-3 px-5 font-mono text-[12px] text-[var(--theme-muted)] transition-colors duration-300"
+            >
+              {{ audit.filingId }}
+            </td>
+            <td
+              class="py-3 px-5 font-medium text-[var(--theme-text)] transition-colors duration-300"
+            >
+              {{ audit.taxpayer }}
+            </td>
+            <td class="py-3 px-5 text-[var(--theme-text)] transition-colors duration-300">
+              {{ audit.type }}
+            </td>
+
+            <td class="py-3 px-5">
+              <span
+                class="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border font-medium transition-colors duration-300"
+                [ngClass]="{
+                  'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/20':
+                    audit.statusColor === 'green',
+                  'bg-[#e3b341]/10 text-[#e3b341] border-[#e3b341]/20':
+                    audit.statusColor === 'amber',
+                  'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/20': audit.statusColor === 'red',
+                  'bg-[#1f6feb]/10 text-[#1f6feb] border-[#1f6feb]/20':
+                    audit.statusColor === 'blue',
+                }"
+              >
+                {{ audit.status }}
+              </span>
+            </td>
+            <td class="py-3 px-5 text-[var(--theme-muted)] transition-colors duration-300">
+              {{ audit.date }}
+            </td>
+            <td class="py-3 px-5 text-[var(--theme-text)] transition-colors duration-300">
+              {{ audit.assigned }}
+            </td>
+            <td class="py-3 px-5 flex items-center gap-3">
+              <button
+                (click)="viewDetails(audit.id)"
+                class="bg-transparent border border-[var(--theme-border)] text-[var(--theme-text)] rounded-md px-3 py-1.5 text-[11px] hover:bg-[var(--theme-surface)] transition-colors duration-300"
+              >
+                View Details
+              </button>
+              <button
+                (click)="addFinding(audit.id)"
+                class="text-[var(--theme-muted)] hover:text-[var(--theme-text)] text-[12px] font-medium transition-colors duration-300"
+              >
+                Add Finding
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

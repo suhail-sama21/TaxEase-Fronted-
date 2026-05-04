@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { TaxFilingService } from '../service/tax-filing.service';
 
 @Component({
   selector: 'app-my-filings',
@@ -8,70 +9,60 @@ import { Router, RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule],
   templateUrl: './my-filings.html'
 })
-export class MyFilingsComponent {
+export class MyFilingsComponent implements OnInit {
+  filings: any[] = [];
   selectedFiling: any = null;
+  currentUserRole: string = 'OFFICER'; // Or 'TAXPAYER'
 
-  // Set this to 'TAXPAYER' to test the restricted view
-  currentUserRole: string = 'OFFICER';
+  constructor(
+    private taxFilingService: TaxFilingService,
+    private router: Router
+  ) {}
 
-  filings = [
-    { id: 101, period: 'FY2025-26', amountDeclared: 45000, submittedDate: '2026-03-01T10:00:00Z', status: 'Approved', statusColor: 'green' },
-    { id: 102, period: 'FY2025-26', amountDeclared: 52000, submittedDate: '2026-03-05T14:30:00Z', status: 'Pending', statusColor: 'blue' },
-    { id: 74, period: 'FY2024-25', amountDeclared: 35000, submittedDate: '2025-06-18T11:20:00Z', status: 'Rejected', statusColor: 'red' }
-  ];
+  ngOnInit() {
+    this.loadFilings();
+  }
 
-  constructor(private router: Router) {}
+  loadFilings() {
+    // For demo, using a fixed taxpayerId or fetching all if officer
+    const taxpayerId = 987654321;
+    this.taxFilingService.getHistory(taxpayerId).subscribe({
+      next: (data) => this.filings = data,
+      error: (err) => console.error('Load failed', err)
+    });
+  }
 
-  // Role check helper
   isOfficer(): boolean {
     return this.currentUserRole === 'OFFICER' || this.currentUserRole === 'ADMIN';
   }
 
-  // View Modal Logic
   viewDetails(filing: any) {
-    console.log('Opening details for:', filing.id);
-    this.selectedFiling = { ...filing }; // Use spread to avoid direct reference issues
+    this.selectedFiling = { ...filing };
   }
 
   closeDetails() {
     this.selectedFiling = null;
   }
 
-  // Officer Status Update Logic
   updateStatus(filingId: number, newStatus: string) {
-    if (!this.isOfficer()) {
-      console.error("Unauthorized: You do not have permission to change status.");
-      return;
-    }
-
-    const filing = this.filings.find(f => f.id === filingId);
-    if (filing) {
-      filing.status = newStatus;
-      filing.statusColor = newStatus === 'Approved' ? 'green' : (newStatus === 'Pending' ? 'blue' : 'red');
-
-      // Update the modal view if it's open
-      if (this.selectedFiling && this.selectedFiling.id === filingId) {
-        this.selectedFiling = { ...filing };
-      }
-      console.log(`Filing #${filingId} status updated to ${newStatus}`);
-    }
+    const officerId = 1; // Mock officer ID from session
+    this.taxFilingService.updateStatus(filingId, newStatus, officerId).subscribe({
+      next: (updated) => {
+        this.loadFilings(); // Refresh table
+        this.selectedFiling = updated; // Update modal
+        console.log('Status updated successfully');
+      },
+      error: (err) => alert('Update failed: ' + err.message)
+    });
   }
 
-  // Calculation Logic
   calculateTax(amount: number): number {
     return amount * 0.10;
   }
 
-  // Navigation Logic
   proceedToPayment(filingId: number, amount: number) {
-    const taxDue = this.calculateTax(amount);
-    console.log(`Initiating payment for Filing #${filingId}. Amount: ${taxDue}`);
-
     this.router.navigate(['/portal/payment'], {
-      queryParams: {
-        id: filingId,
-        amount: taxDue
-      }
+      queryParams: { id: filingId, amount: this.calculateTax(amount) }
     });
   }
 }
