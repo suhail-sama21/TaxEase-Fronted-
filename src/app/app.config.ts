@@ -1,7 +1,6 @@
 import { ApplicationConfig, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { provideHttpClient } from '@angular/common/http';
 
 // NgRx Imports
 import { provideStore } from '@ngrx/store';
@@ -24,7 +23,7 @@ export const appConfig: ApplicationConfig = {
     provideEffects([AuthEffects]),
 
     // Optional but highly recommended: NgRx DevTools for debugging in Chrome
-    provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
+    provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
     provideCharts(withDefaultRegisterables()),
     provideHttpClient()
   ]

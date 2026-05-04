@@ -12,7 +12,7 @@ export class Jwt {
 
   getPayload(): jwt | null{
 
-    let token: string | null = localStorage.getItem('jwt')
+    let token: string | null = localStorage.getItem('token')
     if (token){
       if (token) {
         let payload = jwtDecode<jwt>(token)

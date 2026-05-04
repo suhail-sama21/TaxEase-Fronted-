@@ -4,12 +4,13 @@ import { Observable, of, switchMap } from 'rxjs';
 import { Jwt } from './jwt';
 import { UserService } from './user-service';
 import { User } from '../dto/taxpayer-profile';
+import { environment } from '../environment/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaxpayerService {
-  apiURL: string = "http://localhost:8082/api/taxpayers";
+  apiURL: string = environment.apiUrl + "/taxpayers";
 
   constructor(
     private http: HttpClient,
