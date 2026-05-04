@@ -1,6 +1,6 @@
 import { ApplicationConfig, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 
 // NgRx Imports
@@ -10,11 +10,12 @@ import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { authFeature } from './stores/authStore/auth.features';
 import { AuthEffects } from './stores/authStore/auth.effect';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { authInterceptor } from './core/interceptors/auth-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient(), // <-- Added HTTP Client
+    provideHttpClient(withInterceptors([authInterceptor])), // <-- Added HTTP Client
     provideCharts(withDefaultRegisterables()),
 
     // NgRx Global Providers

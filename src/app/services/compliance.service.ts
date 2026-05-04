@@ -19,6 +19,7 @@ export class ComplianceService {
 
   //1
   getDashboardSummary(): Observable<ComplianceDashboardResponse> {
+    console.log('hii');
     return this.http.get<ComplianceDashboardResponse>(`${this.apiUrl}/dashboard`);
   }
 
