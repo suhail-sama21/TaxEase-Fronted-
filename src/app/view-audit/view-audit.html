@@ -20,6 +20,7 @@
 
     <div class="flex gap-3">
       <button
+        (click)="exportPdf()"
         class="bg-[var(--theme-card)] border border-[var(--theme-border)] hover:border-[var(--theme-muted)] text-[var(--theme-text)] rounded-lg px-4 py-2 text-[13px] font-medium transition-colors duration-300"
       >
         Export PDF
@@ -27,12 +28,6 @@
 
       <!-- NEW: Only show if NOT closing AND NOT already CLOSED -->
       <ng-container *ngIf="auditData.status !== 'CLOSED' && !isClosingAudit">
-        <button
-          (click)="editFindings()"
-          class="bg-[var(--theme-card)] border border-[var(--theme-border)] hover:border-[var(--theme-muted)] text-[var(--theme-text)] rounded-lg px-4 py-2 text-[13px] font-medium transition-colors duration-300"
-        >
-          Update Findings
-        </button>
         <!-- Primary action button retains its brand color but gains transition -->
         <button
           (click)="initiateClose()"
