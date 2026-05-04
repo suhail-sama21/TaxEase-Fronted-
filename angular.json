@@ -3,6 +3,7 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
+    "analytics": "5566fc27-26c4-47bb-ba5c-ccbff5818c38"
 <<<<<<< HEAD
 <<<<<<< HEAD
     "analytics": "9e8f7609-4b63-463b-8ffc-5265ad3edd9c"
