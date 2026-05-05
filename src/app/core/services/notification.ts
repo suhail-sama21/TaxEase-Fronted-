@@ -2,11 +2,10 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// Interface matching the properties used in your HTML
 export interface AppNotification {
   id: number;
   title: string;
-  desc: string; // The description/message
+  desc: string;
   time: string;
   type: string;
   icon: string;
@@ -16,15 +15,15 @@ export interface AppNotification {
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private http = inject(HttpClient);
+  // Using 8088 as seen in your Postman screenshot!
   private apiUrl = 'http://localhost:8088/api/notifications';
 
-  // Fetch all notifications for a specific user
-  getNotifications(userId: number): Observable<AppNotification[]> {
-    return this.http.get<AppNotification[]>(`${this.apiUrl}/user/${userId}`);
+  getNotifications(userId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/user/${userId}`);
   }
 
-  // Mark a specific notification as read
   markAsRead(notificationId: number, userId: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${notificationId}/read?userId=${userId}`, {});
+    // FIX: Added { responseType: 'text' } so Angular doesn't crash on plain text responses
+    return this.http.put(`${this.apiUrl}/${notificationId}/read?userId=${userId}`, {}, { responseType: 'text' });
   }
 }
