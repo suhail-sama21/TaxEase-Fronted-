@@ -45,12 +45,12 @@ export class LoginComponent {
     const emails: Record<string, string> = {
       taxpayer: 'john.doe@example.com',
       admin: 'admin@taxease.gov',
-      auditor: 'auditor@taxease.gov'
+      auditor: 'auditmazhai@example.com'
     };
 
     this.loginForm.patchValue({
       email: emails[role],
-      password: 'demoPassword123'
+      password: 'password123' // Assuming this is the default password for all test accounts
     });
 
     // Trigger the submission with the patched values

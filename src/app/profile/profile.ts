@@ -22,7 +22,7 @@ export class ProfileComponent implements OnInit{
   // Mock User Data
   userProfile = signal({
     fullName: 'John Doe',
-    email: 'john.doe@example.com',
+    email: 'auditmazhai@example.com',
     phone: '+1 (555) 123-4567',
     type: 'Citizen',
     address: '123 Main St, Springfield, IL 62701',
