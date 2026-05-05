@@ -14,7 +14,7 @@ import { provideHttpClient } from '@angular/common/http';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
-    provideHttpClient(), // Essential for making API calls!
+    provideHttpClient(), // Essential for making API calls! (Ithu mattum pothum)
 
     // Wire up NgRx Store and Effects
     provideStore({
@@ -24,7 +24,7 @@ export const appConfig: ApplicationConfig = {
 
     // Optional but highly recommended: NgRx DevTools for debugging in Chrome
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
-    provideCharts(withDefaultRegisterables()),
-    provideHttpClient()
+    provideCharts(withDefaultRegisterables())
+    // Duplicate provideHttpClient()-ah remove panniyachu
   ]
 };

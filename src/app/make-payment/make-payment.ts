@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PaymentService } from '../service/payment.service';
 
 @Component({
   selector: 'app-make-payment',
@@ -9,35 +10,68 @@ import { Router } from '@angular/router';
   imports: [CommonModule, FormsModule],
   templateUrl: './make-payment.html'
 })
-export class MakePaymentComponent {
-  selectedMethod: 'bank' | 'wallet' | 'card' = 'bank';
+export class MakePaymentComponent implements OnInit {
+  selectedMethod: string = 'CREDIT_CARD';
   isProcessing = false;
   paymentSuccess = false;
+  generatedPaymentId: string = '';
+
+  // DYNAMIC DATA STORAGE
+  filings: any[] = [
+    { id: 1, displayId: 'FIL-2025-011', period: 'Q3 2025', amount: 42340.00 },
+    { id: 2, displayId: 'FIL-2026-001', period: 'Q1 2026', amount: 4500.00 },
+    { id: 3, displayId: 'FIL-2025-012', period: 'Q4 2025', amount: 3800.00 }
+  ];
   
-  paymentAmount = 4100.00; // Mock amount
+  selectedFilingId: number = 1; 
+  selectedFiling: any = this.filings[0];
+  paymentAmount: number = this.filings[0].amount;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router, 
+    private paymentService: PaymentService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-  selectMethod(method: 'bank' | 'wallet' | 'card') {
+  ngOnInit(): void {
+    this.onFilingChange(); // Sync initial data
+  }
+
+  // UPDATES THE UI WHEN SELECTION CHANGES
+  onFilingChange() {
+    this.selectedFiling = this.filings.find(f => f.id === this.selectedFilingId);
+    if (this.selectedFiling) {
+      this.paymentAmount = this.selectedFiling.amount;
+    }
+  }
+
+  selectMethod(method: string) {
     this.selectedMethod = method;
   }
 
   processPayment() {
     this.isProcessing = true;
-    
-    // Simulate API call to process payment
-    setTimeout(() => {
-      this.isProcessing = false;
-      this.paymentSuccess = true;
-    }, 1500);
+    const payload = {
+      filingId: this.selectedFilingId,
+      amount: this.paymentAmount,
+      method: this.selectedMethod,
+      status: 'Completed'
+    };
+
+    this.paymentService.makePayment(payload).subscribe({
+      next: (response: any) => {
+        this.isProcessing = false;
+        this.paymentSuccess = true;
+        this.generatedPaymentId = 'PAY-' + response.id;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isProcessing = false;
+        alert('Payment failed. Check your data.');
+      }
+    });
   }
 
-  goToHistory() {
-    // We will build this next!
-    this.router.navigate(['/history']);
-  }
-
-  goToFilings() {
-    this.router.navigate(['/filings']);
-  }
+  goToHistory() { this.router.navigate(['/portal/history']); }
+  goToFilings() { this.router.navigate(['/portal/filings']); }
 }

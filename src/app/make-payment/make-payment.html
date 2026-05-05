@@ -5,7 +5,6 @@
   </div>
 
   <div class="grid grid-cols-[1fr_340px] gap-5">
-    
     <!-- Main Payment Form Card -->
     <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl overflow-hidden shadow-sm transition-colors duration-300">
       <div class="px-5 py-4 border-b border-[var(--theme-border)] transition-colors duration-300">
@@ -15,77 +14,113 @@
       <div class="p-6 flex flex-col gap-5">
         <div>
           <label class="block text-xs text-[var(--theme-muted)] mb-1.5 transition-colors duration-300">Select filing <span class="text-app-danger">*</span></label>
-          <select class="w-full bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-sm px-3 py-2.5 outline-none focus:border-app-primary cursor-pointer appearance-none transition-colors duration-300">
-            <option>FIL-2026-001 — Q1 2026 (Due: $4,500.00)</option>
-            <option>FIL-2025-012 — Q4 2025 (Due: $3,800.00)</option>
-            <option selected>FIL-2025-011 — Q3 2025 (Due: $4,100.00)</option>
+          <!-- Dynamic dropdown -->
+          <select [(ngModel)]="selectedFilingId" (change)="onFilingChange()" class="w-full bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-sm px-3 py-2.5 outline-none focus:border-app-primary cursor-pointer appearance-none transition-colors duration-300">
+            <option *ngFor="let f of filings" [ngValue]="f.id">
+              {{ f.displayId }} — {{ f.period }} (Due: {{ f.amount | currency:'USD' }})
+            </option>
           </select>
         </div>
         
         <div>
           <label class="block text-xs text-[var(--theme-muted)] mb-1.5 transition-colors duration-300">Amount to pay (USD)</label>
-          <input type="number" [(ngModel)]="paymentAmount" disabled class="w-full bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] font-mono text-sm px-3 py-2.5 cursor-not-allowed transition-colors duration-300" />
+          <input type="text" [value]="paymentAmount | currency:'USD'" disabled class="w-full bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] font-mono text-sm px-3 py-2.5 cursor-not-allowed transition-colors duration-300" />
         </div>
         
         <div>
           <label class="block text-xs text-[var(--theme-muted)] mb-2 transition-colors duration-300">Payment method <span class="text-app-danger">*</span></label>
           
-          <div (click)="selectMethod('bank')" class="flex items-center gap-3 p-3.5 mb-2.5 border rounded-lg cursor-pointer transition-colors duration-300"
-               [ngClass]="selectedMethod === 'bank' ? 'border-app-primary bg-app-primary/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
+          <div (click)="selectMethod('CREDIT_CARD')" class="flex items-center gap-3 p-3.5 mb-2.5 border rounded-lg cursor-pointer transition-colors duration-300"
+               [ngClass]="selectedMethod === 'CREDIT_CARD' ? 'border-app-primary bg-app-primary/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
             <div class="w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-colors duration-300"
-                 [ngClass]="selectedMethod === 'bank' ? 'border-app-primary' : 'border-[var(--theme-muted)]'">
-              <div *ngIf="selectedMethod === 'bank'" class="w-2 h-2 rounded-full bg-app-primary"></div>
+                 [ngClass]="selectedMethod === 'CREDIT_CARD' ? 'border-app-primary' : 'border-[var(--theme-muted)]'">
+              <div *ngIf="selectedMethod === 'CREDIT_CARD'" class="w-2 h-2 rounded-full bg-app-primary"></div>
             </div>
             <div>
-              <div class="text-[13px] font-medium text-[var(--theme-text)] transition-colors duration-300">Bank Transfer</div>
-              <div class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300">Direct bank account debit</div>
-            </div>
-          </div>
-
-          <div (click)="selectMethod('wallet')" class="flex items-center gap-3 p-3.5 mb-2.5 border rounded-lg cursor-pointer transition-colors duration-300"
-               [ngClass]="selectedMethod === 'wallet' ? 'border-app-primary bg-app-primary/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
-            <div class="w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-colors duration-300"
-                 [ngClass]="selectedMethod === 'wallet' ? 'border-app-primary' : 'border-[var(--theme-muted)]'">
-              <div *ngIf="selectedMethod === 'wallet'" class="w-2 h-2 rounded-full bg-app-primary"></div>
-            </div>
-            <div>
-              <div class="text-[13px] font-medium text-[var(--theme-text)] transition-colors duration-300">Digital Wallet</div>
-              <div class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300">UPI, PayPal, or e-wallet</div>
-            </div>
-          </div>
-
-          <div (click)="selectMethod('card')" class="flex items-center gap-3 p-3.5 border rounded-lg cursor-pointer transition-colors duration-300"
-               [ngClass]="selectedMethod === 'card' ? 'border-app-primary bg-app-primary/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
-            <div class="w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-colors duration-300"
-                 [ngClass]="selectedMethod === 'card' ? 'border-app-primary' : 'border-[var(--theme-muted)]'">
-              <div *ngIf="selectedMethod === 'card'" class="w-2 h-2 rounded-full bg-app-primary"></div>
-            </div>
-            <div>
-              <div class="text-[13px] font-medium text-[var(--theme-text)] transition-colors duration-300">Credit / Debit Card</div>
+              <div class="text-[13px] font-medium text-[var(--theme-text)] transition-colors duration-300">Credit Card</div>
               <div class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300">Visa, Mastercard, Amex</div>
+            </div>
+          </div>
+
+          <div (click)="selectMethod('DEBIT_CARD')" class="flex items-center gap-3 p-3.5 mb-2.5 border rounded-lg cursor-pointer transition-colors duration-300"
+               [ngClass]="selectedMethod === 'DEBIT_CARD' ? 'border-app-primary bg-app-primary/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
+            <div class="w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-colors duration-300"
+                 [ngClass]="selectedMethod === 'DEBIT_CARD' ? 'border-app-primary' : 'border-[var(--theme-muted)]'">
+              <div *ngIf="selectedMethod === 'DEBIT_CARD'" class="w-2 h-2 rounded-full bg-app-primary"></div>
+            </div>
+            <div>
+              <div class="text-[13px] font-medium text-[var(--theme-text)] transition-colors duration-300">Debit Card</div>
+              <div class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300">Bank debit cards</div>
+            </div>
+          </div>
+
+          <div (click)="selectMethod('UPI')" class="flex items-center gap-3 p-3.5 mb-2.5 border rounded-lg cursor-pointer transition-colors duration-300"
+               [ngClass]="selectedMethod === 'UPI' ? 'border-app-primary bg-app-primary/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
+            <div class="w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-colors duration-300"
+                 [ngClass]="selectedMethod === 'UPI' ? 'border-app-primary' : 'border-[var(--theme-muted)]'">
+              <div *ngIf="selectedMethod === 'UPI'" class="w-2 h-2 rounded-full bg-app-primary"></div>
+            </div>
+            <div>
+              <div class="text-[13px] font-medium text-[var(--theme-text)] transition-colors duration-300">UPI</div>
+              <div class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300">Google Pay, PhonePe, Paytm</div>
+            </div>
+          </div>
+
+          <div (click)="selectMethod('NET_BANKING')" class="flex items-center gap-3 p-3.5 border rounded-lg cursor-pointer transition-colors duration-300"
+               [ngClass]="selectedMethod === 'NET_BANKING' ? 'border-app-primary bg-app-primary/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
+            <div class="w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-colors duration-300"
+                 [ngClass]="selectedMethod === 'NET_BANKING' ? 'border-app-primary' : 'border-[var(--theme-muted)]'">
+              <div *ngIf="selectedMethod === 'NET_BANKING'" class="w-2 h-2 rounded-full bg-app-primary"></div>
+            </div>
+            <div>
+              <div class="text-[13px] font-medium text-[var(--theme-text)] transition-colors duration-300">Net Banking</div>
+              <div class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300">Direct bank login</div>
             </div>
           </div>
         </div>
         
-        <button (click)="processPayment()" [disabled]="isProcessing || paymentSuccess" class="w-full bg-app-primary hover:bg-app-primary-hover text-white rounded-lg py-3 text-sm font-medium transition-colors duration-300 mt-2 disabled:opacity-50">
-          {{ isProcessing ? 'Processing Securely...' : 'Pay Now — ' + (paymentAmount | currency:'USD') }}
+        <!-- NEW PREMIUM PAY BUTTON -->
+        <button (click)="processPayment()" [disabled]="isProcessing || paymentSuccess" 
+                class="relative w-full overflow-hidden group bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white rounded-xl py-4 text-sm font-semibold shadow-lg shadow-blue-500/20 transition-all duration-300 mt-2 disabled:opacity-50 disabled:grayscale">
+          
+          <div class="relative z-10 flex items-center justify-center gap-2">
+            <span *ngIf="isProcessing" class="animate-spin text-lg">◌</span>
+            <span *ngIf="!isProcessing" class="text-lg">🔒</span>
+            <span>{{ isProcessing ? 'Securing Transaction...' : 'Complete Secure Payment — ' + (paymentAmount | currency:'USD') }}</span>
+          </div>
+          
+          <div class="absolute inset-0 w-1/2 h-full bg-white/10 skew-x-[-25deg] -translate-x-full group-hover:translate-x-[250%] transition-transform duration-1000"></div>
         </button>
       </div>
     </div>
 
-    <!-- Sidebar / Summary -->
+    <!-- Sidebar / Summary (Fully Dynamic) -->
     <div class="flex flex-col gap-4">
-      
-      <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl transition-colors duration-300">
+      <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl transition-colors duration-300 shadow-sm">
         <div class="px-5 py-4 border-b border-[var(--theme-border)] transition-colors duration-300">
           <h2 class="text-[14px] font-medium text-[var(--theme-text)] transition-colors duration-300">Payment Summary</h2>
         </div>
         <div class="p-5 text-[13px]">
-          <div class="flex justify-between py-1.5 border-b border-[var(--theme-border)] transition-colors duration-300"><span class="text-[var(--theme-muted)]">Filing</span><span class="text-[var(--theme-text)] font-mono">FIL-2025-011</span></div>
-          <div class="flex justify-between py-1.5 border-b border-[var(--theme-border)] transition-colors duration-300"><span class="text-[var(--theme-muted)]">Period</span><span class="text-[var(--theme-text)]">Q3 2025</span></div>
-          <div class="flex justify-between py-1.5 border-b border-[var(--theme-border)] transition-colors duration-300"><span class="text-[var(--theme-muted)]">Tax due</span><span class="text-[var(--theme-text)]">{{ paymentAmount | currency:'USD' }}</span></div>
-          <div class="flex justify-between py-1.5 border-b border-[var(--theme-border)] transition-colors duration-300"><span class="text-[var(--theme-muted)]">Penalty</span><span class="text-app-danger">$0.00</span></div>
-          <div class="flex justify-between pt-3 mt-1 text-[15px] font-medium transition-colors duration-300"><span class="text-[var(--theme-text)]">Total</span><span class="text-[#3fb950]">{{ paymentAmount | currency:'USD' }}</span></div>
+          <div class="flex justify-between py-1.5 border-b border-[var(--theme-border)] transition-colors duration-300">
+            <span class="text-[var(--theme-muted)]">Filing</span>
+            <span class="text-[var(--theme-text)] font-mono">{{ selectedFiling?.displayId }}</span>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-[var(--theme-border)] transition-colors duration-300">
+            <span class="text-[var(--theme-muted)]">Period</span>
+            <span class="text-[var(--theme-text)]">{{ selectedFiling?.period }}</span>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-[var(--theme-border)] transition-colors duration-300">
+            <span class="text-[var(--theme-muted)]">Tax due</span>
+            <span class="text-[var(--theme-text)]">{{ paymentAmount | currency:'USD' }}</span>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-[var(--theme-border)] transition-colors duration-300">
+            <span class="text-[var(--theme-muted)]">Penalty</span>
+            <span class="text-app-danger">$0.00</span>
+          </div>
+          <div class="flex justify-between pt-3 mt-1 text-[15px] font-medium transition-colors duration-300">
+            <span class="text-[var(--theme-text)]">Total</span>
+            <span class="text-[#3fb950]">{{ paymentAmount | currency:'USD' }}</span>
+          </div>
         </div>
       </div>
 
@@ -93,12 +128,11 @@
       <div *ngIf="paymentSuccess" class="bg-[#3fb950]/10 border border-[#3fb950]/30 rounded-xl p-6 text-center animate-fade-in shadow-[0_0_15px_rgba(63,185,80,0.1)] transition-colors duration-300">
         <div class="w-12 h-12 rounded-full bg-[#3fb950]/10 border border-[#3fb950]/30 flex items-center justify-center text-xl text-[#3fb950] mx-auto mb-3 transition-colors duration-300">✓</div>
         <div class="text-[15px] font-medium text-[#3fb950] mb-1 transition-colors duration-300">Payment Successful</div>
-        <div class="text-[12px] text-[#3fb950]/80 mb-4 font-mono transition-colors duration-300">PAY-88292 · Just now</div>
+        <div class="text-[12px] text-[#3fb950]/80 mb-4 font-mono transition-colors duration-300">{{ generatedPaymentId }} · Just now</div>
         
         <button (click)="goToHistory()" class="w-full bg-transparent border border-[var(--theme-border)] text-[var(--theme-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] rounded-lg py-2 text-xs transition-colors duration-300 mb-2">View receipt →</button>
         <button (click)="goToFilings()" class="w-full bg-transparent border border-[var(--theme-border)] text-[var(--theme-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] rounded-lg py-2 text-xs transition-colors duration-300">Back to filings →</button>
       </div>
-
     </div>
   </div>
 </div>

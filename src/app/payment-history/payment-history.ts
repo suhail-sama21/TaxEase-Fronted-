@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { PaymentService } from '../service/payment.service'; // Check path!
 
 @Component({
   selector: 'app-payment-history',
@@ -8,19 +9,90 @@ import { Router } from '@angular/router';
   imports: [CommonModule],
   templateUrl: './payment-history.html'
 })
-export class PaymentHistoryComponent {
-  transactions = [
-    { id: 'PAY-88291', date: '2026-02-15', amount: '$1,250.00', method: 'Bank Transfer', filing: 'FIL-2026-001', status: 'Completed', statusColor: 'green' },
-    { id: 'PAY-88290', date: '2025-11-10', amount: '$450.00', method: 'Digital Wallet', filing: 'FIL-2025-012', status: 'Completed', statusColor: 'green' },
-    { id: 'PAY-88289', date: '2025-08-05', amount: '$2,100.00', method: 'Bank Transfer', filing: 'FIL-2025-011', status: 'Completed', statusColor: 'green' },
-    { id: 'PAY-88288', date: '2025-05-12', amount: '$150.00', method: 'Digital Wallet', filing: 'FIL-2025-010', status: 'Failed', statusColor: 'red' }
-  ];
+export class PaymentHistoryComponent implements OnInit {
+  
+  allTransactions: any[] = []; // Backup for filtering
+  transactions: any[] = [];    // Data displayed in the table
+  userId: number = 1; // Replace this with dynamic logged-in user ID later
+  
+  // Dashboard calculation variables
+  totalPaid: number = 0;
+  totalTransactions: number = 0;
+  failedTransactions: number = 0;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router, 
+    private paymentService: PaymentService,
+    private cdr: ChangeDetectorRef // Fixes the blank screen bug!
+  ) {}
+
+  ngOnInit(): void {
+    this.loadHistory();
+  }
+
+  loadHistory() {
+    this.paymentService.getPaymentHistory(this.userId).subscribe({
+      next: (backendData: any[]) => {
+        // Map backend keys to frontend UI
+        this.allTransactions = backendData.map(payment => ({
+          id: 'PAY-' + payment.id, 
+          date: payment.date ? payment.date.split('T')[0] : 'N/A', 
+          amount: '$' + parseFloat(payment.amount).toLocaleString('en-US', {minimumFractionDigits: 2}), 
+          method: this.formatMethod(payment.method), 
+          rawMethod: payment.method, // Important for the dropdown filter!
+          filing: payment.filingId ? 'FIL-' + payment.filingId : 'N/A',
+          status: payment.status, 
+          statusColor: payment.status === 'Completed' || payment.status === 'Success' ? 'green' : 'red'
+        }));
+
+        // Initially show all transactions
+        this.transactions = [...this.allTransactions]; 
+
+        // Update the top 3 cards
+        this.calculateMetrics(backendData);
+
+        // Tell Angular to update the screen IMMEDIATELY
+        this.cdr.detectChanges(); 
+      },
+      error: (error) => {
+        console.error('Error fetching payment history', error);
+        alert('Failed to load history da. Check the console.');
+      }
+    });
+  }
+
+  // Filter function triggered by the Dropdown
+  filterByMethod(event: any) {
+    const selectedMethod = event.target.value;
+    
+    if (selectedMethod === 'ALL') {
+      this.transactions = [...this.allTransactions]; // Show all
+    } else {
+      // Filter based on the selected method
+      this.transactions = this.allTransactions.filter(t => t.rawMethod === selectedMethod);
+    }
+    
+    // Tell Angular to update the table after filtering
+    this.cdr.detectChanges(); 
+  }
+
+  // Helper method to make 'CREDIT_CARD' look like 'Credit Card'
+  formatMethod(method: string): string {
+    if (!method) return 'N/A';
+    if (method === 'UPI') return 'UPI'; // Special case for UPI
+    return method.replace('_', ' ').replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase())));
+  }
+
+  calculateMetrics(data: any[]) {
+    this.totalTransactions = data.length;
+    this.failedTransactions = data.filter(p => p.status === 'Failed').length;
+    this.totalPaid = data
+      .filter(p => p.status === 'Completed' || p.status === 'Success')
+      .reduce((sum, p) => sum + parseFloat(p.amount), 0);
+  }
 
   downloadReceipt(paymentId: string) {
     alert(`Downloading receipt for ${paymentId}...`);
-    // Logic to call API and trigger PDF download will go here
   }
 
   retryPayment() {

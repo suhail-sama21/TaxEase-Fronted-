@@ -10,47 +10,48 @@
   </div>
 
   <div class="grid grid-cols-3 gap-4 mb-6">
-    <!-- Total Paid Card -->
+    <!-- Total Paid Card (Dynamic) -->
     <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-5 relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-[#3fb950] transition-colors duration-300">
       <div class="flex justify-between items-start mb-3">
         <div class="text-[11px] text-[var(--theme-muted)] uppercase tracking-wider transition-colors duration-300">Total Paid</div>
-        <!-- 10% opacity accent rule applied here -->
         <div class="w-8 h-8 rounded-md flex items-center justify-center text-[14px] bg-[#3fb950]/10 text-[#3fb950] transition-colors duration-300">$</div>
       </div>
-      <div class="text-2xl font-medium text-[var(--theme-text)] leading-none mb-1.5 transition-colors duration-300">$13,600</div>
+      <div class="text-2xl font-medium text-[var(--theme-text)] leading-none mb-1.5 transition-colors duration-300">${{ totalPaid | number:'1.2-2' }}</div>
       <div class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300">FY 2025–26</div>
     </div>
 
-    <!-- Transactions Card -->
+    <!-- Transactions Card (Dynamic) -->
     <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-5 relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-app-primary transition-colors duration-300">
       <div class="flex justify-between items-start mb-3">
         <div class="text-[11px] text-[var(--theme-muted)] uppercase tracking-wider transition-colors duration-300">Transactions</div>
         <div class="w-8 h-8 rounded-md flex items-center justify-center text-[14px] bg-app-primary/10 text-app-primary transition-colors duration-300">↕</div>
       </div>
-      <div class="text-2xl font-medium text-[var(--theme-text)] leading-none mb-1.5 transition-colors duration-300">4</div>
-      <div class="text-[11px] text-[#3fb950] transition-colors duration-300">▲ 1 this month</div>
+      <div class="text-2xl font-medium text-[var(--theme-text)] leading-none mb-1.5 transition-colors duration-300">{{ totalTransactions }}</div>
+      <div class="text-[11px] text-[#3fb950] transition-colors duration-300">All records</div>
     </div>
 
-    <!-- Failed Card -->
+    <!-- Failed Card (Dynamic) -->
     <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-5 relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-[#f85149] transition-colors duration-300">
       <div class="flex justify-between items-start mb-3">
         <div class="text-[11px] text-[var(--theme-muted)] uppercase tracking-wider transition-colors duration-300">Failed</div>
-        <!-- 10% opacity accent rule applied here -->
         <div class="w-8 h-8 rounded-md flex items-center justify-center text-[14px] bg-[#f85149]/10 text-[#f85149] transition-colors duration-300">✗</div>
       </div>
-      <div class="text-2xl font-medium text-[var(--theme-text)] leading-none mb-1.5 transition-colors duration-300">1</div>
-      <div class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300">— May 2025</div>
+      <div class="text-2xl font-medium text-[var(--theme-text)] leading-none mb-1.5 transition-colors duration-300">{{ failedTransactions }}</div>
+      <div class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300">Needs attention</div>
     </div>
   </div>
 
   <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl overflow-hidden shadow-sm transition-colors duration-300">
     <div class="px-5 py-4 border-b border-[var(--theme-border)] flex items-center justify-between bg-[var(--theme-surface)] transition-colors duration-300">
       <span class="text-[15px] font-medium text-[var(--theme-text)] transition-colors duration-300">Transaction History</span>
-      <select class="bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[12px] px-3 py-1.5 outline-none focus:border-app-primary cursor-pointer appearance-none min-w-[120px] transition-colors duration-300">
-        <option>All Methods</option>
-        <option>Bank Transfer</option>
-        <option>Digital Wallet</option>
-        <option>Credit Card</option>
+      
+      <!-- UPDATED DROPDOWN WITH NEW METHODS AND FILTER LOGIC -->
+      <select (change)="filterByMethod($event)" class="bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[12px] px-3 py-1.5 outline-none focus:border-app-primary cursor-pointer appearance-none min-w-[120px] transition-colors duration-300">
+        <option value="ALL">All Methods</option>
+        <option value="CREDIT_CARD">Credit Card</option>
+        <option value="DEBIT_CARD">Debit Card</option>
+        <option value="UPI">UPI</option>
+        <option value="NET_BANKING">Net Banking</option>
       </select>
     </div>
 
@@ -68,6 +69,12 @@
           </tr>
         </thead>
         <tbody>
+          <!-- Shows if array is empty (or filter returns 0 results) -->
+          <tr *ngIf="transactions.length === 0">
+            <td colspan="7" class="px-5 py-8 text-center text-[var(--theme-muted)]">No transactions found for this method.</td>
+          </tr>
+          
+          <!-- Loops through data -->
           <tr *ngFor="let t of transactions" class="hover:bg-[var(--theme-surface)] border-b border-[var(--theme-border)] last:border-0 transition-colors duration-300">
             <td class="px-5 py-3 text-app-primary font-mono text-[12px] transition-colors duration-300">{{ t.id }}</td>
             <td class="px-5 py-3 text-[var(--theme-muted)] transition-colors duration-300">{{ t.date }}</td>
@@ -75,14 +82,13 @@
             <td class="px-5 py-3 text-[var(--theme-text)] transition-colors duration-300">{{ t.method }}</td>
             <td class="px-5 py-3 text-[var(--theme-muted)] font-mono text-[11px] transition-colors duration-300">{{ t.filing }}</td>
             <td class="px-5 py-3">
-              <!-- Replaced hardcoded row status colors with the 10% opacity accent rule -->
               <span class="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border transition-colors duration-300"
                     [ngClass]="t.statusColor === 'green' ? 'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/30' : 'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/30'">
                 {{ t.status }}
               </span>
             </td>
             <td class="px-5 py-3">
-              <button *ngIf="t.status === 'Completed'" (click)="downloadReceipt(t.id)" class="bg-transparent border border-[var(--theme-border)] text-[var(--theme-muted)] rounded-md px-2.5 py-1 text-[11px] hover:bg-[var(--theme-surface)] hover:text-[var(--theme-text)] transition-colors duration-300">
+              <button *ngIf="t.status === 'Completed' || t.status === 'Success'" (click)="downloadReceipt(t.id)" class="bg-transparent border border-[var(--theme-border)] text-[var(--theme-muted)] rounded-md px-2.5 py-1 text-[11px] hover:bg-[var(--theme-surface)] hover:text-[var(--theme-text)] transition-colors duration-300">
                 ↓ Receipt
               </button>
               <button *ngIf="t.status === 'Failed'" (click)="retryPayment()" class="bg-app-primary text-white border-none rounded-md px-2.5 py-1 text-[11px] hover:bg-app-primary-hover transition-colors duration-300">
