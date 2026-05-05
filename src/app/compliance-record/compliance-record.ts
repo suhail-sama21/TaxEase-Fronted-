@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ComplianceService } from '../services/compliance.service';
 import { ComplianceResponse, UpdateComplianceRequest } from '../models/compliance.model';
+import { catchError, Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-compliance-record',
@@ -23,8 +24,18 @@ export class ComplianceRecordComponent implements OnInit {
   // Inject the service
   constructor(private complianceService: ComplianceService) {}
 
+  // records$!: Observable<ComplianceResponse[]>;
+
   // Fetch data automatically when the page loads
-  ngOnInit(): void {
+  ngOnInit() {
+  //  T   this.complianceService.getAllCompliance().pipe(
+      // Handle the error within the RxJS pipeline
+    //   catchError((err) => {
+    //     console.error('Failed to load records:', err);
+    //     // Return an Observable of an empty array so the stream doesn't completely break
+    //     return of([]);
+    //   }),
+    // );
     this.loadRecords();
   }
 
@@ -32,6 +43,7 @@ export class ComplianceRecordComponent implements OnInit {
     this.complianceService.getAllCompliance().subscribe({
       next: (data) => {
         this.records = data;
+        // console.log('Loaded records:', this.records$);
       },
       error: (err) => console.error('Failed to load records:', err),
     });

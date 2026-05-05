@@ -6,19 +6,21 @@ import { of } from 'rxjs';
 
 import * as AuthActions from './auth.action';
 import { AuthService } from '../../core/services/auth';
+import { Store } from '@ngrx/store';
 
 @Injectable()
 export class AuthEffects {
   private actions$ = inject(Actions);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private store = inject(Store);
 
   login$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.login),
       mergeMap((action) =>
         this.authService.login(action.credentials).pipe(
-          map((response) => AuthActions.loginSuccess({ response })),
+          map((response) => AuthActions.loginSuccess({ response, email: action.credentials.email })),
           catchError((error: any) => of(AuthActions.loginFailure({ error: error.message }))),
         ),
       ),
@@ -39,13 +41,40 @@ export class AuthEffects {
     ),
   );
 
+  updateProfile$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.updateProfile),
+      mergeMap((action) =>
+        this.authService.updateProfile(action.userData).pipe(
+          map((user) => AuthActions.updateProfileSuccess({ user })),
+          catchError((error: any) => of(AuthActions.updateProfileFailure({ error: error.message }))),
+        ),
+      ),
+    ),
+  );
+
+  getProfile$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.getProfile),
+      mergeMap((action) =>
+        this.authService.getProfile(action.email).pipe(
+          map((user) => AuthActions.getProfileSuccess({ user })),
+          catchError((error: any) => of(AuthActions.getProfileFailure({ error: error.message }))),
+        ),
+      ),
+    ),
+  );
+
   authSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(AuthActions.loginSuccess),
         tap((action) => {
           localStorage.setItem('token', action.response.token);
-          //   console.log(action.response);
+          const email = action.email ?? action.response.user?.email ?? action.response.user?.email;
+          if (email) {
+            this.store.dispatch(AuthActions.getProfile({ email }));
+          }
           this.router.navigate(['/portal']);
         }),
       ),

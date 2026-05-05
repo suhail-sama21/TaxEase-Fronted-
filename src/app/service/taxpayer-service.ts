@@ -27,4 +27,8 @@ export class TaxpayerService {
     }
     return of(null);
   }
+
+  updatePassword(id: number, passwordData: { oldPassword: string; newPassword: string }): Observable<any> {
+    return this.userService.updatePassword(id, passwordData);
+  }
 }
