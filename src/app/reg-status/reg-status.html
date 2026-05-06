@@ -86,22 +86,25 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-(--theme-border)">
-          <tr *ngFor="let doc of requiredDocs" class="hover:bg-(--theme-surface) transition-colors duration-300">
-            <td class="px-6 py-4 font-semibold text-(--theme-text) transition-colors duration-300">{{ doc.type }}</td>
-            <td class="px-6 py-4 text-(--theme-muted) font-medium transition-colors duration-300">{{ doc.date }}</td>
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border transition-colors duration-300"
-                    [ngClass]="{
-                      'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/30': doc.statusColor === 'green',
-                      'bg-[#e3b341]/10 text-[#e3b341] border-[#e3b341]/30': doc.statusColor === 'amber',
-                      'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/30': doc.statusColor === 'red'
-                    }">
-                {{ doc.status }}
-              </span>
-            </td>
-          </tr>
+          @for (doc of requiredDocs; track $index){
+            <tr class="hover:bg-(--theme-surface) transition-colors duration-300">
+              <td class="px-6 py-4 font-semibold text-(--theme-text) transition-colors duration-300">{{ doc.type }}</td>
+              <td class="px-6 py-4 text-(--theme-muted) font-medium transition-colors duration-300">{{ doc.date }}</td>
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border transition-colors duration-300"
+                      [ngClass]="{
+                        'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/30': doc.statusColor === 'green',
+                        'bg-[#e3b341]/10 text-[#e3b341] border-[#e3b341]/30': doc.statusColor === 'amber',
+                        'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/30': doc.statusColor === 'red'
+                      }">
+                  {{ doc.status }}
+                </span>
+              </td>
+            </tr>
+          }
         </tbody>
       </table>
+      <button (click)="addDummy()">click to add dummy</button>
     </div>
 
   </div>

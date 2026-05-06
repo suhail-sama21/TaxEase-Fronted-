@@ -106,23 +106,25 @@ export class ProfileComponent implements OnInit{
       oldPassword: this.security.currentPassword,
       newPassword: this.security.newPassword
     }).subscribe({
-      next: () => {
+      next: (response) => {
+        this.isSavingPassword = false;
         this.passwordInfoBox('successful');
         this.security.currentPassword = '';
         this.security.newPassword = '';
         this.security.confirmPassword = '';
       },
       error: (err) => {
+        this.isSavingPassword = false;
         const errorMessage = typeof err?.error === 'string' ? err.error : err?.message || 'Unable to update password';
+        console.error('Password update error:', err);
+        
         if (err.status === 401 || /incorrect/i.test(errorMessage)) {
           this.passwordInfoBox('incorrect');
+        } else if (err.status === 0) {
+          this.passwordInfoBox('networkError');
         } else {
           this.passwordInfoBox('serverError');
-          console.error('Password update error:', errorMessage);
         }
-      },
-      complete: () => {
-        this.isSavingPassword = false;
       }
     });
   }
@@ -166,10 +168,18 @@ export class ProfileComponent implements OnInit{
       this.passwordInfoAppear = true
       this.infoMessage = "Unable to update password right now. Please try again later."
     }
+    else if (message === "networkError"){
+      this.passwordInfoAppear = true
+      this.infoMessage = "Network error. Please check your connection and try again."
+    }
     else if (message === "successful"){
       this.passwordInfoAppear = true;
       this.boxColor ="#3fb950"
       this.infoMessage = "Password changed successfully"
+      // Auto-hide success message after 3 seconds
+      setTimeout(() => {
+        this.passwordInfoAppear = false;
+      }, 3000);
     }
   }
 }

@@ -7,7 +7,7 @@ import { AuthResponse, User } from '../../interfaces/auth.interface';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/auth`; 
+  private apiUrl = `${environment.apiUrl}/auth`;
 
   login(credentials: any): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials);
@@ -22,6 +22,6 @@ export class AuthService {
   }
 
   getProfile(email: string): Observable<User> {
-    return this.http.get<User>(`http://localhost:8081/api/users/username/${email}`);
+    return this.http.get<User>(`http://localhost:8099/api/users/username/${email}`);
   }
 }
