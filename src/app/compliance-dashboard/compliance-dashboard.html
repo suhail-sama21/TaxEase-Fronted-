@@ -10,8 +10,8 @@
       </p>
     </div>
     <button
-      (click)="runNewCheck()"
-      class="bg-transparent text-[var(--theme-text)] font-medium text-[13px] hover:text-[#1f6feb] transition-colors duration-300 flex items-center gap-2"
+      routerLink="/src/app/create-compliance/create-compliance.html"
+      class="cursor-pointer bg-transparent text-[var(--theme-text)] font-medium text-[13px] hover:text-[#1f6feb] transition-colors duration-300 flex items-center gap-2"
     >
       + New Check ↗
     </button>
@@ -94,11 +94,12 @@
         <span class="text-[15px] font-bold text-[var(--theme-text)] transition-colors duration-300"
           >Recent Compliance Checks</span
         >
-        <button
-          class="text-[12px] text-[var(--theme-text)] hover:text-[#1f6feb] transition-colors duration-300 font-medium"
+        <a
+          routerLink="/src/app/compliance-record/compliance-record.html"
+          class="cursor-pointer text-[12px] text-[var(--theme-text)] hover:text-[#1f6feb] transition-colors duration-300 font-medium"
         >
           View all →
-        </button>
+        </a>
       </div>
 
       <div class="overflow-x-auto">
