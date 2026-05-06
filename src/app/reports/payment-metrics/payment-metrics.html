@@ -7,11 +7,13 @@
         <p class="text-sm text-[var(--theme-muted)] mt-0.5 transition-colors duration-300">Transaction volumes, methods, and success rates</p>
       </div>
     </div>
-    <select class="bg-[var(--theme-surface)] border border-[var(--theme-border)] text-[var(--theme-text)] text-sm rounded-lg px-4 py-2.5 outline-none focus:border-[#1f6feb] transition-colors duration-300">
-      <option>All Methods</option>
-      <option>Credit Card</option>
-      <option>UPI</option>
-    </select>
+      <select (change)="onMethodChange($event)" class="bg-[var(--theme-surface)] border border-[var(--theme-border)] text-[var(--theme-text)] text-sm rounded-lg px-4 py-2.5 outline-none focus:border-[#1f6feb] transition-colors duration-300">
+        <option value="All Methods">All Methods</option>
+        <option value="CREDIT_CARD">Credit Card</option>
+        <option value="DEBIT_CARD">Debit Card</option>
+        <option value="UPI">UPI</option>
+        <option value="NET_BANKING">Net Banking</option>
+      </select>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
