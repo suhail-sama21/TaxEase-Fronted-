@@ -56,9 +56,4 @@ export class ComplianceDashboard implements OnInit {
     if (result === 'Non-Compliant') return 'red';
     return 'amber'; // Pending
   }
-
-  runNewCheck() {
-    alert('Initiating new compliance check...');
-    // In the future, you could use this.router.navigate(['/portal/create-compliance']) here!
-  }
 }
