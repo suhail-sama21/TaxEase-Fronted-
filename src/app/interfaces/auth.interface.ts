@@ -7,6 +7,8 @@ export interface User {
   role: string;
   address: string;
   contactInfo: string;
+  dob: string;         // Added
+  panNumber: string;   // Added
   createdAt: string;
   updatedAt: string;
 }
