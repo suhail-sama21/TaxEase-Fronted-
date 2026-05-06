@@ -32,6 +32,7 @@ export class ComplianceService {
 
   // 3. Fetch all records
   getAllCompliance(): Observable<ComplianceResponse[]> {
+    console.log('Fetching all compliance records...');
     return this.http.get<ComplianceResponse[]>(this.apiUrl);
   }
 
