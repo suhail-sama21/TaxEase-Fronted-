@@ -10,7 +10,17 @@ export class PaymentService {
   private apiUrl = 'http://localhost:8088/api/payments'; 
 
   constructor(private http: HttpClient) {}
-
+  private taxFilingApiUrl = 'http://localhost:8088/api/filings'; 
+  // ADD THIS FUNCTION: Fetch pending filings for a user
+getAllFilings(userId: number): Observable<any[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    
+    // FIXED: Added { headers } to the request!
+    return this.http.get<any[]>(`${this.taxFilingApiUrl}/taxpayer/${userId}`, { headers }); 
+  }
   getPaymentHistory(userId: number): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({

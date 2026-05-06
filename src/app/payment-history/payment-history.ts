@@ -56,7 +56,7 @@ export class PaymentHistoryComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching payment history', error);
-        alert('Failed to load history da. Check the console.');
+        alert('Failed to load history. Check the console.');
       }
     });
   }

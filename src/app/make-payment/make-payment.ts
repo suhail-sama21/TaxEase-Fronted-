@@ -16,16 +16,14 @@ export class MakePaymentComponent implements OnInit {
   paymentSuccess = false;
   generatedPaymentId: string = '';
 
-  // DYNAMIC DATA STORAGE
-  filings: any[] = [
-    { id: 1, displayId: 'FIL-2025-011', period: 'Q3 2025', amount: 42340.00 },
-    { id: 2, displayId: 'FIL-2026-001', period: 'Q1 2026', amount: 4500.00 },
-    { id: 3, displayId: 'FIL-2025-012', period: 'Q4 2025', amount: 3800.00 }
-  ];
-  
-  selectedFilingId: number = 1; 
-  selectedFiling: any = this.filings[0];
-  paymentAmount: number = this.filings[0].amount;
+  // 1. Start with empty/null data instead of hardcoded arrays
+  filings: any[] = [];
+  selectedFilingId: number | null = null; 
+  selectedFiling: any = null;
+  paymentAmount: number = 0;
+
+  // 2. Add the userId so the fetch function works
+  userId: number = 1; // Replace later with your actual logged-in user ID
 
   constructor(
     private router: Router, 
@@ -34,12 +32,51 @@ export class MakePaymentComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.onFilingChange(); // Sync initial data
+    // 3. Trigger the fetch from the backend when the page loads!
+    this.fetchPendingFilings(); 
+  }
+
+  fetchPendingFilings() {
+    // Call the service method to get ALL history
+    this.paymentService.getAllFilings(this.userId).subscribe({
+      next: (backendData: any[]) => {
+        
+        // FILTER: Keep only the items where status is 'Pending'
+        const pendingData = backendData.filter(filing => 
+          filing.status && filing.status.toLowerCase() === 'pending'
+        );
+
+        // MAP: Transform the filtered data to fit your dropdown UI
+        this.filings = pendingData.map(filing => ({
+          id: filing.id, 
+          displayId: 'FIL-' + filing.id,
+          period: filing.period || 'Current Period', 
+          amount: filing.amountDeclared || filing.amount // Adjust based on your backend keys
+        }));
+
+        // SELECT: Automatically select the first filing if the list isn't empty
+        if (this.filings.length > 0) {
+          this.selectedFilingId = this.filings[0].id;
+          this.onFilingChange(); // Sync the UI amounts
+        } else {
+           this.selectedFilingId = null;
+           this.paymentAmount = 0;
+        }
+        
+        // Tell Angular to update the screen
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load filings history', err);
+        alert('Could not load your tax filings.');
+      }
+    });
   }
 
   // UPDATES THE UI WHEN SELECTION CHANGES
   onFilingChange() {
-    this.selectedFiling = this.filings.find(f => f.id === this.selectedFilingId);
+    // Use == instead of === just in case the HTML select turns the ID into a string
+    this.selectedFiling = this.filings.find(f => f.id == this.selectedFilingId);
     if (this.selectedFiling) {
       this.paymentAmount = this.selectedFiling.amount;
     }
@@ -50,6 +87,11 @@ export class MakePaymentComponent implements OnInit {
   }
 
   processPayment() {
+    if (!this.selectedFilingId) {
+      alert('Please select a valid filing to pay for.');
+      return;
+    }
+
     this.isProcessing = true;
     const payload = {
       filingId: this.selectedFilingId,
