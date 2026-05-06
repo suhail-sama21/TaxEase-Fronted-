@@ -25,8 +25,8 @@ export class UserService {
     return this.http.get<User>(this.apiURL + '/username/' + sub);
   }
   updatePassword(id: number, password: any){
-    return this.http.patch<string>(this.apiURL + `/${id}/changePassword`, password, {
-      responseType: 'text' as 'json'
+    return this.http.patch<any>(this.apiURL + `/${id}/changePassword`, password, {
+      responseType: 'text' as any
     });
   }
 }
