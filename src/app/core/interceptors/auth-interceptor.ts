@@ -27,6 +27,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       if ((error.status === 401 || error.status === 403) && !isPasswordEndpoint) {
         localStorage.clear();
         router.navigate(['/login']);
+      } else if (error.status === 403) {
+        console.error("403 Forbidden: Missing permissions or endpoint not found.");
       }
       return throwError(() => error);
     }),
