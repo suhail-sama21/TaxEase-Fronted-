@@ -1,5 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Store } from '@ngrx/store';
+import { Subject } from 'rxjs';
+import { filter, takeUntil } from 'rxjs/operators';
+import { AppNotification, NotificationService } from '../core/services/notification';
+import { selectUser } from '../stores/authStore/auth.features';
 
 @Component({
   selector: 'app-notifications',
@@ -7,62 +12,101 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   templateUrl: './notifications.html'
 })
-export class NotificationsComponent {
-  // Mock data mapping to your Get User Notifications endpoint
-  notifications = [
-    { 
-      id: 1, 
-      title: 'Filing Deadline Approaching', 
-      desc: 'Your Q1 2026 tax filing is due in 5 days. Please submit your documents to avoid penalties.', 
-      time: '2 hours ago', 
-      type: 'warning', 
-      icon: '⚠', 
-      read: false 
-    },
-    { 
-      id: 2, 
-      title: 'Payment Confirmation', 
-      desc: 'We have successfully received your payment of $4,250.00 for Filing ID FIL-003.', 
-      time: '1 day ago', 
-      type: 'success', 
-      icon: '✓', 
-      read: true 
-    },
-    { 
-      id: 3, 
-      title: 'Compliance Audit Update', 
-      desc: 'Your recent filing has been selected for a routine compliance check. No action required at this time.', 
-      time: '3 days ago', 
-      type: 'info', 
-      icon: 'ℹ', 
-      read: true 
-    },
-    { 
-      id: 4, 
-      title: 'System Maintenance', 
-      desc: 'TaxEase will be down for scheduled maintenance on Sunday from 2:00 AM to 4:00 AM EST.', 
-      time: '1 week ago', 
-      type: 'system', 
-      icon: '🔔', 
-      read: true 
-    },
-    { 
-      id: 5, 
-      title: 'Document Verified', 
-      desc: 'Your ID Proof (DOC-001) has been successfully verified by our compliance team.', 
-      time: '2 weeks ago', 
-      type: 'verified', 
-      icon: '★', 
-      read: true 
-    }
-  ];
+export class NotificationsComponent implements OnInit, OnDestroy {
+  private store = inject(Store);
+  private notificationService = inject(NotificationService);
+  private destroy$ = new Subject<void>();
 
-  markAllAsRead() {
-    this.notifications.forEach(n => n.read = true);
-    // Here you would call: PUT /Mark Notification as Read
+  notifications: AppNotification[] = [];
+  currentUserId!: number;
+
+  ngOnInit() {
+    this.store.select(selectUser).pipe(
+      takeUntil(this.destroy$),
+      filter((user): user is any => !!user && !!user.id)
+    ).subscribe(user => {
+      this.currentUserId = user.id;
+      this.loadNotifications();
+    });
   }
 
-  markAsRead(notif: any) {
-    notif.read = true;
+  loadNotifications() {
+    this.notificationService.getNotifications(this.currentUserId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (backendData) => {
+          // MAP the backend JSON to the format your HTML expects
+          this.notifications = backendData.map(n => ({
+            id: n.id,
+            title: this.formatTitle(n.category), 
+            desc: n.message, // Map 'message' to 'desc'
+            time: this.formatDate(n.createdAt), // Map 'createdAt' to 'time'
+            type: this.getIconType(n.category),
+            icon: this.getIconSymbol(n.category),
+            read: n.status === 'READ' // Map 'status' to boolean
+          }));
+        },
+        error: (err) => console.error('Error fetching notifications:', err)
+      });
+  }
+
+  // --- Helper Methods to generate UI styling based on Backend Category ---
+  
+  formatTitle(category: string): string {
+    if (!category) return 'System Alert';
+    // Turns "FILING" into "Filing Update"
+    return category.charAt(0).toUpperCase() + category.slice(1).toLowerCase() + ' Update';
+  }
+
+  getIconType(category: string): string {
+    switch (category?.toUpperCase()) {
+      case 'FILING': return 'success';
+      case 'PAYMENT': return 'info';
+      case 'AUDIT': return 'warning';
+      default: return 'system';
+    }
+  }
+
+  getIconSymbol(category: string): string {
+    switch (category?.toUpperCase()) {
+      case 'FILING': return '✓';
+      case 'PAYMENT': return '$';
+      case 'AUDIT': return '⚠';
+      default: return '🔔';
+    }
+  }
+
+  formatDate(dateString: string): string {
+    if (!dateString) return 'Just now';
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // -----------------------------------------------------------------------
+
+  markAsRead(notif: AppNotification) {
+    if (notif.read) return;
+
+    notif.read = true; // Instantly update UI
+
+    this.notificationService.markAsRead(notif.id, this.currentUserId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => console.log('Successfully marked as read'),
+        error: (err) => {
+          console.error('Failed to mark as read:', err);
+          notif.read = false; // Revert if API fails
+        }
+      });
+  }
+
+  markAllAsRead() {
+    const unreadNotifs = this.notifications.filter(n => !n.read);
+    unreadNotifs.forEach(notif => this.markAsRead(notif));
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

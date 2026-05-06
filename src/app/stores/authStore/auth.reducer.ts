@@ -13,7 +13,7 @@ export const initialState: AuthState = {
 export const authReducer = createReducer(
   initialState,
   
-  on(AuthActions.login, AuthActions.signup, (state) => ({
+  on(AuthActions.login, AuthActions.signup, AuthActions.updateProfile, AuthActions.getProfile, (state) => ({
     ...state,
     isLoading: true,
     error: null
@@ -21,13 +21,20 @@ export const authReducer = createReducer(
 
   on(AuthActions.loginSuccess, AuthActions.signupSuccess, (state, { response }) => ({
     ...state,
-    user: response.user,
+    user: response.user ?? state.user,
     isAuthenticated: true,
     isLoading: false,
     error: null
   })),
 
-  on(AuthActions.loginFailure, AuthActions.signupFailure, (state, { error }) => ({
+  on(AuthActions.getProfileSuccess, AuthActions.updateProfileSuccess, (state, { user }) => ({
+    ...state,
+    user,
+    isLoading: false,
+    error: null
+  })),
+
+  on(AuthActions.loginFailure, AuthActions.signupFailure, AuthActions.updateProfileFailure, AuthActions.getProfileFailure, (state, { error }) => ({
     ...state,
     error: error,
     isLoading: false

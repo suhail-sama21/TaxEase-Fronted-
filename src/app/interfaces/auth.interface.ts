@@ -1,15 +1,21 @@
 export interface User {
+  id: number;
   name: string;
   email: string;
+  phone: string;
+  password: string;
   role: string;
-  phone?: string;
-  address?: string;
-  contactInfo?: string;
+  address: string;
+  contactInfo: string;
+  dob: string;         // Added
+  panNumber: string;   // Added
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AuthResponse {
   token: string;
-  user: User;
+  user?: User;
 }
 
 export interface AuthState {

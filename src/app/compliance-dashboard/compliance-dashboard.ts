@@ -1,30 +1,64 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common'; // <-- This fixes ngClass, ngFor, and the number pipe
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ComplianceService } from '../services/compliance.service';
+import { ComplianceDashboardResponse, ComplianceResponse } from '../models/compliance.model';
 
 @Component({
   selector: 'app-compliance-dashboard',
   standalone: true,
-  imports: [CommonModule], // <-- Must be included here
-  templateUrl: './compliance-dashboard.html'
+  imports: [CommonModule],
+  templateUrl: './compliance-dashboard.html',
 })
-export class  ComplianceDashboard  { // Ensure the class is exported
-
-  // This fixes the "Property 'metrics' does not exist" error
-  metrics = {
-    totalChecks: 12450,
-    pendingReviews: 342,
-    nonCompliant: 89
+export class ComplianceDashboard implements OnInit {
+  // State for the top cards
+  metrics: ComplianceDashboardResponse = {
+    totalChecks: 0,
+    pendingReviews: 0,
+    nonCompliant: 0,
+    compliant: 0,
+    systemHealth: 0,
   };
 
-  recentChecks = [
-    { id: 'CMP-1042', taxpayer: 'Acme Corp', taxpayerId: 'TXP-8821', type: 'Filing Deadline', date: '2026-03-01', status: 'Compliant', statusColor: 'green' },
-    { id: 'CMP-1043', taxpayer: 'John Doe', taxpayerId: 'TXP-1002', type: 'Payment Match', date: '2026-03-02', status: 'Non-Compliant', statusColor: 'red' },
-    { id: 'CMP-1044', taxpayer: 'TechFlow LLC', taxpayerId: 'TXP-9932', type: 'Audit Follow-up', date: '2026-03-03', status: 'Pending Review', statusColor: 'amber' },
-    { id: 'CMP-1045', taxpayer: 'Jane Smith', taxpayerId: 'TXP-1005', type: 'Filing Deadline', date: '2026-03-04', status: 'Compliant', statusColor: 'green' }
-  ];
+  // State for the recent table
+  recentChecks: ComplianceResponse[] = [];
 
-  // This fixes the "Property 'runNewCheck' does not exist" error
+  constructor(private complianceService: ComplianceService) {}
+
+  ngOnInit(): void {
+    this.loadDashboardMetrics();
+    this.loadRecentChecks();
+  }
+
+  loadDashboardMetrics() {
+    this.complianceService.getDashboardSummary().subscribe({
+      next: (data) => {
+        // Round the health score to avoid decimals like 33.333%
+        data.systemHealth = Math.round(data.systemHealth);
+        this.metrics = data;
+      },
+      error: (err) => console.error('Failed to fetch dashboard metrics:', err),
+    });
+  }
+
+  loadRecentChecks() {
+    this.complianceService.getAllCompliance().subscribe({
+      next: (data) => {
+        // Sort by ID descending (newest first), then grab the first 5 records
+        this.recentChecks = data.sort((a, b) => b.id - a.id).slice(0, 5);
+      },
+      error: (err) => console.error('Failed to fetch recent checks:', err),
+    });
+  }
+
+  // Utility method to dynamically assign colors
+  getStatusColor(result: string): string {
+    if (result === 'Compliant') return 'green';
+    if (result === 'Non-Compliant') return 'red';
+    return 'amber'; // Pending
+  }
+
   runNewCheck() {
     alert('Initiating new compliance check...');
+    // In the future, you could use this.router.navigate(['/portal/create-compliance']) here!
   }
 }

@@ -1,24 +1,25 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, switchMap } from 'rxjs'; 
+import { Observable, of, switchMap } from 'rxjs';
 import { Jwt } from './jwt';
 import { UserService } from './user-service';
-import { User } from '../dto/taxpayer-profile';
+import { taxpayerDocument, User } from '../dto/taxpayer-profile';
 import { environment } from '../environment/environment';
+import { Store } from '@ngrx/store';
+import { selectUser } from '../stores/authStore/auth.features';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TaxpayerService {
-  apiURL: string = environment.apiUrl + "/taxpayers";
 
   constructor(
     private http: HttpClient,
     private jwtService: Jwt,
-    private userService: UserService
+    private userService: UserService,
+    private store: Store
   ) {}
 
-  
   getProfile(): Observable<User | null> {
     const payload = this.jwtService.getPayload();
 
@@ -27,5 +28,22 @@ export class TaxpayerService {
       return this.userService.getUser(payload.sub);
     }
     return of(null);
+  }
+
+  updatePassword(id: number, passwordData: { oldPassword: string; newPassword: string }): Observable<any> {
+    return this.userService.updatePassword(id, passwordData);
+  }
+
+  getDocuments(): Observable<taxpayerDocument[]> {
+    return this.store.select(selectUser).pipe(
+      switchMap(user => {
+        if (user) {
+          console.log('Fetching documents for user ID:', user.id);
+          return this.http.get<taxpayerDocument[]>(`${environment.apiUrl}/taxpayers/user/${user.id}/documents`);
+        } else {
+          return of([]); 
+        }
+      })
+    );
   }
 }

@@ -101,7 +101,8 @@
             <td
               class="py-4 px-5 font-medium text-[var(--theme-text)] transition-colors duration-300"
             >
-              {{ rec.taxpayer }}
+              {{ rec.taxpayerId }}
+              <!-- {{ rec.taxpayerId }} -->
             </td>
             <td class="py-4 px-5 text-[var(--theme-text)] transition-colors duration-300">
               {{ rec.type }}
@@ -115,7 +116,7 @@
                   'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/20': rec.statusColor === 'red',
                 }"
               >
-                {{ rec.status }}
+                {{ rec.result }}
               </span>
             </td>
             <td class="py-4 px-5 text-[var(--theme-muted)] transition-colors duration-300">
@@ -154,7 +155,7 @@
           >Update Status <span class="text-[#f85149]">*</span></label
         >
         <select
-          [(ngModel)]="updateData.status"
+          [(ngModel)]="updateData.result"
           aria-label="Update Status"
           class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] transition-colors duration-300 rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-2.5 outline-none focus:border-[#1f6feb] cursor-pointer appearance-none"
         >
