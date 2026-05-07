@@ -1,117 +1,245 @@
 <div class="max-w-4xl mx-auto p-6">
+
   <!-- Stepper Header -->
+
   <div class="mb-10">
+
     <div class="flex items-center justify-between relative">
+
       <div *ngFor="let step of [1,2,3,4,5]" class="z-10 flex flex-col items-center">
+
         <div [ngClass]="currentStep >= step ? 'bg-app-primary text-white' : 'bg-[var(--theme-bg)] text-[var(--theme-muted)]'"
+
              class="w-10 h-10 rounded-full border-2 border-[var(--theme-border)] flex items-center justify-center font-bold transition-all duration-300">
+
           {{ step }}
+
         </div>
+
       </div>
+
       <div class="absolute top-5 left-0 w-full h-[2px] bg-[var(--theme-border)] -z-0"></div>
+
     </div>
+
   </div>
+
+
 
   <!-- Step 1: Gross Income -->
+
   <div *ngIf="currentStep === 1" class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+
     <h2 class="text-2xl font-semibold text-[var(--theme-text)] mb-2">Income Declaration</h2>
+
     <p class="text-[var(--theme-muted)] mb-6">Enter your gross earnings for the period {{ period }}.</p>
 
+
+
     <div class="space-y-4 bg-[var(--theme-card)] p-6 rounded-xl border border-[var(--theme-border)]">
+
       <div>
+
         <label class="block text-sm font-medium text-[var(--theme-muted)] mb-2">Annual Gross Salary</label>
-        <input type="number" [(ngModel)]="incomeData.gross" placeholder="e.g. 50000"
-               class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg px-4 py-2 text-[var(--theme-text)] focus:border-app-primary outline-none">
+
+        <!-- Updated to allow manual typing without step interference -->
+
+        <input type="number"
+
+               [(ngModel)]="incomeData.gross"
+
+               placeholder="e.g. 50000"
+
+               (wheel)="$event.preventDefault()"
+
+               class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg px-4 py-2 text-[var(--theme-text)] focus:border-app-primary outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+
       </div>
-      <button (click)="nextStep()" class="w-full bg-app-primary text-white py-2 rounded-lg font-medium hover:brightness-110 transition-all">
+
+      <button (click)="nextStep()" [disabled]="!incomeData.gross" class="w-full bg-app-primary text-white py-2 rounded-lg font-medium hover:brightness-110 transition-all disabled:opacity-50">
+
         Continue
+
       </button>
+
     </div>
+
   </div>
+
+
 
   <!-- Step 2: Deductions -->
+
   <div *ngIf="currentStep === 2" class="animate-in fade-in duration-500">
+
     <h2 class="text-2xl font-semibold text-[var(--theme-text)] mb-6">Deductions & Exemptions</h2>
+
     <div class="bg-[var(--theme-card)] p-6 rounded-xl border border-[var(--theme-border)] space-y-4">
+
       <div>
+
         <label class="block text-sm font-medium text-[var(--theme-muted)] mb-2">Standard Deductions (80C, etc.)</label>
-        <input type="number" [(ngModel)]="incomeData.deductions"
-               class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg px-4 py-2 text-[var(--theme-text)] outline-none focus:border-app-primary">
+
+        <input type="number"
+
+               [(ngModel)]="incomeData.deductions"
+
+               (wheel)="$event.preventDefault()"
+
+               class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg px-4 py-2 text-[var(--theme-text)] outline-none focus:border-app-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+
       </div>
+
       <div class="flex gap-4">
+
         <button (click)="prevStep()" class="flex-1 border border-[var(--theme-border)] text-[var(--theme-text)] py-2 rounded-lg">Back</button>
+
         <button (click)="nextStep()" class="flex-1 bg-app-primary text-white py-2 rounded-lg">Continue</button>
+
       </div>
+
     </div>
+
   </div>
+
+
 
   <!-- Step 3: Review Summary -->
+
   <div *ngIf="currentStep === 3" class="animate-in fade-in duration-500">
+
     <h2 class="text-2xl font-semibold text-[var(--theme-text)] mb-6">Review Calculation</h2>
+
     <div class="bg-[var(--theme-card)] p-6 rounded-xl border border-[var(--theme-border)] space-y-3">
+
       <div class="flex justify-between text-sm"><span class="text-[var(--theme-muted)]">Taxpayer ID</span> <span class="text-[var(--theme-text)] font-mono">{{ taxpayerId }}</span></div>
+
       <div class="flex justify-between text-sm"><span class="text-[var(--theme-muted)]">Period</span> <span class="text-[var(--theme-text)]">{{ period }}</span></div>
+
       <div class="h-[1px] bg-[var(--theme-border)] my-2"></div>
+
       <div class="flex justify-between text-lg font-bold"><span class="text-app-primary">Taxable Income</span> <span class="text-[var(--theme-text)]">{{ taxableIncome | currency:'USD' }}</span></div>
+
       <div class="flex justify-between text-lg font-bold"><span class="text-app-primary">Total Tax Due (10%)</span> <span class="text-app-primary">{{ taxDue | currency:'USD' }}</span></div>
 
+
+
       <div class="pt-6 flex gap-4">
+
         <button (click)="prevStep()" class="flex-1 border border-[var(--theme-border)] text-[var(--theme-text)] py-2 rounded-lg">Back</button>
+
         <button (click)="nextStep()" class="flex-1 bg-app-primary text-white py-2 rounded-lg">Next</button>
+
       </div>
+
     </div>
+
   </div>
+
+
 
   <!-- Step 4: Final Declaration & Submit -->
+
   <div *ngIf="currentStep === 4" class="animate-in fade-in duration-500">
+
     <h2 class="text-2xl font-semibold text-[var(--theme-text)] mb-6">Declarations</h2>
+
     <div class="bg-[var(--theme-card)] p-6 rounded-xl border border-[var(--theme-border)] space-y-4">
+
       <label class="flex items-center gap-3 cursor-pointer">
+
         <input type="checkbox" [(ngModel)]="declarations.accuracy" class="accent-app-primary">
+
         <span class="text-sm text-[var(--theme-muted)]">I declare that all information provided is accurate.</span>
+
       </label>
+
       <label class="flex items-center gap-3 cursor-pointer">
+
         <input type="checkbox" [(ngModel)]="declarations.terms" class="accent-app-primary">
+
         <span class="text-sm text-[var(--theme-muted)]">I agree to the TaxEase terms of service.</span>
+
       </label>
+
+
 
       <div class="pt-6 flex gap-4">
+
         <button (click)="prevStep()" [disabled]="isSubmitting" class="flex-1 border border-[var(--theme-border)] text-[var(--theme-text)] py-2 rounded-lg">Back</button>
+
         <button (click)="submitFiling()" [disabled]="!declarations.accuracy || !declarations.terms || isSubmitting"
+
                 class="flex-1 bg-app-primary text-white py-2 rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+
           <span *ngIf="isSubmitting" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-          {{ isSubmitting ? 'Submitting to Backend...' : 'Final Submit' }}
+
+          {{ isSubmitting ? 'Submitting...' : 'Final Submit' }}
+
         </button>
+
       </div>
+
     </div>
+
   </div>
 
-  <!-- Step 5: Success Screen (Data from Backend) -->
+
+
+  <!-- Step 5: Success Screen -->
+
   <div *ngIf="currentStep === 5" class="text-center animate-in zoom-in duration-500">
+
     <div class="w-20 h-20 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">✓</div>
+
     <h2 class="text-3xl font-bold text-[var(--theme-text)] mb-2">Filing Submitted!</h2>
-    <p class="text-[var(--theme-muted)] mb-8">Your tax return has been successfully recorded in the system.</p>
+
+    <p class="text-[var(--theme-muted)] mb-8">Your tax return has been successfully recorded.</p>
+
+
 
     <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-2xl p-6 max-w-md mx-auto mb-10 space-y-4">
+
       <div class="flex justify-between">
+
         <span class="text-[var(--theme-muted)]">Filing ID:</span>
+
         <span class="text-[var(--theme-text)] font-bold">#{{ generatedFilingId }}</span>
+
       </div>
+
       <div class="flex justify-between">
+
         <span class="text-[var(--theme-muted)]">Current Status:</span>
+
         <span class="px-2 py-1 bg-blue-500/10 text-blue-500 rounded text-xs font-bold uppercase tracking-wider">
-          {{ filingStatus }}
-        </span>
+
+{{ filingStatus }}
+
+</span>
+
       </div>
+
     </div>
 
+
+
     <div class="flex flex-col gap-3 max-w-xs mx-auto">
+
       <button (click)="goToPayment()" class="w-full bg-app-primary text-white py-3 rounded-xl font-bold shadow-lg shadow-app-primary/20 hover:scale-[1.02] transition-transform">
+
         Proceed to Payment
+
       </button>
-      <button (click)="currentStep = 1" class="text-[var(--theme-muted)] hover:text-[var(--theme-text)] text-sm">
+
+      <button (click)="resetForm()" class="text-[var(--theme-muted)] hover:text-[var(--theme-text)] text-sm">
+
         File another return
+
       </button>
+
     </div>
+
   </div>
+
 </div>
