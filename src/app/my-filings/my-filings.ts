@@ -90,8 +90,20 @@ export class MyFilingsComponent implements OnInit {
   calculateTax(amount: number): number {
     return amount * 0.10;
   }
+proceedToPayment(filingId: number, amountDeclared: number) {
+   // Calculate the 10% tax here so the payment page doesn't have to guess the logic
+   const taxDue = amountDeclared * 0.10;
 
-  proceedToPayment(filingId: number, amount: number) {
+   this.router.navigate(['/portal/payment'], {
+     queryParams: {
+       id: filingId,
+       amount: taxDue.toFixed(2), // Send the actual tax amount, not the total declared
+       type: 'TAX_PAYMENT'
+     }
+   });
+ }
+}
+ proceedToPayment(filingId: number, amount: number) {
     const taxAmount = this.calculateTax(amount);
     this.router.navigate(['/portal/payment'], {
       queryParams: {
@@ -101,3 +113,17 @@ export class MyFilingsComponent implements OnInit {
     });
   }
 }
+   this.router.navigate(['/portal/payment'], {
+     queryParams: {
+       id: filingId,
+       amount: taxDue.toFixed(2), // Send the actual tax amount, not the total declared
+       type: 'TAX_PAYMENT'
+     }
+   });
+ }
+  //proceedToPayment(filingId: number, amount: number) {
+    //this.router.navigate(['/portal/payment'], {
+      //queryParams: { id: filingId, amount: this.calculateTax(amount) }
+    //});
+  //}
+//}

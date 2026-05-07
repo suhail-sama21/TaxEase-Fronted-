@@ -3,17 +3,20 @@ import { CommonModule } from '@angular/common';
 import { TaxpayerService } from '../service/taxpayer-service';
 import { AsyncPipe } from '@angular/common';
 import { OnInit } from '@angular/core';
+import { taxpayerDocument } from '../dto/taxpayer-profile';
 
 @Component({
   selector: 'app-reg-status',
   standalone: true,
-  imports: [CommonModule, AsyncPipe],
+  imports: [CommonModule],
   templateUrl: './reg-status.html'
 })
 export class RegStatusComponent implements OnInit{
+  
+  taxpayerDocuments: taxpayerDocument[]= [];
 
   ngOnInit(): void {
-    this.addDummy();
+    this.loadDocuments();
   }
 
   constructor(private service: TaxpayerService){}
@@ -31,22 +34,70 @@ export class RegStatusComponent implements OnInit{
   ];
 
   // Required documents table data
-  requiredDocs = [
-    { type: 'ID Proof', date: '2026-03-02', status: 'Verified', statusColor: 'green' },
-    { type: 'PAN Card', date: '2026-03-02', status: 'Verified', statusColor: 'green' },
-    { type: 'Address Proof', date: '2026-03-03', status: 'Pending', statusColor: 'amber' },
-    { type: 'Income Proof', date: '—', status: 'Missing', statusColor: 'red' }
-  ];
+  requiredDocs: any[] = [];
 
   refreshStatus() {
-    alert('Checking for updates from the compliance server...');
+    this.loadDocuments();
   }
-  addDummy(){
+  loadDocuments(){
     let obj = this.service.getDocuments()
     if (obj){
       obj.subscribe((data) => {
         console.log('Documents fetched successfully:', data);
+        this.taxpayerDocuments = data;
+        this.requiredDocs = this.transformDocuments(data);
       });
+    }
+  }
+
+  private transformDocuments(documents: taxpayerDocument[]): any[] {
+    const mapped = documents.map(doc => ({
+      type: this.mapDocType(doc.docType),
+      date: doc.uploadedDate.split('T')[0],
+      status: doc.verificationStatus,
+      statusColor: this.getStatusColor(doc.verificationStatus)
+    }));
+
+    // Add missing document types
+    const existingTypes = mapped.map(d => d.type);
+    const allTypes = ['ID Proof', 'PAN Card', 'Address Proof', 'Income Proof'];
+    allTypes.forEach(type => {
+      if (!existingTypes.includes(type)) {
+        mapped.push({
+          type,
+          date: '—',
+          status: 'Missing',
+          statusColor: 'red'
+        });
+      }
+    });
+
+    return mapped;
+  }
+
+  private mapDocType(docType: string): string {
+    switch (docType) {
+      case 'PAN':
+        return 'PAN Card';
+      case 'ID Proof':
+        return 'ID Proof';
+      case 'Address proof':
+        return 'Address Proof';
+      default:
+        return docType;
+    }
+  }
+
+  private getStatusColor(status: string): string {
+    switch (status) {
+      case 'Verified':
+        return 'green';
+      case 'Pending':
+        return 'amber';
+      case 'Missing':
+        return 'red';
+      default:
+        return 'red';
     }
   }
 }
