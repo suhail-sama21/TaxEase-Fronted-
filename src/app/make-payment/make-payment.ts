@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PaymentService } from '../service/payment.service';
+//
+import {ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-make-payment',
@@ -18,7 +20,7 @@ export class MakePaymentComponent implements OnInit {
 
   // 1. Start with empty/null data instead of hardcoded arrays
   filings: any[] = [];
-  selectedFilingId: number | null = null; 
+  selectedFilingId: number | null = null;
   selectedFiling: any = null;
   paymentAmount: number = 0;
 
@@ -26,51 +28,53 @@ export class MakePaymentComponent implements OnInit {
   userId: number = 1; // Replace later with your actual logged-in user ID
 
   constructor(
-    private router: Router, 
+    private router: Router,
     private paymentService: PaymentService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    //
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
     // 3. Trigger the fetch from the backend when the page loads!
-    this.fetchPendingFilings(); 
+    this.fetchPendingFilings();
   }
 
   fetchPendingFilings() {
     // Call the service method to get ALL history
     this.paymentService.getAllFilings(this.userId).subscribe({
-      next: (backendData: any[]) => {
-        
-        // FILTER: Keep only the items where status is 'Pending'
-        const pendingData = backendData.filter(filing => 
-          filing.status && filing.status.toLowerCase() === 'pending'
-        );
+          next: (backendData: any[]) => {
+            // Change filter to 'approved' if that's when they should pay
+            const pendingData = backendData.filter(filing =>
+              filing.status && filing.status.toLowerCase() === 'approved'
+            );
 
-        // MAP: Transform the filtered data to fit your dropdown UI
-        this.filings = pendingData.map(filing => ({
-          id: filing.id, 
-          displayId: 'FIL-' + filing.id,
-          period: filing.period || 'Current Period', 
-          amount: filing.amountDeclared || filing.amount // Adjust based on your backend keys
-        }));
+            this.filings = pendingData.map(filing => ({
+              id: filing.id,
+              displayId: 'FIL-' + filing.id,
+              period: filing.period,
+              amount: filing.amountDeclared * 0.10 // Assuming 10% tax
+            }));
 
-        // SELECT: Automatically select the first filing if the list isn't empty
-        if (this.filings.length > 0) {
-          this.selectedFilingId = this.filings[0].id;
-          this.onFilingChange(); // Sync the UI amounts
-        } else {
-           this.selectedFilingId = null;
-           this.paymentAmount = 0;
-        }
-        
-        // Tell Angular to update the screen
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Failed to load filings history', err);
-        alert('Could not load your tax filings.');
-      }
-    });
+            // CHECK FOR QUERY PARAMS (Autofill Logic)
+            this.route.queryParams.subscribe(params => {
+              if (params['id']) {
+                this.selectedFilingId = Number(params['id']);
+                this.paymentAmount = Number(params['amount']);
+
+                // Ensure the selected filing exists in our list for the dropdown
+                this.selectedFiling = this.filings.find(f => f.id == this.selectedFilingId);
+              } else if (this.filings.length > 0) {
+                // Default to first if no params
+                this.selectedFilingId = this.filings[0].id;
+                this.onFilingChange();
+              }
+            });
+
+            this.cdr.detectChanges();
+          },
+          error: (err) => console.error(err)
+        });
   }
 
   // UPDATES THE UI WHEN SELECTION CHANGES

@@ -1,139 +1,87 @@
 <div>
-  <!-- Header Section -->
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-xl font-medium text-[var(--theme-text)] transition-colors duration-300">My Tax Filings</h1>
-      <p class="text-[13px] text-[var(--theme-muted)] mt-1 transition-colors duration-300">View and manage your submitted tax returns.</p>
+      <h1 class="text-xl font-medium text-[var(--theme-text)]">My Tax Filings</h1>
+      <p class="text-[13px] text-[var(--theme-muted)] mt-1">View and manage your submitted tax returns.</p>
     </div>
   </div>
 
-  <div class="bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-xl overflow-hidden shadow-sm transition-colors duration-300">
+  <div class="bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-xl overflow-hidden shadow-sm">
 
-    <!-- Filter Bar -->
-    <div class="px-5 py-4 border-b border-[var(--theme-border)] flex items-center justify-between bg-[var(--theme-card)] transition-colors duration-300">
+    <div class="px-5 py-4 border-b border-[var(--theme-border)] flex items-center justify-between bg-[var(--theme-card)]">
       <div class="flex gap-3">
-        <select class="bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-1.5 outline-none focus:border-app-primary cursor-pointer transition-colors duration-300">
+        <select [(ngModel)]="selectedPeriod" (change)="applyFilters()" class="bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-1.5 outline-none focus:border-app-primary">
           <option>All Periods</option>
           <option>FY2025-26</option>
           <option>FY2024-25</option>
         </select>
-        <select class="bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-1.5 outline-none focus:border-app-primary cursor-pointer transition-colors duration-300">
+        <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-1.5 outline-none focus:border-app-primary">
           <option>All Statuses</option>
           <option>Approved</option>
           <option>Pending</option>
+          <option>Paid</option>
           <option>Rejected</option>
         </select>
       </div>
     </div>
 
-    <!-- Table Section -->
     <div class="overflow-x-auto">
       <table class="w-full border-collapse text-[13px] whitespace-nowrap">
         <thead>
-        <tr class="bg-[var(--theme-card)] border-b border-[var(--theme-border)] transition-colors duration-300">
-          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase tracking-wide font-normal">Filing ID</th>
-          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase tracking-wide font-normal">Period</th>
-          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase tracking-wide font-normal">Amount Declared</th>
-          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase tracking-wide font-normal">Tax Due (10%)</th>
-          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase tracking-wide font-normal">Submitted Date</th>
-          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase tracking-wide font-normal">Status</th>
-          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase tracking-wide font-normal">Actions</th>
+        <tr class="bg-[var(--theme-card)] border-b border-[var(--theme-border)]">
+          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal">Filing ID</th>
+          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal">Period</th>
+          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal">Amount Declared</th>
+          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal">Tax Due (10%)</th>
+          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal">Submitted Date</th>
+          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal">Status</th>
+          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal">Actions</th>
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let f of filings" class="hover:bg-[var(--theme-bg)] border-b border-[var(--theme-border)] last:border-0 transition-colors duration-300">
+        <tr *ngFor="let f of filings" class="hover:bg-[var(--theme-bg)] border-b border-[var(--theme-border)] last:border-0 transition-colors">
           <td class="px-5 py-3 text-app-primary font-mono text-[12px]">#{{ f.id }}</td>
           <td class="px-5 py-3 text-[var(--theme-text)]">{{ f.period }}</td>
           <td class="px-5 py-3 text-[var(--theme-text)]">{{ f.amountDeclared | currency:'USD' }}</td>
           <td class="px-5 py-3 text-[var(--theme-text)] font-medium">{{ calculateTax(f.amountDeclared) | currency:'USD' }}</td>
           <td class="px-5 py-3 text-[var(--theme-muted)]">{{ f.submittedDate | date:'mediumDate' }}</td>
           <td class="px-5 py-3">
-              <span class="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border transition-colors duration-300"
+              <span class="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border"
                     [ngClass]="{
-                      'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/20': f.statusColor === 'green',
-                      'bg-app-primary/10 text-app-primary border-app-primary/20': f.statusColor === 'blue',
-                      'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/20': f.statusColor === 'red'
+                      'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/20': f.statusColor === 'green' || f.status === 'Approved' || f.status === 'Paid',
+                      'bg-app-primary/10 text-app-primary border-app-primary/20': f.statusColor === 'blue' || f.status === 'Pending',
+                      'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/20': f.statusColor === 'red' || f.status === 'Rejected'
                     }">
                 {{ f.status }}
               </span>
           </td>
           <td class="px-5 py-3">
             <div class="flex items-center gap-2">
-              <button (click)="viewDetails(f)" class="bg-transparent border border-[var(--theme-border)] text-[var(--theme-muted)] rounded-md px-2.5 py-1 text-[11px] hover:bg-[var(--theme-bg)] hover:text-[var(--theme-text)] transition-colors">
+              <button (click)="viewDetails(f)" class="bg-transparent border border-[var(--theme-border)] text-[var(--theme-muted)] rounded-md px-2.5 py-1 text-[11px] hover:bg-[var(--theme-bg)] transition-colors">
                 View
               </button>
-              <button *ngIf="f.status === 'Approved'" (click)="proceedToPayment(f.id, f.amountDeclared)" class="bg-app-primary text-white border-none rounded-md px-2.5 py-1 text-[11px] hover:bg-app-primary-hover transition-colors">
+
+              <button *ngIf="f.status === 'Pending'" (click)="updateStatus(f.id, 'Approved')"
+                      class="bg-green-600/10 text-green-600 border border-green-600/20 rounded-md px-2.5 py-1 text-[11px] hover:bg-green-600 hover:text-white transition-all">
+                Approve
+              </button>
+
+              <button *ngIf="f.status === 'Approved'" (click)="proceedToPayment(f.id, f.amountDeclared)"
+                      class="bg-app-primary text-white border-none rounded-md px-2.5 py-1 text-[11px] hover:bg-app-primary-hover transition-colors">
                 Pay
               </button>
+
+              <span *ngIf="f.status === 'Paid'" class="text-[#3fb950] text-[11px] font-bold px-2 flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  Paid
+                </span>
             </div>
           </td>
         </tr>
         </tbody>
       </table>
-    </div>
-  </div>
-</div>
-
-<!-- Combined Details & Officer Action Modal -->
-<div *ngIf="selectedFiling" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-  <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-
-    <!-- Modal Header -->
-    <div class="px-6 py-4 border-b border-[var(--theme-border)] flex justify-between items-center bg-[var(--theme-bg)]">
-      <h3 class="text-lg font-medium text-[var(--theme-text)]">Filing Details - #{{ selectedFiling.id }}</h3>
-      <button (click)="closeDetails()" class="text-[var(--theme-muted)] hover:text-[var(--theme-text)] text-xl transition-colors">✕</button>
-    </div>
-
-    <!-- Modal Body -->
-    <div class="p-6 space-y-6">
-      <div class="grid grid-cols-2 gap-6">
-        <div>
-          <label class="text-[10px] uppercase text-[var(--theme-muted)] tracking-widest font-semibold">Tax Period</label>
-          <p class="text-[var(--theme-text)] text-sm mt-1">{{ selectedFiling.period }}</p>
-        </div>
-        <div>
-          <label class="text-[10px] uppercase text-[var(--theme-muted)] tracking-widest font-semibold">Current Status</label>
-          <p class="text-sm mt-1 font-medium"
-             [ngClass]="{'text-green-500': selectedFiling.statusColor === 'green', 'text-blue-500': selectedFiling.statusColor === 'blue', 'text-red-500': selectedFiling.statusColor === 'red'}">
-            {{ selectedFiling.status }}
-          </p>
-        </div>
-        <div>
-          <label class="text-[10px] uppercase text-[var(--theme-muted)] tracking-widest font-semibold">Total Declared</label>
-          <p class="text-[var(--theme-text)] text-sm mt-1">{{ selectedFiling.amountDeclared | currency:'USD' }}</p>
-        </div>
-        <div>
-          <label class="text-[10px] uppercase text-[var(--theme-muted)] tracking-widest font-semibold">Estimated Tax</label>
-          <p class="text-app-primary font-bold text-sm mt-1">{{ calculateTax(selectedFiling.amountDeclared) | currency:'USD' }}</p>
-        </div>
-      </div>
-
-      <div class="pt-4 border-t border-[var(--theme-border)]">
-        <label class="text-[10px] uppercase text-[var(--theme-muted)] tracking-widest font-semibold">Submission Date</label>
-        <p class="text-[var(--theme-text)] text-sm mt-1">{{ selectedFiling.submittedDate | date:'fullDate' }}</p>
-      </div>
-    </div>
-
-    <!-- Modal Footer: Dynamic based on Role -->
-    <div class="px-6 py-4 bg-[var(--theme-bg)] flex justify-between items-center border-t border-[var(--theme-border)]">
-
-      <!-- Officer Actions: Only shown if isOfficer() is true -->
-      <div *ngIf="isOfficer()" class="flex gap-2">
-        <button (click)="updateStatus(selectedFiling.id, 'Rejected')"
-                class="px-4 py-2 rounded-lg text-[12px] font-medium border border-red-500/50 text-red-500 hover:bg-red-500/10 transition-all">
-          Reject Filing
-        </button>
-        <button (click)="updateStatus(selectedFiling.id, 'Approved')"
-                class="px-4 py-2 rounded-lg text-[12px] font-medium bg-green-600 text-white hover:bg-green-700 transition-all">
-          Approve Filing
-        </button>
-      </div>
-
-      <!-- General Close Button -->
-      <button (click)="closeDetails()"
-              [class]="isOfficer() ? 'text-[var(--theme-muted)] text-[12px] hover:text-[var(--theme-text)]' : 'w-full bg-app-primary text-white py-2 rounded-lg text-[13px] font-medium shadow-lg shadow-app-primary/20'">
-        {{ isOfficer() ? 'Cancel' : 'Close Record' }}
-      </button>
     </div>
   </div>
 </div>

@@ -1,22 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { TaxFilingService } from '../service/tax-filing.service';
 
 @Component({
   selector: 'app-my-filings',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './my-filings.html'
 })
 export class MyFilingsComponent implements OnInit {
   filings: any[] = [];
+  allFilings: any[] = [];
   selectedFiling: any = null;
-  currentUserRole: string = 'TAXPAYER'; // Or 'TAXPAYER'
+  currentUserRole: string = 'TAXPAYER';
+
+  selectedPeriod: string = 'All Periods';
+  selectedStatus: string = 'All Statuses';
 
   constructor(
     private taxFilingService: TaxFilingService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -24,12 +30,23 @@ export class MyFilingsComponent implements OnInit {
   }
 
   loadFilings() {
-    // For demo, using a fixed taxpayerId or fetching all if officer
     const taxpayerId = 10;
     this.taxFilingService.getHistory(taxpayerId).subscribe({
-      next: (data) => this.filings = data,
+      next: (data) => {
+        this.allFilings = data;
+        this.applyFilters();
+      },
       error: (err) => console.error('Load failed', err)
     });
+  }
+
+  applyFilters() {
+    this.filings = this.allFilings.filter(f => {
+      const matchesPeriod = this.selectedPeriod === 'All Periods' || f.period === this.selectedPeriod;
+      const matchesStatus = this.selectedStatus === 'All Statuses' || f.status === this.selectedStatus;
+      return matchesPeriod && matchesStatus;
+    });
+    this.cdr.detectChanges();
   }
 
   isOfficer(): boolean {
@@ -45,35 +62,42 @@ export class MyFilingsComponent implements OnInit {
   }
 
   updateStatus(filingId: number, newStatus: string) {
-    const officerId = 1; // Mock officer ID from session
+    const officerId = 1;
+
     this.taxFilingService.updateStatus(filingId, newStatus, officerId).subscribe({
-      next: (updated) => {
-        this.loadFilings(); // Refresh table
-        this.selectedFiling = updated; // Update modal
-        console.log('Status updated successfully');
+      next: (updatedFiling) => {
+        console.log('Status updated to:', newStatus);
+
+        const index = this.allFilings.findIndex(f => f.id === filingId);
+        if (index !== -1) {
+          this.allFilings[index].status = newStatus;
+          // Logic to handle 'Paid' color mapping
+          this.allFilings[index].statusColor =
+            newStatus === 'Approved' || newStatus === 'Paid' ? 'green' :
+            newStatus === 'Pending' ? 'blue' : 'red';
+        }
+
+        this.applyFilters();
+        this.cdr.detectChanges();
       },
-      error: (err) => alert('Update failed: ' + err.message)
+      error: (err) => {
+        console.error('Failed to update status', err);
+        alert('Error: Could not update status.');
+      }
     });
   }
 
   calculateTax(amount: number): number {
     return amount * 0.10;
   }
- proceedToPayment(filingId: number, amountDeclared: number) {
-   // Calculate the 10% tax here so the payment page doesn't have to guess the logic
-   const taxDue = amountDeclared * 0.10;
 
-   this.router.navigate(['/portal/payment'], {
-     queryParams: {
-       id: filingId,
-       amount: taxDue.toFixed(2), // Send the actual tax amount, not the total declared
-       type: 'TAX_PAYMENT'
-     }
-   });
- }
-  //proceedToPayment(filingId: number, amount: number) {
-    //this.router.navigate(['/portal/payment'], {
-      //queryParams: { id: filingId, amount: this.calculateTax(amount) }
-    //});
-  //}
-//}
+  proceedToPayment(filingId: number, amount: number) {
+    const taxAmount = this.calculateTax(amount);
+    this.router.navigate(['/portal/payment'], {
+      queryParams: {
+        id: filingId,
+        amount: taxAmount.toFixed(2)
+      }
+    });
+  }
+}
