@@ -8,7 +8,7 @@ import { taxpayerDocument } from '../dto/taxpayer-profile';
 @Component({
   selector: 'app-reg-status',
   standalone: true,
-  imports: [CommonModule, AsyncPipe],
+  imports: [CommonModule],
   templateUrl: './reg-status.html'
 })
 export class RegStatusComponent implements OnInit{

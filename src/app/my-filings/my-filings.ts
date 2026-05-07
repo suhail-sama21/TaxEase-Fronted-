@@ -71,9 +71,4 @@ export class MyFilingsComponent implements OnInit {
      }
    });
  }
-  //proceedToPayment(filingId: number, amount: number) {
-    //this.router.navigate(['/portal/payment'], {
-      //queryParams: { id: filingId, amount: this.calculateTax(amount) }
-    //});
-  //}
-//}
+}
