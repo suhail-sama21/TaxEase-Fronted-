@@ -12,7 +12,7 @@ import { TaxFilingService } from '../service/tax-filing.service';
 export class MyFilingsComponent implements OnInit {
   filings: any[] = [];
   selectedFiling: any = null;
-  currentUserRole: string = 'OFFICER'; // Or 'TAXPAYER'
+  currentUserRole: string = 'TAXPAYER'; // Or 'TAXPAYER'
 
   constructor(
     private taxFilingService: TaxFilingService,
@@ -25,7 +25,7 @@ export class MyFilingsComponent implements OnInit {
 
   loadFilings() {
     // For demo, using a fixed taxpayerId or fetching all if officer
-    const taxpayerId = 987654321;
+    const taxpayerId = 10;
     this.taxFilingService.getHistory(taxpayerId).subscribe({
       next: (data) => this.filings = data,
       error: (err) => console.error('Load failed', err)
@@ -59,10 +59,21 @@ export class MyFilingsComponent implements OnInit {
   calculateTax(amount: number): number {
     return amount * 0.10;
   }
+ proceedToPayment(filingId: number, amountDeclared: number) {
+   // Calculate the 10% tax here so the payment page doesn't have to guess the logic
+   const taxDue = amountDeclared * 0.10;
 
-  proceedToPayment(filingId: number, amount: number) {
-    this.router.navigate(['/portal/payment'], {
-      queryParams: { id: filingId, amount: this.calculateTax(amount) }
-    });
-  }
-}
+   this.router.navigate(['/portal/payment'], {
+     queryParams: {
+       id: filingId,
+       amount: taxDue.toFixed(2), // Send the actual tax amount, not the total declared
+       type: 'TAX_PAYMENT'
+     }
+   });
+ }
+  //proceedToPayment(filingId: number, amount: number) {
+    //this.router.navigate(['/portal/payment'], {
+      //queryParams: { id: filingId, amount: this.calculateTax(amount) }
+    //});
+  //}
+//}

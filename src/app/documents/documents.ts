@@ -1,8 +1,7 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { DocumentService } from '../service/document.service';
-import { CommonModule } from '@angular/common'; // Fixes *ngIf, *ngFor, and | date
-import { FormsModule } from '@angular/forms';   // Fixes [(ngModel)]
-
 
 @Component({
   selector: 'app-documents',
@@ -10,36 +9,97 @@ import { FormsModule } from '@angular/forms';   // Fixes [(ngModel)]
   imports: [CommonModule, FormsModule],
   templateUrl: './documents.html'
 })
-export class DocumentsComponent implements OnInit {
-  @Input() filingId!: number; // Passed from parent or route
-  currentFilingId: number | null = null;
-  uploadedDocs: any[] = [];
-  isUploading = false;
+export class DocumentsComponent {
+  // Use ViewChild to get the value directly from the textarea
+  @ViewChild('urlInput') urlInput!: ElementRef<HTMLTextAreaElement>;
 
-  constructor(private documentService: DocumentService) {}
+  // Upload States
+  uploadFilingId: number | null = null;
+  isSubmitting = false;
+  isUploaded = false;
+  uploadMessage = '';
 
-  ngOnInit() {
-    if (this.filingId) {
-      this.loadDocuments();
+  // Fetch States
+  fetchFilingId: number | null = null;
+  isFetching = false;
+  fetchedDocs: any[] = [];
+  fetchMessage = '';
+
+  constructor(
+    private documentService: DocumentService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  // The Link Button Logic
+  submitUrl() {
+    // Get value from ViewChild instead of passing it as a parameter
+    const url = this.urlInput.nativeElement.value;
+
+    if (!this.uploadFilingId || !url) {
+      this.uploadMessage = 'Filing ID and URL are required.';
+      return;
     }
-  }
 
-  loadDocuments() {
-    this.documentService.getDocuments(this.filingId).subscribe(docs => {
-      this.uploadedDocs = docs;
+    if (this.isSubmitting) return;
+    this.isSubmitting = true;
+    this.uploadMessage = 'Processing...';
+
+    const payload = { filingId: Number(this.uploadFilingId), fileUrl: url };
+
+    this.documentService.uploadDocument(payload).subscribe({
+      next: (res) => {
+        this.isSubmitting = false;
+        this.isUploaded = true;
+        this.uploadMessage = 'Document linked successfully!';
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        // CORS/Parsing workaround for 201 Created
+        if (err.status === 0 || err.status === 201 || err.status === 200) {
+          this.isUploaded = true;
+          this.uploadMessage = 'Document linked successfully!';
+        } else {
+          this.uploadMessage = err.error?.message || 'Upload failed.';
+        }
+        this.cdr.detectChanges();
+      }
     });
   }
 
-  submitUrl(url: string) {
-    this.isUploading = true;
-    const dto = { filingId: this.filingId, fileUrl: url };
+  // The Fetch Button Logic
+  loadDocuments() {
+    if (!this.fetchFilingId) {
+      this.fetchMessage = 'Please enter an ID.';
+      return;
+    }
 
-    this.documentService.uploadDocument(dto).subscribe({
-      next: (newDoc) => {
-        this.uploadedDocs.unshift(newDoc);
-        this.isUploading = false;
+    this.isFetching = true;
+    this.fetchMessage = 'Searching...';
+    this.fetchedDocs = [];
+
+    this.documentService.getDocuments(this.fetchFilingId).subscribe({
+      next: (docs) => {
+        this.isFetching = false;
+        this.fetchedDocs = docs;
+        this.fetchMessage = docs.length > 0 ? '' : 'No documents found for this ID.';
+        this.cdr.detectChanges();
       },
-      error: () => this.isUploading = false
+      error: (err) => {
+        this.isFetching = false;
+        this.fetchMessage = 'Failed to retrieve documents.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  resetUpload() {
+    this.isUploaded = false;
+    this.uploadMessage = '';
+    this.cdr.detectChanges();
+    // Use timeout to wait for the DOM to re-render the textarea
+    setTimeout(() => {
+      if (this.urlInput) this.urlInput.nativeElement.value = '';
     });
   }
 }
