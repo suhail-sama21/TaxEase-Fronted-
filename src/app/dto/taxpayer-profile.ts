@@ -14,3 +14,11 @@ export interface TaxpayerProfile {
   type: string;
   user: User; // This links the nested object
 }
+
+export interface taxpayerDocument{
+  docType: string,
+  fileUri: string,
+  id: number,
+  uploadedDate: string,
+  verificationStatus: string
+}

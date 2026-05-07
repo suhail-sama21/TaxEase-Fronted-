@@ -1,230 +1,109 @@
 <div class="max-w-4xl mx-auto animate-fade-in pb-12">
-  <!-- Header with Back Button -->
-  <div class="flex items-center justify-between mb-8">
-    <div>
-      <div class="flex items-center gap-3 mb-1">
-        <button
-          (click)="goBack()"
-          class="text-[var(--theme-muted)] hover:text-[var(--theme-text)] transition-colors duration-300 text-[20px] leading-none mb-0.5"
-        >
-          ←
-        </button>
-        <h1 class="text-2xl font-bold text-[var(--theme-text)] transition-colors duration-300">
-          Audit Case Details
-        </h1>
+  <!-- This block only renders once the Observable (auditData$) has data -->
+  <div *ngIf="auditData$ | async as audit; else loadingTemplate">
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-3">
+        <button (click)="goBack()" class="text-[var(--theme-muted)] text-xl">←</button>
+        <h1 class="text-2xl font-bold text-[var(--theme-text)]">Audit Case Details</h1>
       </div>
-      <p class="text-[13px] text-[var(--theme-muted)] transition-colors duration-300 ml-8">
-        Review scope, findings, and current status for this record.
-      </p>
-    </div>
 
-    <div class="flex gap-3">
-      <button
-        (click)="exportPdf()"
-        class="bg-[var(--theme-card)] border border-[var(--theme-border)] hover:border-[var(--theme-muted)] text-[var(--theme-text)] rounded-lg px-4 py-2 text-[13px] font-medium transition-colors duration-300"
-      >
-        Export PDF
-      </button>
-
-      <!-- NEW: Only show if NOT closing AND NOT already CLOSED -->
-      <ng-container *ngIf="auditData.status !== 'CLOSED' && !isClosingAudit">
-        <!-- Primary action button retains its brand color but gains transition -->
+      <div class="flex gap-3">
+        <!-- Close button shows only if ACTIVE -->
+        <!-- Use .toUpperCase() here to ensure it matches regardless of backend casing -->
         <button
+          *ngIf="audit.status.toUpperCase() === 'ACTIVE' && !isClosingAudit"
           (click)="initiateClose()"
-          class="bg-[#238636] hover:bg-[#2ea043] text-white rounded-lg px-4 py-2 text-[13px] font-medium transition-colors duration-300 shadow-lg shadow-green-500/10 flex items-center gap-2"
+          class="bg-[#238636] hover:bg-[#2ea043] text-white rounded-lg px-4 py-2 text-[13px] font-medium transition-colors shadow-lg shadow-green-500/10 flex items-center gap-2"
         >
           <span>✓</span> Close Audit Case
         </button>
-      </ng-container>
-    </div>
-  </div>
-
-  <!-- Meta Information Card -->
-  <div
-    class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl p-6 mb-6 shadow-sm"
-  >
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-      <div>
-        <div
-          class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300 uppercase tracking-wider font-semibold mb-1"
-        >
-          System ID
-        </div>
-        <div
-          class="text-[15px] font-mono font-medium text-[var(--theme-text)] transition-colors duration-300"
-        >
-          AUD-{{ auditData.id }}
-        </div>
-      </div>
-
-      <div>
-        <div
-          class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300 uppercase tracking-wider font-semibold mb-1"
-        >
-          Officer ID
-        </div>
-        <div
-          class="text-[15px] font-mono font-medium text-[var(--theme-text)] transition-colors duration-300"
-        >
-          OFF-{{ auditData.officerId }}
-        </div>
-      </div>
-
-      <div>
-        <div
-          class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300 uppercase tracking-wider font-semibold mb-1"
-        >
-          Created At
-        </div>
-        <div class="text-[14px] text-[var(--theme-text)] transition-colors duration-300">
-          {{ getFormattedDate(auditData.createdAt) }}
-        </div>
-      </div>
-
-      <div>
-        <div
-          class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300 uppercase tracking-wider font-semibold mb-2"
-        >
-          Current Status
-        </div>
-        <!-- Status badges converted to the 10% opacity background rule -->
-        <span
-          class="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border font-medium transition-colors duration-300"
-          [ngClass]="{
-            'bg-[#e3b341]/10 text-[#e3b341] border-[#e3b341]/20': auditData.status === 'PENDING',
-            'bg-[#1f6feb]/10 text-[#1f6feb] border-[#1f6feb]/20': auditData.status === 'ACTIVE',
-            'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/20':
-              auditData.status === 'RESOLVED' || auditData.status === 'CLOSED',
-          }"
-        >
-          {{ auditData.status }}
-        </span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Scope & Findings Content -->
-  <div
-    class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl overflow-hidden shadow-sm mb-6"
-  >
-    <!-- Scope Section -->
-    <div class="p-6 border-b border-[var(--theme-border)] transition-colors duration-300">
-      <h2
-        class="text-[14px] font-bold text-[var(--theme-text)] transition-colors duration-300 mb-3 flex items-center gap-2"
-      >
-        <span class="text-[var(--theme-muted)] transition-colors duration-300">🎯</span> Audit Scope
-      </h2>
-      <div
-        class="bg-[var(--theme-bg)] border border-[var(--theme-border)] transition-colors duration-300 rounded-lg p-5 text-[14px] text-[var(--theme-text)] leading-relaxed"
-      >
-        {{ auditData.scope }}
       </div>
     </div>
 
-    <!-- Findings Section -->
-    <div class="p-6">
-      <h2
-        class="text-[14px] font-bold text-[var(--theme-text)] transition-colors duration-300 mb-3 flex items-center gap-2"
-      >
-        <span class="text-[var(--theme-muted)] transition-colors duration-300">📝</span> Findings &
-        Notes
-      </h2>
-
-      <div *ngIf="auditData.findings; else noFindings">
-        <div
-          class="bg-[var(--theme-bg)] border border-[var(--theme-border)] transition-colors duration-300 rounded-lg p-5 text-[14px] text-[var(--theme-text)] leading-relaxed whitespace-pre-line"
-        >
-          {{ auditData.findings }}
-        </div>
-      </div>
-
-      <ng-template #noFindings>
-        <div
-          class="bg-[var(--theme-bg)] border border-[var(--theme-border)] transition-colors duration-300 border-dashed rounded-lg p-8 text-center"
-        >
-          <p class="text-[13px] text-[var(--theme-muted)] transition-colors duration-300">
-            No findings have been recorded for this audit yet.
+    <!-- Data Cards -->
+    <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-6 mb-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div>
+          <p class="text-[11px] text-[var(--theme-muted)] uppercase mb-1">System ID</p>
+          <p class="text-[15px] font-mono font-medium text-[var(--theme-text)]">
+            AUD-{{ audit.id }}
           </p>
         </div>
-      </ng-template>
-    </div>
-  </div>
-
-  <!-- Close Audit Form Panel (Shows only when isClosingAudit is true) -->
-  <div
-    *ngIf="isClosingAudit"
-    class="bg-[var(--theme-card)] border-2 border-[#238636] transition-colors duration-300 rounded-xl overflow-hidden shadow-[0_0_15px_rgba(35,134,54,0.1)] animate-fade-in mb-6"
-  >
-    <div
-      class="px-6 py-4 border-b border-[var(--theme-border)] bg-[var(--theme-bg)] transition-colors duration-300 flex justify-between items-center"
-    >
-      <h2
-        class="text-[16px] font-bold text-[var(--theme-text)] transition-colors duration-300 flex items-center gap-2"
-      >
-        <span class="text-[#3fb950]">🔒</span> Finalize & Close Audit Case
-      </h2>
-      <button
-        (click)="cancelClose()"
-        class="text-[var(--theme-muted)] hover:text-[var(--theme-text)] transition-colors duration-300"
-      >
-        ✕
-      </button>
-    </div>
-
-    <div class="p-6">
-      <!-- Warning box using the 10% opacity rule for warning colors -->
-      <div
-        class="mb-4 p-4 bg-[#e3b341]/10 border border-[#e3b341]/20 transition-colors duration-300 rounded-lg text-[12px] text-[var(--theme-text)] leading-relaxed"
-      >
-        <span class="font-bold text-[#e3b341] mr-1">Warning:</span> Closing this audit will lock the
-        record. You must provide a comprehensive final summary of the findings before proceeding.
-      </div>
-
-      <div class="mb-6">
-        <label
-          class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2"
-          >Final Audit Findings <span class="text-[#f85149]">*</span></label
-        >
-        <textarea
-          [(ngModel)]="closeRequest.findings"
-          rows="6"
-          maxlength="2000"
-          placeholder="Document the final resolution, any actions taken, and the justification for closing this case..."
-          class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] transition-colors duration-300 rounded-lg text-[var(--theme-text)] text-[13px] px-4 py-3 outline-none focus:border-[#3fb950] placeholder-[var(--theme-muted)] resize-y"
-        ></textarea>
-        <div class="flex justify-between items-center mt-1.5">
-          <span class="text-[11px] text-[#f85149]" *ngIf="closeRequest.findings.length === 0"
-            >Findings are required to close the case.</span
-          >
+        <div>
+          <p class="text-[11px] text-[var(--theme-muted)] uppercase mb-2">Status</p>
           <span
-            class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300 ml-auto"
-            [class.text-[#f85149]]="closeRequest.findings.length > 1900"
-            >{{ closeRequest.findings.length }} / 2000</span
+            class="px-2.5 py-0.5 rounded-full border text-[11px] font-medium"
+            [ngClass]="
+              audit.status === 'ACTIVE'
+                ? 'bg-[#1f6feb]/10 text-[#1f6feb] border-[#1f6feb]/20'
+                : 'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/20'
+            "
           >
+            {{ audit.status }}
+          </span>
         </div>
       </div>
+    </div>
 
+    <!-- Scope/Findings Card -->
+    <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-6 mb-6">
+      <h2 class="text-[14px] font-bold text-[var(--theme-text)] mb-3">Audit Scope</h2>
+      <!-- CHANGED text-white TO text-[var(--theme-text)] -->
       <div
-        class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--theme-border)] transition-colors duration-300"
+        class="bg-[var(--theme-bg)] p-4 rounded-lg text-[var(--theme-text)] mb-6 border border-[var(--theme-border)]"
       >
+        {{ audit.scope }}
+      </div>
+
+      <h2 class="text-[14px] font-bold text-[var(--theme-text)] mb-3">Findings</h2>
+      <!-- CHANGED text-white TO text-[var(--theme-text)] -->
+      <div
+        class="bg-[var(--theme-bg)] p-4 rounded-lg text-[var(--theme-text)] border border-[var(--theme-border)]"
+      >
+        {{ audit.findings || 'No findings recorded yet.' }}
+      </div>
+    </div>
+
+    <!-- The Actual Close Functionality Form -->
+    <div
+      *ngIf="isClosingAudit"
+      class="bg-[var(--theme-card)] border-2 border-[#238636] rounded-xl p-6 animate-fade-in shadow-xl"
+    >
+      <h3 class="text-[#3fb950] font-bold text-lg mb-4 flex items-center gap-2">
+        <span>🔒</span> Finalize Audit Findings
+      </h3>
+      <textarea
+        [(ngModel)]="closeRequest.findings"
+        placeholder="Enter final summary to close this case..."
+        class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] p-4 rounded-lg text-white mb-4 outline-none focus:border-[#3fb950]"
+        rows="5"
+      ></textarea>
+
+      <div class="flex justify-end gap-3">
         <button
           (click)="cancelClose()"
-          class="bg-transparent border border-[var(--theme-border)] text-[var(--theme-text)] rounded-lg px-5 py-2 text-[13px] font-medium hover:bg-[var(--theme-surface)] transition-colors duration-300"
+          class="px-5 py-2 text-[var(--theme-muted)] hover:text-white transition-colors"
         >
           Cancel
         </button>
-        <!-- Primary action button retains its brand color but gains transition -->
         <button
           (click)="submitCloseAudit()"
-          [disabled]="closeRequest.findings.trim() === ''"
-          class="bg-[#238636] hover:bg-[#2ea043] text-white rounded-lg px-6 py-2 text-[13px] font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="bg-[#238636] text-white px-6 py-2 rounded-lg font-bold"
         >
           Submit & Close Case
         </button>
       </div>
     </div>
   </div>
-  <div class="text-center text-[var(--theme-muted)] transition-colors duration-300 text-[12px]">
-    This record is strictly confidential and protected under system access policies.
-  </div>
+
+  <!-- Loading Template (Shown until auditData$ has data) -->
+  <ng-template #loadingTemplate>
+    <div
+      class="text-center py-20 bg-[var(--theme-card)] rounded-xl border border-[var(--theme-border)]"
+    >
+      <div class="animate-pulse text-[var(--theme-muted)]">
+        Syncing with database for AUD-{{ currentAuditId }}...
+      </div>
+    </div>
+  </ng-template>
 </div>

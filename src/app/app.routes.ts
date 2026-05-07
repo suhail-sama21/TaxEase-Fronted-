@@ -56,7 +56,7 @@ export const routes: Routes = [
       { path: 'audit-cases', component: AuditCasesComponent },
       { path: 'create-audit', component: CreateAuditComponent },
       { path: 'view-audit/:id', component: ViewAuditComponent }, // Route with ID parameter
-      { path: 'view-audit', component: ViewAuditComponent }, // Fallback route
+      { path: 'view-audit/:id', component: ViewAuditComponent }, // Fallback route
       // Default child route redirects to dashboard inside the portal
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],

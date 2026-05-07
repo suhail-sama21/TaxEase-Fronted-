@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ReportingService } from '../../services/reporting.service';
 
 @Component({
   selector: 'app-report-download',
@@ -10,33 +11,78 @@ import { FormsModule } from '@angular/forms';
 })
 export class ReportDownloadComponent {
   
-  // Form variables
+  // Form variables bonded to your HTML [(ngModel)]
   startDate: string = '';
   endDate: string = '';
-  reportType: string = 'Revenue';
+  
+  // Default Category (This is just for the CSV file name)
+  reportType: string = 'Financial';
 
+  // Simplified Metrics directly matching your backend endpoint!
   metrics = {
-    totalVolume: false,
-    successRate: false,
-    failureReasons: false,
-    auditFindings: false
+    revenue: true,      // Default checked
+    compliance: false   // Default unchecked
   };
 
-  recentReports = [
-    { id: 'REP-0091', name: 'Q1 2026 Revenue Summary', category: 'Revenue', date: '2026-04-20', status: 'Ready', statusColor: 'green' },
-    { id: 'REP-0092', name: 'Failed Transactions Log', category: 'Payments', date: '2026-04-18', status: 'Ready', statusColor: 'green' },
-    { id: 'REP-0093', name: 'Q1 Audit Discrepancies', category: 'Audit', date: '2026-04-15', status: 'Expired', statusColor: 'amber' },
-    { id: 'REP-0094', name: 'Custom Revenue Export', category: 'Revenue', date: 'Just now', status: 'Generating', statusColor: 'blue' }
-  ];
+  isGenerating: boolean = false;
+  recentReports: any[] = [];
+
+  constructor(private reportingService: ReportingService) {}
 
   downloadReport() {
-    const selectedMetrics = Object.keys(this.metrics).filter(key => (this.metrics as any)[key]);
-
-    if (selectedMetrics.length === 0) {
-      alert("Please select at least one metric!");
+    // 1. Validation
+    if (!this.startDate || !this.endDate) {
+      alert("Please select both Start Date and End Date!");
       return;
     }
 
-    alert('Report generation initiated! It will appear in your history shortly.');
+    // 2. Build backend array based on exact checkboxes
+    const backendMetrics: string[] = [];
+    
+    if (this.metrics.revenue) {
+      backendMetrics.push("Revenue");
+    }
+    if (this.metrics.compliance) {
+      backendMetrics.push("Compliance");
+    }
+
+    if (backendMetrics.length === 0) {
+      alert("Please select at least one data metric (Revenue or Compliance)!");
+      return;
+    }
+
+    this.isGenerating = true;
+
+    // 3. Call the backend API
+    this.reportingService.downloadCustomReport(this.startDate, this.endDate, this.reportType, backendMetrics)
+      .subscribe({
+        next: (blob: Blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `TaxEase_${this.reportType}_Report_${this.startDate}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          
+          window.URL.revokeObjectURL(url);
+          a.remove();
+
+          this.recentReports.unshift({ 
+            id: 'REP-' + Math.floor(1000 + Math.random() * 9000), 
+            name: `${this.reportType} Extract`, 
+            category: this.reportType, 
+            date: new Date().toISOString().split('T')[0], 
+            status: 'Ready', 
+            statusColor: 'green' 
+          });
+
+          this.isGenerating = false;
+        },
+        error: (err: any) => {
+          console.error('Error generating report:', err);
+          alert('Failed to generate report. Check your date range or backend connection.');
+          this.isGenerating = false;
+        }
+      });
   }
 }

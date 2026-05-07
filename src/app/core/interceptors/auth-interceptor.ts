@@ -22,9 +22,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error) => {
-      if (error.status === 401 || error.status === 403) {
+      // Only logout on 401/403 for non-password endpoints
+      const isPasswordEndpoint = req.url.includes('/changePassword');
+      if ((error.status === 401 || error.status === 403) && !isPasswordEndpoint) {
         localStorage.clear();
         router.navigate(['/login']);
+      } else if (error.status === 403) {
+        console.error("403 Forbidden: Missing permissions or endpoint not found.");
       }
       return throwError(() => error);
     }),
