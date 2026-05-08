@@ -21,6 +21,9 @@ export class ProfileComponent implements OnInit{
   
   isSaving = false;
   isSavingPassword = false;
+  isEditMode = false;
+  isConfirmModalOpen = false;
+  editChanges: any = {};
 
   // Mock User Data
   userProfile = signal({
@@ -57,15 +60,64 @@ export class ProfileComponent implements OnInit{
   }
 
   assignData() {
-  this.userProfile.update(profile => ({
-    ...profile,                   // 1. Keep everything currently in the signal (dob, pan, etc.)
-    fullName: this.userData.name, // 2. Overwrite only these specific fields
-    email: this.userData.email,
-    address: this.userData.address,
-    phone: this.userData.phone,
-    type: this.userData.role || 'Citizen'
-  }));
-}
+    this.userProfile.update(profile => ({
+      fullName: this.userData.name,
+      email: this.userData.email,
+      address: this.userData.address,
+      phone: this.userData.phone,
+      type: this.userData.role || 'Citizen',
+      dob: this.userData.dob,
+      pan: this.userData.panNumber
+    }));
+  }
+
+  enableEditMode() {
+    this.isEditMode = true;
+  }
+
+  cancelEdit() {
+    this.isEditMode = false;
+    this.assignData();
+  }
+
+  openConfirmModal() {
+    this.editChanges = {
+      name: this.userProfile().fullName,
+      phone: this.userProfile().phone,
+      address: this.userProfile().address,
+      panNumber: this.userProfile().pan,
+      dob: this.userProfile().dob
+    };
+    this.isConfirmModalOpen = true;
+  }
+
+  closeConfirmModal() {
+    this.isConfirmModalOpen = false;
+  }
+
+  confirmProfileUpdate() {
+    if (!this.userData?.id) {
+      console.error('User ID not found');
+      return;
+    }
+
+    this.isSaving = true;
+    this.taxpayerService.updateProfile(this.editChanges).subscribe({
+      next: (response) => {
+        this.isSaving = false;
+        this.isEditMode = false;
+        this.isConfirmModalOpen = false;
+        this.userData = response.user;
+        this.assignData();
+        alert('Profile updated successfully!');
+      },
+      error: (err) => {
+        this.isSaving = false;
+        console.error('Profile update error:', err);
+        alert('Failed to update profile. Please try again.');
+      }
+    });
+  }
 
   saveProfile() {
     this.isSaving = true;
@@ -182,4 +234,6 @@ export class ProfileComponent implements OnInit{
       }, 3000);
     }
   }
+
+  
 }

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { TaxFilingService } from '../service/tax-filing.service';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-my-filings',
@@ -10,7 +12,7 @@ import { TaxFilingService } from '../service/tax-filing.service';
   templateUrl: './my-filings.html'
 })
 export class MyFilingsComponent implements OnInit {
-  filings: any[] = [];
+  filings$!: Observable<any[]>;
   selectedFiling: any = null;
   currentUserRole: string = 'TAXPAYER'; // Or 'TAXPAYER'
 
@@ -24,12 +26,16 @@ export class MyFilingsComponent implements OnInit {
   }
 
   loadFilings() {
-    // For demo, using a fixed taxpayerId or fetching all if officer
-    const taxpayerId = 10;
-    this.taxFilingService.getHistory(taxpayerId).subscribe({
-      next: (data) => this.filings = data,
-      error: (err) => console.error('Load failed', err)
-    });
+  const taxpayerId = 10;
+
+    // 2. Assign the Observable directly. Do NOT use .subscribe() here.
+    this.filings$ = this.taxFilingService.getHistory(taxpayerId).pipe(
+      catchError((err) => {
+        console.error('Load failed', err);
+        // Return an empty array so the UI doesn't break
+        return of([]); 
+      })
+    );
   }
 
   isOfficer(): boolean {
@@ -77,3 +83,4 @@ export class MyFilingsComponent implements OnInit {
     //});
   //}
 //}
+}

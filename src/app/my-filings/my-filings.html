@@ -41,7 +41,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let f of filings" class="hover:bg-[var(--theme-bg)] border-b border-[var(--theme-border)] last:border-0 transition-colors duration-300">
+        <tr *ngFor="let f of filings$ | async" class="hover:bg-[var(--theme-bg)] border-b border-[var(--theme-border)] last:border-0 transition-colors duration-300">
           <td class="px-5 py-3 text-app-primary font-mono text-[12px]">#{{ f.id }}</td>
           <td class="px-5 py-3 text-[var(--theme-text)]">{{ f.period }}</td>
           <td class="px-5 py-3 text-[var(--theme-text)]">{{ f.amountDeclared | currency:'USD' }}</td>

@@ -83,27 +83,80 @@
             <th class="px-6 py-3">Document Type</th>
             <th class="px-6 py-3">Upload Date</th>
             <th class="px-6 py-3">Status</th>
+            <th class="px-6 py-3">Verify</th>
+            <th class="px-6 py-3">Upload / Update</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-(--theme-border)">
-          @for (doc of requiredDocs; track $index){
-            <tr class="hover:bg-(--theme-surface) transition-colors duration-300">
-              <td class="px-6 py-4 font-semibold text-(--theme-text) transition-colors duration-300">{{ doc.type }}</td>
-              <td class="px-6 py-4 text-(--theme-muted) font-medium transition-colors duration-300">{{ doc.date }}</td>
-              <td class="px-6 py-4">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border transition-colors duration-300"
-                      [ngClass]="{
-                        'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/30': doc.statusColor === 'green',
-                        'bg-[#e3b341]/10 text-[#e3b341] border-[#e3b341]/30': doc.statusColor === 'amber',
-                        'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/30': doc.statusColor === 'red'
-                      }">
-                  {{ doc.status }}
-                </span>
-              </td>
-            </tr>
-          }
+          <tr *ngFor="let doc of requiredDocs$ | async; let i = index" class="hover:bg-(--theme-surface) transition-colors duration-300">
+            <td class="px-6 py-4 font-semibold text-(--theme-text) transition-colors duration-300">{{ doc.type }}</td>
+            <td class="px-6 py-4 text-(--theme-muted) font-medium transition-colors duration-300">{{ doc.date }}</td>
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border transition-colors duration-300"
+                    [ngClass]="{
+                      'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/30': doc.statusColor === 'green',
+                      'bg-[#e3b341]/10 text-[#e3b341] border-[#e3b341]/30': doc.statusColor === 'amber',
+                      'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/30': doc.statusColor === 'red'
+                    }">
+                {{ doc.status }}
+              </span>
+            </td>
+            <td class="px-6 py-4">
+              <button
+                (click)="openVerifyModal(doc)"
+                [disabled]="!doc.fileUri || doc.statusColor === 'green'"
+                class="rounded-lg px-3 py-2 text-xs font-semibold transition-colors duration-300 border border-(--theme-border) bg-(--theme-surface) hover:border-[#1f6feb] hover:text-[#1f6feb] disabled:opacity-40 disabled:cursor-not-allowed">
+                Verify
+              </button>
+            </td>
+            <td class="px-6 py-4">
+              <button
+                (click)="openUploadModal(doc)"
+                class="rounded-lg px-3 py-2 text-xs font-semibold transition-colors duration-300 border border-(--theme-border) bg-(--theme-surface) hover:border-[#1f6feb] hover:text-[#1f6feb]">
+                {{ doc.fileUri ? 'Update Document' : 'Upload Document' }}
+              </button>
+            </td>
+          </tr>
         </tbody>
       </table>
+
+      <div *ngIf="isUploadModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div class="w-full max-w-lg rounded-3xl bg-(--theme-card) border border-(--theme-border) p-6 shadow-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-lg font-bold text-(--theme-text)">{{ activeDoc?.fileUri ? 'Update Document' : 'Upload Document' }}</h3>
+              <p class="text-sm text-(--theme-muted)">Document: {{ activeDoc?.type }}</p>
+            </div>
+            <button (click)="closeUploadModal()" class="text-(--theme-muted) hover:text-(--theme-text)">✕</button>
+          </div>
+          <div class="space-y-4">
+            <label class="block text-sm font-semibold text-(--theme-text)">Document URL</label>
+            <input [(ngModel)]="documentInputUrl" type="text" placeholder="Enter document URL"
+                   class="w-full rounded-2xl border border-(--theme-border) bg-(--theme-surface) px-4 py-3 text-sm text-(--theme-text) outline-none focus:border-[#1f6feb]" />
+          </div>
+          <div class="mt-6 flex justify-end gap-3">
+            <button (click)="closeUploadModal()" class="rounded-xl border border-(--theme-border) px-4 py-2 text-sm font-semibold text-(--theme-text) bg-(--theme-surface)">Cancel</button>
+            <button (click)="submitDocument()" class="rounded-xl bg-[#1f6feb] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1054d1]">Submit</button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="isVerifyModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div class="w-full max-w-md rounded-3xl bg-(--theme-card) border border-(--theme-border) p-6 shadow-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-lg font-bold text-(--theme-text)">Verify Document</h3>
+              <p class="text-sm text-(--theme-muted)">Choose accept or reject for {{ verificationTarget?.type }}</p>
+            </div>
+            <button (click)="closeVerifyModal()" class="text-(--theme-muted) hover:text-(--theme-text)">✕</button>
+          </div>
+          <div class="grid gap-3">
+            <button (click)="verifyDocument('Accepted')" class="rounded-xl bg-[#3fb950] px-4 py-3 text-sm font-semibold text-white hover:bg-[#34a83b]">Verify / Accept</button>
+            <button (click)="verifyDocument('Rejected')" class="rounded-xl bg-[#f85149] px-4 py-3 text-sm font-semibold text-white hover:bg-[#d63d3d]">Reject</button>
+            <button (click)="closeVerifyModal()" class="rounded-xl border border-(--theme-border) px-4 py-3 text-sm font-semibold text-(--theme-text) bg-(--theme-surface)">Cancel</button>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>
