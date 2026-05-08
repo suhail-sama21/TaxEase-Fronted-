@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, switchMap } from 'rxjs';
+import { Observable, of, switchMap, map, catchError } from 'rxjs';
 import { Jwt } from './jwt';
 import { UserService } from './user-service';
 import { taxpayerDocument, User } from '../dto/taxpayer-profile';
@@ -20,13 +20,27 @@ export class TaxpayerService {
     private store: Store
   ) {}
 
-  getProfile(userId: any, userType: any): Observable<User | null> {
-    const payload = this.jwtService.getPayload();
+  getProfile(userId?: any, userType?: any): Observable<User | null> {
+    if (userId) {
+      return this.http.get<any>(`${environment.apiUrl}/taxpayers/user/${userId}/profile`).pipe(
+        map((response) => response?.user ?? response),
+        catchError((error) => {
+          console.error('Fetch profile by ID failed, falling back to token payload:', error);
+          const payload = this.jwtService.getPayload();
+          if (payload && payload.sub) {
+            return this.userService.getUser(payload.sub);
+          }
+          return of(null);
+        }),
+      );
+    }
 
+    const payload = this.jwtService.getPayload();
     if (payload && payload.sub) {
       console.log('Fetching user details for:', payload.sub);
       return this.userService.getUser(payload.sub);
     }
+
     return of(null);
   }
 

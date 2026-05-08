@@ -86,12 +86,16 @@ export class AuthEffects {
   getProfile$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.getProfile),
-      mergeMap((action) =>
-        this.taxpayerService.getProfile(action.userId, action.userType).pipe(
+      mergeMap((action) => {
+        const profile$ = action.userId
+          ? this.taxpayerService.getProfile(action.userId, action.userType)
+          : this.authService.getProfile(action.email ?? '');
+
+        return profile$.pipe(
           map((user) => AuthActions.getProfileSuccess({ user })),
           catchError((error: any) => of(AuthActions.getProfileFailure({ error: this.extractErrorMessage(error) }))),
-        ),
-      ),
+        );
+      }),
     ),
   );
 
@@ -108,7 +112,9 @@ export class AuthEffects {
 
           // Trigger the profile fetch using the new ID and Type format
           if (userId) {
-            this.store.dispatch(AuthActions.getProfile({ userId: userId, userType: userRole }));
+            this.store.dispatch(AuthActions.getProfile({ userId, userType: userRole, email: action.email }));
+          } else {
+            this.store.dispatch(AuthActions.getProfile({ email: action.email }));
           }
           
           this.router.navigate(['/portal']);

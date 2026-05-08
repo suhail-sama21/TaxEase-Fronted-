@@ -56,6 +56,9 @@ export class ProfileComponent implements OnInit{
         this.assignData();
         console.log('User Data from Store:', this.userData);
       }
+      else{
+        console.log("No user data found in sore")
+      }
     });
   }
 

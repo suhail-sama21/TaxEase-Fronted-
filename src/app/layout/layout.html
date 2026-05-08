@@ -35,14 +35,14 @@
     
     <header class="h-13 border-b border-(--theme-border) flex items-center px-5 gap-3 bg-(--theme-surface) shrink-0 transition-colors duration-300">
       
-      <div class="flex-1 max-w-90 relative">
+      <!-- <div class="flex-1 max-w-90 relative">
         <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-(--theme-muted) text-sm transition-colors duration-300">⌕</span>
         <input 
           type="text" 
           placeholder="Search filings, payments, documents…" 
           class="w-full bg-(--theme-card) border border-(--theme-border) rounded-md text-(--theme-text) text-[13px] py-1.5 pl-8 pr-3 outline-none focus:border-[#1f6feb] transition-colors duration-300"
         />
-      </div>
+      </div> -->
 
       <div class="flex items-center gap-3 ml-auto">
         <button (click)="toggleTheme()" class="flex items-center justify-between w-12 h-6 bg-(--theme-card) border border-(--theme-border) rounded-full px-1 cursor-pointer transition-colors duration-300">
@@ -50,7 +50,7 @@
            <span class="text-[12px]">🌙</span>
         </button>
 
-        <div class="w-8 h-8 rounded-md bg-(--theme-card) border border-(--theme-border) flex items-center justify-center cursor-pointer relative text-(--theme-muted) text-sm hover:text-(--theme-text) transition-colors duration-300">
+        <div routerLink="/portal/notifications"  class="w-8 h-8 rounded-md bg-(--theme-card) border border-(--theme-border) flex items-center justify-center cursor-pointer relative text-(--theme-muted) text-sm hover:text-(--theme-text) transition-colors duration-300">
           🔔
           <div *ngIf="notificationCount > 0" class="w-2 h-2 bg-[#f85149] rounded-full absolute top-1 right-1"></div>
         </div>

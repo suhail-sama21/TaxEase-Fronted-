@@ -10,7 +10,7 @@ export const signup = createAction('[Auth] Signup', props<{ userData: any }>());
 export const signupSuccess = createAction('[Auth] Signup Success', props<{ response: AuthResponse }>());
 export const signupFailure = createAction('[Auth] Signup Failure', props<{ error: string }>());
 
-export const getProfile = createAction('[Auth] Get Profile', props<{ userId: number, userType: string }>());
+export const getProfile = createAction('[Auth] Get Profile', props<{ userId?: number; userType?: string; email?: string }>());
 export const getProfileSuccess = createAction('[Auth] Get Profile Success', props<{ user: any }>());
 export const getProfileFailure = createAction('[Auth] Get Profile Failure', props<{ error: string }>());
 
