@@ -19,6 +19,10 @@ export class MyFilingsComponent implements OnInit {
   selectedPeriod: string = 'All Periods';
   selectedStatus: string = 'All Statuses';
 
+  isLoading = false;
+  isUpdating = false;
+  errorMessage = '';
+
   constructor(
     private taxFilingService: TaxFilingService,
     private router: Router,
@@ -31,12 +35,34 @@ export class MyFilingsComponent implements OnInit {
 
   loadFilings() {
     const taxpayerId = 10;
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.cdr.detectChanges();
+
     this.taxFilingService.getHistory(taxpayerId).subscribe({
       next: (data) => {
-        this.allFilings = data;
+        this.isLoading = false;
+        this.allFilings = data || [];
         this.applyFilters();
+        this.cdr.detectChanges();
       },
-      error: (err) => console.error('Load failed', err)
+      error: (err) => {
+        this.isLoading = false;
+
+        if (err.status === 404) {
+          this.errorMessage = 'No filings found for this taxpayer.';
+        } else if (err.status === 0) {
+          this.errorMessage = 'Network error. Please check your connection and refresh the page.';
+        } else if (err.status === 500) {
+          this.errorMessage = 'Server error. Please try again later.';
+        } else {
+          this.errorMessage = 'Failed to load filings. Please try again.';
+        }
+
+        this.allFilings = [];
+        this.filings = [];
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -54,35 +80,61 @@ export class MyFilingsComponent implements OnInit {
   }
 
   viewDetails(filing: any) {
+    if (!filing || !filing.id) {
+      this.errorMessage = 'Error: Invalid filing data.';
+      this.cdr.detectChanges();
+      return;
+    }
     this.selectedFiling = { ...filing };
+    this.cdr.detectChanges();
   }
 
   closeDetails() {
     this.selectedFiling = null;
+    this.cdr.detectChanges();
   }
 
   updateStatus(filingId: number, newStatus: string) {
+    if (!filingId) {
+      this.errorMessage = 'Error: Invalid filing ID.';
+      this.cdr.detectChanges();
+      return;
+    }
+
     const officerId = 1;
+    this.isUpdating = true;
+    this.errorMessage = '';
+    this.cdr.detectChanges();
 
     this.taxFilingService.updateStatus(filingId, newStatus, officerId).subscribe({
       next: (updatedFiling) => {
-        console.log('Status updated to:', newStatus);
-
         const index = this.allFilings.findIndex(f => f.id === filingId);
         if (index !== -1) {
           this.allFilings[index].status = newStatus;
-          // Logic to handle 'Paid' color mapping
           this.allFilings[index].statusColor =
             newStatus === 'Approved' || newStatus === 'Paid' ? 'green' :
             newStatus === 'Pending' ? 'blue' : 'red';
         }
-
+        this.isUpdating = false;
         this.applyFilters();
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Failed to update status', err);
-        alert('Error: Could not update status.');
+        this.isUpdating = false;
+
+        if (err.status === 400) {
+          this.errorMessage = 'Error: Invalid status update. Please try again.';
+        } else if (err.status === 404) {
+          this.errorMessage = 'Error: Filing not found. It may have been deleted.';
+        } else if (err.status === 409) {
+          this.errorMessage = 'Error: Cannot update this filing at the moment. Please try again later.';
+        } else if (err.status === 0) {
+          this.errorMessage = 'Error: Network error. Please check your connection.';
+        } else {
+          this.errorMessage = 'Error: Failed to update status. Please try again.';
+        }
+
+        this.cdr.detectChanges();
       }
     });
   }
@@ -90,40 +142,29 @@ export class MyFilingsComponent implements OnInit {
   calculateTax(amount: number): number {
     return amount * 0.10;
   }
-proceedToPayment(filingId: number, amountDeclared: number) {
-   // Calculate the 10% tax here so the payment page doesn't have to guess the logic
-   const taxDue = amountDeclared * 0.10;
 
-   this.router.navigate(['/portal/payment'], {
-     queryParams: {
-       id: filingId,
-       amount: taxDue.toFixed(2), // Send the actual tax amount, not the total declared
-       type: 'TAX_PAYMENT'
-     }
-   });
- }
-}
- proceedToPayment(filingId: number, amount: number) {
-    const taxAmount = this.calculateTax(amount);
+  proceedToPayment(filingId: number, amountDeclared: number) {
+    if (!filingId || !amountDeclared) {
+      this.errorMessage = 'Error: Invalid filing data. Please try again.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const taxDue = amountDeclared * 0.10;
     this.router.navigate(['/portal/payment'], {
       queryParams: {
         id: filingId,
-        amount: taxAmount.toFixed(2)
+        amount: taxDue.toFixed(2),
+        type: 'TAX_PAYMENT'
       }
+    }).catch(err => {
+      this.errorMessage = 'Error: Could not navigate to payment. Please try again.';
+      this.cdr.detectChanges();
     });
   }
+
+  clearError() {
+    this.errorMessage = '';
+    this.cdr.detectChanges();
+  }
 }
-   this.router.navigate(['/portal/payment'], {
-     queryParams: {
-       id: filingId,
-       amount: taxDue.toFixed(2), // Send the actual tax amount, not the total declared
-       type: 'TAX_PAYMENT'
-     }
-   });
- }
-  //proceedToPayment(filingId: number, amount: number) {
-    //this.router.navigate(['/portal/payment'], {
-      //queryParams: { id: filingId, amount: this.calculateTax(amount) }
-    //});
-  //}
-//}

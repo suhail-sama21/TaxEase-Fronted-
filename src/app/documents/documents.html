@@ -6,44 +6,110 @@
 
       <div *ngIf="isUploaded" class="text-center py-6">
         <div class="w-12 h-12 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
         </div>
-        <p class="text-green-500 font-bold mb-6">Linked Successfully!</p>
-        <button (click)="resetUpload()" class="px-6 py-2 bg-app-primary text-white rounded-xl text-sm font-medium">Link Another</button>
+        <p class="text-green-600 dark:text-green-400 font-bold mb-2">Linked Successfully!</p>
+        <p class="text-sm text-[var(--theme-muted)] mb-6">Your document has been registered with Filing ID <span class="font-mono font-bold">#{{ uploadFilingId }}</span></p>
+        <button (click)="resetUpload()" class="px-6 py-2 bg-blue-600 dark:bg-app-primary text-white rounded-xl text-sm font-medium hover:bg-blue-700 dark:hover:brightness-110 transition-all">Link Another</button>
       </div>
 
       <div *ngIf="!isUploaded" class="space-y-4">
+        <!-- Filing ID Input -->
         <div>
           <label class="block text-xs font-semibold text-[var(--theme-muted)] uppercase mb-2">Filing ID</label>
-          <input type="number" [(ngModel)]="uploadFilingId" placeholder="ID" class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl px-4 py-3 text-sm text-[var(--theme-text)] outline-none focus:border-app-primary">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-[var(--theme-muted)] uppercase mb-2">Document URL</label>
-          <textarea #urlInput rows="3" placeholder="https://..." class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl px-4 py-3 text-sm text-[var(--theme-text)] outline-none focus:border-app-primary resize-none"></textarea>
+          <input type="number"
+                 [(ngModel)]="uploadFilingId"
+                 placeholder="Enter Filing ID"
+                 class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl px-4 py-3 text-sm text-[var(--theme-text)] outline-none focus:border-blue-600 dark:focus:border-app-primary transition-colors">
+          <p *ngIf="!uploadFilingId && showErrors" class="mt-1 flex items-center gap-1 text-red-600 dark:text-red-400 text-xs font-medium">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+            Filing ID is required
+          </p>
         </div>
 
+        <!-- Document URL Input -->
+        <div>
+          <label class="block text-xs font-semibold text-[var(--theme-muted)] uppercase mb-2">Document URL</label>
+          <textarea
+            [(ngModel)]="documentUrl"
+            (input)="validateDocumentUrl()"
+            rows="3"
+            placeholder="https://example.com/document.pdf"
+            class="w-full bg-[var(--theme-bg)] border rounded-xl px-4 py-3 text-sm text-[var(--theme-text)] outline-none resize-none transition-colors"
+            [ngClass]="{'border-blue-600 dark:border-app-primary': isValidUrl === null || isValidUrl, 'border-red-500 dark:border-red-400': isValidUrl === false}"></textarea>
+
+          <!-- Validation feedback -->
+          <div *ngIf="documentUrl" class="mt-2 space-y-1">
+            <div *ngIf="isValidUrl === true" class="flex items-center gap-2 text-green-600 dark:text-green-400 text-xs font-medium">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+              Valid URL format
+            </div>
+            <div *ngIf="isValidUrl === false" class="flex items-center gap-2 text-red-600 dark:text-red-400 text-xs font-medium">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+              Invalid URL format
+            </div>
+            <div class="text-[var(--theme-muted)] text-xs">
+              • Must start with http:// or https://
+              <br>• Supported: pdf, doc, docx, xls, xlsx, jpg, png, gif, txt, zip
+            </div>
+          </div>
+          <p *ngIf="!documentUrl && showErrors" class="mt-1 flex items-center gap-1 text-red-600 dark:text-red-400 text-xs font-medium">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+            Document URL is required
+          </p>
+        </div>
+
+        <!-- Submit Button -->
         <button type="button"
-                (click)="$event.preventDefault(); submitUrl()"
-                [disabled]="isSubmitting || !uploadFilingId"
-                class="w-full bg-app-primary text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2">
+                (click)="submitUrl()"
+                [disabled]="isSubmitting || !uploadFilingId || !documentUrl || isValidUrl === false"
+                class="w-full bg-blue-600 dark:bg-app-primary text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-blue-700 dark:hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
           <span *ngIf="isSubmitting" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-          Link Document
+          {{ isSubmitting ? 'Linking...' : 'Link Document' }}
         </button>
-        <p *ngIf="uploadMessage" class="text-center text-xs text-red-500 font-medium">{{ uploadMessage }}</p>
+
+        <!-- Error/Success Messages -->
+        <div *ngIf="uploadMessage"
+             [ngClass]="{'bg-green-500/10 border border-green-500/30': uploadMessage.includes('successfully'), 'bg-red-500/10 border border-red-500/30': uploadMessage.includes('failed') || uploadMessage.includes('required') || uploadMessage.includes('valid')}"
+             class="p-3 rounded-lg flex items-start gap-2">
+          <svg *ngIf="uploadMessage.includes('successfully')" class="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+          <svg *ngIf="!uploadMessage.includes('successfully')" class="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+          <span [ngClass]="{'text-green-600 dark:text-green-400': uploadMessage.includes('successfully'), 'text-red-600 dark:text-red-400': uploadMessage.includes('failed') || uploadMessage.includes('required') || uploadMessage.includes('valid')}" class="text-xs font-medium">
+            {{ uploadMessage }}
+          </span>
+        </div>
       </div>
     </div>
 
+    <!-- Search Records Section -->
     <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-2xl p-8 shadow-sm">
       <h2 class="text-xl font-bold text-[var(--theme-text)] mb-6">Search Records</h2>
 
       <div class="flex gap-2 mb-8">
-        <input type="number" [(ngModel)]="fetchFilingId" placeholder="Enter Filing ID" class="flex-1 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl px-4 py-3 text-sm text-[var(--theme-text)] outline-none focus:border-app-primary">
-        <button (click)="loadDocuments()" [disabled]="isFetching" class="px-6 bg-app-primary text-white rounded-xl text-sm font-bold flex items-center gap-2">
+        <input type="number"
+               [(ngModel)]="fetchFilingId"
+               placeholder="Enter Filing ID"
+               class="flex-1 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl px-4 py-3 text-sm text-[var(--theme-text)] outline-none focus:border-blue-600 dark:focus:border-app-primary transition-colors">
+        <button (click)="loadDocuments()"
+                [disabled]="isFetching || !fetchFilingId"
+                class="px-6 bg-blue-600 dark:bg-app-primary text-white rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-blue-700 dark:hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
           <span *ngIf="isFetching" class="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-          Fetch
+          {{ isFetching ? 'Fetching...' : 'Fetch' }}
         </button>
       </div>
 
+      <!-- Error/Status Messages -->
+      <div *ngIf="fetchMessage && !isFetching"
+           [ngClass]="{'bg-red-500/10 border border-red-500/30': fetchMessage.includes('Failed') || fetchMessage.includes('Error'), 'bg-blue-500/10 border border-blue-500/30': fetchMessage.includes('No documents')}"
+           class="p-3 rounded-lg flex items-start gap-2 mb-4">
+        <svg *ngIf="fetchMessage.includes('No documents')" class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2z" clip-rule="evenodd"></path></svg>
+        <svg *ngIf="fetchMessage.includes('Failed') || fetchMessage.includes('Error')" class="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+        <span [ngClass]="{'text-blue-600 dark:text-blue-400': fetchMessage.includes('No documents'), 'text-red-600 dark:text-red-400': fetchMessage.includes('Failed') || fetchMessage.includes('Error')}" class="text-xs font-medium">
+          {{ fetchMessage }}
+        </span>
+      </div>
+
+      <!-- Documents Table -->
       <div class="overflow-hidden border border-[var(--theme-border)] rounded-xl">
         <table class="w-full text-sm text-left">
           <thead class="bg-[var(--theme-bg)] text-[var(--theme-muted)] text-xs uppercase">
@@ -54,22 +120,26 @@
           </thead>
           <tbody class="divide-y divide-[var(--theme-border)]">
           <tr *ngFor="let doc of fetchedDocs" class="hover:bg-[var(--theme-bg)] transition-colors">
-            <td class="px-4 py-3 text-app-primary font-mono text-xs">#{{ doc.id }}</td>
+            <td class="px-4 py-3 text-blue-600 dark:text-app-primary font-mono text-xs">#{{ doc.id }}</td>
             <td class="px-4 py-3">
               <a [href]="doc.fileUrl"
                  target="_blank"
-                 class="text-app-primary hover:underline text-xs break-all block max-w-[400px]"
+                 class="text-blue-600 dark:text-app-primary hover:underline text-xs break-all block max-w-[400px]"
                  [title]="doc.fileUrl">
                 {{ doc.fileUrl }}
               </a>
             </td>
           </tr>
-          <tr *ngIf="fetchedDocs.length === 0">
+          <tr *ngIf="fetchedDocs.length === 0 && !isFetching">
             <td colspan="2" class="px-4 py-10 text-center text-[var(--theme-muted)] italic">
-              {{ fetchMessage || 'No records fetched yet.' }}
+              No documents available
             </td>
           </tr>
           </tbody>
         </table>
       </div>
     </div>
+
+  </div>
+
+</div>

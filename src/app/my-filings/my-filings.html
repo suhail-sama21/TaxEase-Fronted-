@@ -6,16 +6,35 @@
     </div>
   </div>
 
-  <div class="bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-xl overflow-hidden shadow-sm">
+  <!-- Error Toast Notification -->
+  <div *ngIf="errorMessage" class="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start justify-between gap-3 animate-in fade-in slide-in-from-top duration-300">
+    <div class="flex items-start gap-3">
+      <svg class="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+      <div>
+        <p class="text-sm font-medium text-red-600 dark:text-red-400">{{ errorMessage }}</p>
+      </div>
+    </div>
+    <button (click)="clearError()" class="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300">
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+    </button>
+  </div>
 
-    <div class="px-5 py-4 border-b border-[var(--theme-border)] flex items-center justify-between bg-[var(--theme-card)]">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-xl overflow-hidden shadow-sm p-8 text-center">
+    <div class="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 dark:border-app-primary/20 dark:border-t-app-primary rounded-full animate-spin mx-auto mb-4"></div>
+    <p class="text-[var(--theme-muted)]">Loading your filings...</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-xl overflow-hidden shadow-sm">
+
+    <div class="px-5 py-4 border-b border-[var(--theme-border)] bg-[var(--theme-card)] transition-colors">
       <div class="flex gap-3">
-        <select [(ngModel)]="selectedPeriod" (change)="applyFilters()" class="bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-1.5 outline-none focus:border-app-primary">
+        <select [(ngModel)]="selectedPeriod" (change)="applyFilters()" class="bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-1.5 outline-none focus:border-blue-600 dark:focus:border-app-primary cursor-pointer transition-colors">
           <option>All Periods</option>
           <option>FY2025-26</option>
           <option>FY2024-25</option>
         </select>
-        <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-1.5 outline-none focus:border-app-primary">
+        <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-1.5 outline-none focus:border-blue-600 dark:focus:border-app-primary cursor-pointer transition-colors">
           <option>All Statuses</option>
           <option>Approved</option>
           <option>Pending</option>
@@ -29,59 +48,99 @@
       <table class="w-full border-collapse text-[13px] whitespace-nowrap">
         <thead>
         <tr class="bg-[var(--theme-card)] border-b border-[var(--theme-border)]">
-          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal">Filing ID</th>
-          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal">Period</th>
-          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal">Amount Declared</th>
-          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal">Tax Due (10%)</th>
-          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal">Submitted Date</th>
-          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal">Status</th>
-          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal">Actions</th>
+          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal tracking-wide">Filing ID</th>
+          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal tracking-wide">Period</th>
+          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal tracking-wide">Amount Declared</th>
+          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal tracking-wide">Tax Due (10%)</th>
+          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal tracking-wide">Status</th>
+          <th class="px-5 py-3 text-left text-[var(--theme-muted)] text-[10px] uppercase font-normal tracking-wide">Actions</th>
         </tr>
         </thead>
         <tbody>
         <tr *ngFor="let f of filings" class="hover:bg-[var(--theme-bg)] border-b border-[var(--theme-border)] last:border-0 transition-colors">
-          <td class="px-5 py-3 text-app-primary font-mono text-[12px]">#{{ f.id }}</td>
+          <td class="px-5 py-3 text-blue-600 dark:text-app-primary font-mono text-[12px]">#{{ f.id }}</td>
           <td class="px-5 py-3 text-[var(--theme-text)]">{{ f.period }}</td>
           <td class="px-5 py-3 text-[var(--theme-text)]">{{ f.amountDeclared | currency:'USD' }}</td>
           <td class="px-5 py-3 text-[var(--theme-text)] font-medium">{{ calculateTax(f.amountDeclared) | currency:'USD' }}</td>
-          <td class="px-5 py-3 text-[var(--theme-muted)]">{{ f.submittedDate | date:'mediumDate' }}</td>
           <td class="px-5 py-3">
               <span class="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border"
                     [ngClass]="{
-                      'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/20': f.statusColor === 'green' || f.status === 'Approved' || f.status === 'Paid',
-                      'bg-app-primary/10 text-app-primary border-app-primary/20': f.statusColor === 'blue' || f.status === 'Pending',
-                      'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/20': f.statusColor === 'red' || f.status === 'Rejected'
+                      'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/20': f.status === 'Approved' || f.status === 'Paid',
+                      'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20': f.status === 'Pending',
+                      'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/20': f.status === 'Rejected'
                     }">
                 {{ f.status }}
               </span>
           </td>
           <td class="px-5 py-3">
             <div class="flex items-center gap-2">
-              <button (click)="viewDetails(f)" class="bg-transparent border border-[var(--theme-border)] text-[var(--theme-muted)] rounded-md px-2.5 py-1 text-[11px] hover:bg-[var(--theme-bg)] transition-colors">
+              <button (click)="viewDetails(f)"
+                      class="bg-gray-500/10 text-gray-600 dark:text-gray-400 border border-gray-500/20 dark:border-gray-400/30 rounded-md px-2.5 py-1 text-[11px] hover:bg-gray-600 hover:text-white hover:border-gray-600 dark:hover:bg-gray-500 dark:hover:border-gray-500 transition-all duration-200">
                 View
               </button>
 
               <button *ngIf="f.status === 'Pending'" (click)="updateStatus(f.id, 'Approved')"
-                      class="bg-green-600/10 text-green-600 border border-green-600/20 rounded-md px-2.5 py-1 text-[11px] hover:bg-green-600 hover:text-white transition-all">
-                Approve
+                      [disabled]="isUpdating"
+                      class="bg-green-600/10 text-green-600 border border-green-600/20 rounded-md px-2.5 py-1 text-[11px] hover:bg-green-600 hover:text-white hover:border-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                {{ isUpdating ? 'Updating...' : 'Approve' }}
               </button>
 
               <button *ngIf="f.status === 'Approved'" (click)="proceedToPayment(f.id, f.amountDeclared)"
-                      class="bg-app-primary text-white border-none rounded-md px-2.5 py-1 text-[11px] hover:bg-app-primary-hover transition-colors">
-                Pay
+                      class="bg-amber-600/10 text-amber-600 border border-amber-600/20 rounded-md px-2.5 py-1 text-[11px] hover:bg-amber-600 hover:text-white hover:border-amber-600 transition-all">
+                Pay Now
               </button>
 
-              <span *ngIf="f.status === 'Paid'" class="text-[#3fb950] text-[11px] font-bold px-2 flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                  </svg>
-                  Paid
-                </span>
+              <span *ngIf="f.status === 'Paid'" class="text-[#3fb950] text-[11px] font-bold px-2 flex items-center gap-1">✓ Paid</span>
+
+              <span *ngIf="f.status === 'Rejected'" class="text-[#f85149] text-[11px] font-bold px-2 flex items-center gap-1">✕ Rejected</span>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="filings.length === 0">
+          <td colspan="6" class="px-5 py-10 text-center text-[var(--theme-muted)] italic">
+            <div class="flex flex-col items-center gap-2">
+              <svg class="w-8 h-8 text-[var(--theme-border)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              No filings found
             </div>
           </td>
         </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+</div>
+
+<!-- Details Modal -->
+<div *ngIf="selectedFiling" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+  <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+    <div class="px-6 py-4 border-b border-[var(--theme-border)] flex justify-between items-center bg-[var(--theme-bg)]">
+      <h3 class="text-lg font-medium text-[var(--theme-text)]">Filing Details - #{{ selectedFiling.id }}</h3>
+      <button (click)="closeDetails()" class="text-[var(--theme-muted)] hover:text-[var(--theme-text)] text-xl transition-colors">✕</button>
+    </div>
+    <div class="p-6 space-y-6">
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <label class="text-[10px] uppercase text-[var(--theme-muted)] font-semibold tracking-widest">Tax Period</label>
+          <p class="text-[var(--theme-text)] text-sm mt-1">{{ selectedFiling.period }}</p>
+        </div>
+        <div>
+          <label class="text-[10px] uppercase text-[var(--theme-muted)] font-semibold tracking-widest">Status</label>
+          <p class="text-sm mt-1 font-medium" [ngClass]="{'text-green-600 dark:text-green-400': selectedFiling.status === 'Approved' || selectedFiling.status === 'Paid', 'text-blue-600 dark:text-blue-400': selectedFiling.status === 'Pending', 'text-red-600 dark:text-red-400': selectedFiling.status === 'Rejected'}">
+            {{ selectedFiling.status }}
+          </p>
+        </div>
+        <div>
+          <label class="text-[10px] uppercase text-[var(--theme-muted)] font-semibold tracking-widest">Amount Declared</label>
+          <p class="text-[var(--theme-text)] text-sm mt-1">{{ selectedFiling.amountDeclared | currency:'USD' }}</p>
+        </div>
+        <div>
+          <label class="text-[10px] uppercase text-[var(--theme-muted)] font-semibold tracking-widest">Tax Due</label>
+          <p class="text-blue-600 dark:text-app-primary font-bold text-sm mt-1">{{ calculateTax(selectedFiling.amountDeclared) | currency:'USD' }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="px-6 py-4 bg-[var(--theme-bg)] flex justify-end border-t border-[var(--theme-border)]">
+      <button (click)="closeDetails()" class="w-full bg-blue-600 dark:bg-app-primary text-white py-2 rounded-lg text-sm font-medium shadow-lg hover:bg-blue-700 dark:hover:brightness-110 transition-all">Close Record</button>
     </div>
   </div>
 </div>
