@@ -33,7 +33,7 @@ export class MyFilingsComponent implements OnInit {
       catchError((err) => {
         console.error('Load failed', err);
         // Return an empty array so the UI doesn't break
-        return of([]); 
+        return of([]);
       })
     );
   }

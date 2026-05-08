@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { selectError, selectIsLoading } from '../stores/authStore/auth.features';
+import { authFeature, selectError, selectIsLoading } from '../stores/authStore/auth.features';
 
 import * as AuthActions from '../stores/authStore/auth.action';
+import { catchError, tap } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -26,6 +27,9 @@ export class LoginComponent {
   isLoading$ = this.store.select(selectIsLoading);
   error$ = this.store.select(selectError);
 
+  ngOnInit(){
+    
+  }
   onSubmit() {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();

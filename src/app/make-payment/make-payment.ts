@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PaymentService } from '../service/payment.service';
+import { Store } from '@ngrx/store';
+import { selectUser } from '../stores/authStore/auth.features';
 
 @Component({
   selector: 'app-make-payment',
@@ -23,15 +25,23 @@ export class MakePaymentComponent implements OnInit {
   paymentAmount: number = 0;
 
   // 2. Add the userId so the fetch function works
-  userId: number = 1; // Replace later with your actual logged-in user ID
-
+  
   constructor(
     private router: Router, 
     private paymentService: PaymentService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private store: Store
   ) {}
+  userId: number  =0; // Replace later with your actual logged-in user ID
+
 
   ngOnInit(): void {
+    this.store.select(selectUser).subscribe(user => {
+          if (user) {
+            this.userId = user.id
+            console.log('User Data from Store:', this.userId);
+          }
+        });
     // 3. Trigger the fetch from the backend when the page loads!
     this.fetchPendingFilings(); 
   }
@@ -43,9 +53,10 @@ export class MakePaymentComponent implements OnInit {
         
         // FILTER: Keep only the items where status is 'Pending'
         const pendingData = backendData.filter(filing => 
+         
           filing.status && filing.status.toLowerCase() === 'pending'
         );
-
+        console.log('Pending filings:', pendingData); // Debug log
         // MAP: Transform the filtered data to fit your dropdown UI
         this.filings = pendingData.map(filing => ({
           id: filing.id, 

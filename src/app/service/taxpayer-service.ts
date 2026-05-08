@@ -20,7 +20,7 @@ export class TaxpayerService {
     private store: Store
   ) {}
 
-  getProfile(): Observable<User | null> {
+  getProfile(userId: any, userType: any): Observable<User | null> {
     const payload = this.jwtService.getPayload();
 
     if (payload && payload.sub) {
