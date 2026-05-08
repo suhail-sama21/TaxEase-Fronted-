@@ -43,7 +43,6 @@ export class FileTaxesComponent implements OnInit{
     accuracy: false
   };
 
-  // ADDING 'private' HERE IS CRITICAL
   constructor(
     private router: Router,
     private taxFilingService: TaxFilingService,
@@ -52,7 +51,7 @@ export class FileTaxesComponent implements OnInit{
     private store: Store
   ){
     //let id:number;
-     
+
   }
   ngOnInit(){
     this.store.select(selectUser).subscribe(user => {
@@ -62,7 +61,7 @@ export class FileTaxesComponent implements OnInit{
       }
     })
   }
-  
+
 
   get taxableIncome(): number {
     const g = this.incomeData.gross || 0;
@@ -75,26 +74,68 @@ export class FileTaxesComponent implements OnInit{
     return this.taxableIncome * 0.10;
   }
 
-  nextStep() { if (this.currentStep < 5) this.currentStep++; }
-  prevStep() { if (this.currentStep > 1) this.currentStep--; }
+  nextStep() {
+    this.submissionError = '';
+    if (this.currentStep < 5) this.currentStep++;
+  }
+
+  prevStep() {
+    this.submissionError = '';
+    if (this.currentStep > 1) this.currentStep--;
+  }
 
   resetForm() {
     this.currentStep = 1;
     this.isSubmitting = false;
-    this.submissionMessage = '';
+    this.submissionError = '';
     this.incomeData = { gross: null, deductions: 0, other: 0 };
     this.declarations = { terms: false, accuracy: false };
     this.generatedFilingId = null;
+    this.cdr.detectChanges();
   }
 
   submitFiling() {
     console.log("File Taxes Component Initialized with taxpayerId:", this.taxpayerId);
+    this.submissionError = '';
+
+    // Validation checks
+    if (!this.incomeData.gross || this.incomeData.gross <= 0) {
+      this.submissionError = 'Error: Please enter a valid gross income amount.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (this.incomeData.deductions < 0) {
+      this.submissionError = 'Error: Deductions cannot be negative.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (this.incomeData.deductions > this.incomeData.gross) {
+      this.submissionError = 'Error: Deductions cannot exceed gross income.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (!this.declarations.accuracy) {
+      this.submissionError = 'Error: Please confirm the accuracy of your information.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (!this.declarations.terms) {
+      this.submissionError = 'Error: Please agree to the terms of service.';
+      this.cdr.detectChanges();
+      return;
+    }
+
     if (this.isSubmitting) return;
 
     this.isSubmitting = true;
-    this.submissionMessage = 'Processing your request...';
+    this.submissionError = '';
+    this.cdr.detectChanges();
 
-    const filingRequest = {
+    const filingRequest: TaxFilingRequestDTO = {
       taxpayerId: Number(this.taxpayerId),
       period: this.period,
       amountDeclared: Number(this.taxableIncome.toFixed(2))
@@ -106,7 +147,7 @@ export class FileTaxesComponent implements OnInit{
 
         this.generatedFilingId = res.id;
         this.filingStatus = res.status || 'Pending';
-        this.submissionMessage = 'Submission Successful!';
+        this.submissionError = '';
 
         // Update state
         this.currentStep = 5;
@@ -118,7 +159,24 @@ export class FileTaxesComponent implements OnInit{
       error: (err) => {
         console.error("Backend Error:", err);
         this.isSubmitting = false;
-        this.submissionMessage = err.error?.message || 'Submission failed.';
+
+        // Handle specific error cases
+        if (err.status === 400) {
+          this.submissionError = 'Error: Invalid data provided. Please check your entries and try again.';
+        } else if (err.status === 409) {
+          this.submissionError = 'Error: A filing for this period already exists. Please contact support.';
+        } else if (err.status === 422) {
+          this.submissionError = 'Error: Invalid taxable income. Please ensure deductions do not exceed gross income.';
+        } else if (err.status === 0) {
+          this.submissionError = 'Error: Network error. Please check your internet connection and try again.';
+        } else if (err.status === 500 || err.status === 503) {
+          this.submissionError = 'Error: Server error. Please try again later.';
+        } else if (err.error?.message) {
+          this.submissionError = `Error: ${err.error.message}`;
+        } else {
+          this.submissionError = 'Error: Failed to submit your filing. Please try again later.';
+        }
+
         this.cdr.detectChanges();
       }
     });
