@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { TaxFilingService } from '../service/tax-filing.service';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { selectUser } from '../stores/authStore/auth.features';
 
 @Component({
   selector: 'app-my-filings',
@@ -13,6 +15,8 @@ import { catchError } from 'rxjs/operators';
   templateUrl: './my-filings.html'
 })
 export class MyFilingsComponent implements OnInit {
+
+  taxpayerId: number = 0;
   filings: any[] = [];
   allFilings: any[] = [];
   selectedFiling: any = null;
@@ -28,15 +32,24 @@ export class MyFilingsComponent implements OnInit {
   constructor(
     private taxFilingService: TaxFilingService,
     private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private store: Store
+  ){
+    //let id:number;
+    this.store.select(selectUser).subscribe(user => {
+      if(user){
+        //assigning taxpayer id
+         this.taxpayerId = user.id;
+      }
+    })
+  }
 
   ngOnInit() {
     this.loadFilings();
   }
 
   loadFilings() {
-    const taxpayerId = 10;
+    const taxpayerId = this.taxpayerId;
     this.isLoading = true;
     this.errorMessage = '';
     this.cdr.detectChanges();

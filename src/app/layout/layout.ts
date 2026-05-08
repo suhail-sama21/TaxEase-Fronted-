@@ -1,6 +1,10 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, RouterLink } from '@angular/router';
+import { OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { selectUser } from '../stores/authStore/auth.features';
+import { Observable , of} from 'rxjs';
 
 @Component({
   selector: 'app-layout',
@@ -8,15 +12,29 @@ import { RouterModule, RouterLink } from '@angular/router';
   imports: [CommonModule, RouterModule, RouterLink],
   templateUrl: './layout.html',
 })
-export class LayoutComponent {
+export class LayoutComponent implements OnInit {
   // Hardcoded for now, but you will later populate this from your IdentityService
-  userName = 'John Doe';
+  userName$!: Observable<string>;
   userInitials = 'JD';
-  userRole = 'Taxpayer';
+  userRole$!: Observable<string>;
   notificationCount = 2;
   isDarkMode = true;
   toggleTheme() {
     this.isDarkMode = !this.isDarkMode;
+  }
+
+  constructor(private store: Store) {}
+
+  ngOnInit(): void {
+    this.store.select(selectUser).subscribe(user => {
+      if (user) {
+        this.userName$ = of(user.name);
+        this.userRole$ = of(user.role);
+        console.log('User data from store:', user); // Debug log to check user data
+        console.log('User name:', this.userName$); // Debug log to check userName assignment
+        console.log('User role:', this.userRole$); // Debug log to check userRole assignment
+      }
+    });
   }
 
   // Menu items updated with the new '/portal' base path

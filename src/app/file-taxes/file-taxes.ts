@@ -3,11 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TaxFilingService } from '../service/tax-filing.service';
-import { TaxpayerService } from '../service/taxpayer-service';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
-import { Observable , of} from 'rxjs';
-import { OnInit } from '@angular/core';
 
 export interface TaxFilingRequestDTO {
   taxpayerId: number;
@@ -21,10 +18,10 @@ export interface TaxFilingRequestDTO {
   imports: [CommonModule, FormsModule],
   templateUrl: './file-taxes.html'
 })
-export class FileTaxesComponent implements OnInit{
+export class FileTaxesComponent {
   currentStep = 1;
   isSubmitting = false;
-  submissionMessage: string = '';
+  submissionError: string = '';
 
   generatedFilingId: number | null = null;
   filingStatus: string = '';
@@ -47,13 +44,9 @@ export class FileTaxesComponent implements OnInit{
     private router: Router,
     private taxFilingService: TaxFilingService,
     private cdr: ChangeDetectorRef,
-    private taxpayerService: TaxpayerService,
     private store: Store
   ){
     //let id:number;
-
-  }
-  ngOnInit(){
     this.store.select(selectUser).subscribe(user => {
       if(user){
         //id =user.id
