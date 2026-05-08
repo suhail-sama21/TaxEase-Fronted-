@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, switchMap, map, catchError } from 'rxjs';
 import { Jwt } from './jwt';
 import { UserService } from './user-service';
-import { taxpayerDocument, User } from '../dto/taxpayer-profile';
+import { taxpayerDocument, User , TaxpayerProfile} from '../dto/taxpayer-profile';
 import { environment } from '../environment/environment';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
@@ -20,6 +20,11 @@ export class TaxpayerService {
     private store: Store
   ) {}
 
+  gettaxpayerprofile(userId: number): Observable<TaxpayerProfile | null>{
+    return this.http.get<TaxpayerProfile>(`${environment.apiUrl}/taxpayers/user/${userId}/full-profile`)   
+  }
+
+
   getProfile(userId?: any, userType?: any): Observable<User | null> {
     if (userId) {
       return this.http.get<any>(`${environment.apiUrl}/taxpayers/user/${userId}/profile`).pipe(
@@ -34,6 +39,7 @@ export class TaxpayerService {
         }),
       );
     }
+    
 
     const payload = this.jwtService.getPayload();
     if (payload && payload.sub) {

@@ -23,6 +23,7 @@ export class ProfileComponent implements OnInit{
   isSavingPassword = false;
   isEditMode = false;
   isConfirmModalOpen = false;
+  isSecurityExpanded = false;
   editChanges: any = {};
 
   // Mock User Data
@@ -192,6 +193,33 @@ export class ProfileComponent implements OnInit{
     } else {
       this.showConfirmPassword = !this.showConfirmPassword;
     }
+  }
+
+  // Convert PAN to uppercase
+  formatPAN() {
+    if (this.userProfile().pan) {
+      this.userProfile.update(profile => ({
+        ...profile,
+        pan: profile.pan.toUpperCase().replace(/[^A-Z0-9]/g, '')
+      }));
+    }
+  }
+
+  // Toggle Security & Password section
+  toggleSecuritySection() {
+    this.isSecurityExpanded = !this.isSecurityExpanded;
+  }
+
+  // Collapse security section and reset password fields
+  closeSecuritySection() {
+    this.isSecurityExpanded = false;
+    this.security.currentPassword = '';
+    this.security.newPassword = '';
+    this.security.confirmPassword = '';
+    this.passwordInfoAppear = false;
+    this.showCurrentPassword = false;
+    this.showNewPassword = false;
+    this.showConfirmPassword = false;
   }
 
   passwordInfoAppear = false
