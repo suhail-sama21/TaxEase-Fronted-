@@ -20,27 +20,25 @@ export class AuthEffects {
 
   // --- Helper function to dynamically extract Spring Boot error messages ---
   // --- Helper function to dynamically extract Spring Boot error messages ---
+  // --- Helper function to dynamically extract Spring Boot error messages ---
   private extractErrorMessage(error: any): string {
-    let finalMessage = 'An unexpected error occurred. Please try again.';
-
-    if (error instanceof HttpErrorResponse) {
-      const backendResponse = error.error;
-
-      if (backendResponse && backendResponse.message) {
-        if (typeof backendResponse.message === 'string') {
-          finalMessage = backendResponse.message;
-        } else if (typeof backendResponse.message === 'object') {
-          finalMessage = Object.values(backendResponse.message).join(' | '); 
-        }
-      } else if (backendResponse && typeof backendResponse.error === 'string') {
-          finalMessage = backendResponse.error;
-      }
+    // 1. If the Global Interceptor caught it, it already extracted the clean string for us!
+    if (error instanceof Error) {
+      console.log('%c Error from Interceptor: ', 'background: #f85149; color: white;', error.message);
+      return error.message;
     }
 
-    // NEW: Log the beautifully extracted message directly to the console!
-    console.log('%c Extracted Backend Error: ', 'background: #f85149; color: white; border-radius: 3px;', finalMessage);
+    // 2. Fallback just in case the interceptor is ever bypassed
+    if (error instanceof HttpErrorResponse) {
+      const backendResponse = error.error;
+      if (backendResponse && backendResponse.message) {
+        if (typeof backendResponse.message === 'string') return backendResponse.message;
+        if (typeof backendResponse.message === 'object') return Object.values(backendResponse.message).join(' | '); 
+      }
+      if (backendResponse && typeof backendResponse.error === 'string') return backendResponse.error;
+    }
 
-    return finalMessage;
+    return error.message || 'An unexpected error occurred. Please try again.';
   }
   
   // 1. Handle Login API Call
