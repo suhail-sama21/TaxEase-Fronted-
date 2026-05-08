@@ -3,6 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TaxFilingService } from '../service/tax-filing.service';
+import { TaxpayerService } from '../service/taxpayer-service';
+import { Store } from '@ngrx/store';
+import { selectUser } from '../stores/authStore/auth.features';
+import { Observable , of} from 'rxjs';
+import { OnInit } from '@angular/core';
 
 export interface TaxFilingRequestDTO {
   taxpayerId: number;
@@ -16,7 +21,7 @@ export interface TaxFilingRequestDTO {
   imports: [CommonModule, FormsModule],
   templateUrl: './file-taxes.html'
 })
-export class FileTaxesComponent {
+export class FileTaxesComponent implements OnInit{
   currentStep = 1;
   isSubmitting = false;
   submissionMessage: string = '';
@@ -30,7 +35,7 @@ export class FileTaxesComponent {
     other: 0 as number
   };
 
-  readonly taxpayerId = 10;
+  taxpayerId: number= 0;
   readonly period = "FY2025-26";
 
   declarations = {
@@ -42,8 +47,22 @@ export class FileTaxesComponent {
   constructor(
     private router: Router,
     private taxFilingService: TaxFilingService,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private taxpayerService: TaxpayerService,
+    private store: Store
+  ){
+    //let id:number;
+     
+  }
+  ngOnInit(){
+    this.store.select(selectUser).subscribe(user => {
+      if(user){
+        //id =user.id
+         this.taxpayerId = user.id;
+      }
+    })
+  }
+  
 
   get taxableIncome(): number {
     const g = this.incomeData.gross || 0;
@@ -69,6 +88,7 @@ export class FileTaxesComponent {
   }
 
   submitFiling() {
+    console.log("File Taxes Component Initialized with taxpayerId:", this.taxpayerId);
     if (this.isSubmitting) return;
 
     this.isSubmitting = true;
