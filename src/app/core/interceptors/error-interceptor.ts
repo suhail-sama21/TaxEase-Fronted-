@@ -1,15 +1,16 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
-import { ToastService } from '../services/toast';
+
+
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
-  const toastService = inject(ToastService);
+  // You can even remove the inject(ToastService) line if you aren't using it at all anymore
+  // const toastService = inject(ToastService); 
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       let extractedMessage = 'An unexpected error occurred. Please try again.';
 
-      // Extract the exact Spring Boot error message
       if (error.error) {
         if (typeof error.error.message === 'string') {
           extractedMessage = error.error.message;
@@ -20,10 +21,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         }
       }
 
-      // 1. Show the error globally on the screen via the Toast Service
-      toastService.showError(extractedMessage);
+      // REMOVE OR COMMENT OUT THIS LINE:
+      // toastService.showError(extractedMessage);
 
-      // 2. Pass the error along so your local components/Effects can still stop loading spinners
+      // Keep this line! This passes the extracted "Taxpayer not found..." string to your component
       return throwError(() => new Error(extractedMessage));
     })
   );
