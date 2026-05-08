@@ -8,7 +8,7 @@
 
       <div *ngFor="let step of [1,2,3,4,5]" class="z-10 flex flex-col items-center">
 
-        <div [ngClass]="currentStep >= step ? 'bg-app-primary text-white' : 'bg-[var(--theme-bg)] text-[var(--theme-muted)]'"
+        <div [ngClass]="currentStep >= step ? 'bg-blue-600 dark:bg-app-primary text-white' : 'bg-[var(--theme-bg)] text-[var(--theme-muted)]'"
 
              class="w-10 h-10 rounded-full border-2 border-[var(--theme-border)] flex items-center justify-center font-bold transition-all duration-300">
 
@@ -42,8 +42,6 @@
 
         <label class="block text-sm font-medium text-[var(--theme-muted)] mb-2">Annual Gross Salary</label>
 
-        <!-- Updated to allow manual typing without step interference -->
-
         <input type="number"
 
                [(ngModel)]="incomeData.gross"
@@ -52,11 +50,21 @@
 
                (wheel)="$event.preventDefault()"
 
-               class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg px-4 py-2 text-[var(--theme-text)] focus:border-app-primary outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+               class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg px-4 py-2 text-[var(--theme-text)] focus:border-blue-600 dark:focus:border-app-primary outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+
+        <p *ngIf="!incomeData.gross && submissionError" class="mt-2 flex items-center gap-1 text-red-600 dark:text-red-400 text-xs font-medium">
+
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+
+          Gross salary is required
+
+        </p>
 
       </div>
 
-      <button (click)="nextStep()" [disabled]="!incomeData.gross" class="w-full bg-app-primary text-white py-2 rounded-lg font-medium hover:brightness-110 transition-all disabled:opacity-50">
+
+
+      <button (click)="nextStep()" [disabled]="!incomeData.gross" class="w-full bg-blue-600 dark:bg-app-primary text-white py-2 rounded-lg font-medium hover:bg-blue-700 dark:hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
 
         Continue
 
@@ -86,15 +94,19 @@
 
                (wheel)="$event.preventDefault()"
 
-               class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg px-4 py-2 text-[var(--theme-text)] outline-none focus:border-app-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+               class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg px-4 py-2 text-[var(--theme-text)] outline-none focus:border-blue-600 dark:focus:border-app-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+
+        <p class="mt-1 text-[10px] text-[var(--theme-muted)]">Maximum allowed: {{ incomeData.gross | currency:'USD' }}</p>
 
       </div>
 
+
+
       <div class="flex gap-4">
 
-        <button (click)="prevStep()" class="flex-1 border border-[var(--theme-border)] text-[var(--theme-text)] py-2 rounded-lg">Back</button>
+        <button (click)="prevStep()" class="flex-1 border border-[var(--theme-border)] text-[var(--theme-text)] py-2 rounded-lg hover:bg-[var(--theme-bg)] transition-colors">Back</button>
 
-        <button (click)="nextStep()" class="flex-1 bg-app-primary text-white py-2 rounded-lg">Continue</button>
+        <button (click)="nextStep()" class="flex-1 bg-blue-600 dark:bg-app-primary text-white py-2 rounded-lg hover:bg-blue-700 dark:hover:brightness-110 transition-all">Continue</button>
 
       </div>
 
@@ -118,17 +130,23 @@
 
       <div class="h-[1px] bg-[var(--theme-border)] my-2"></div>
 
-      <div class="flex justify-between text-lg font-bold"><span class="text-app-primary">Taxable Income</span> <span class="text-[var(--theme-text)]">{{ taxableIncome | currency:'USD' }}</span></div>
+      <div class="flex justify-between text-lg font-bold"><span class="text-blue-600 dark:text-app-primary">Gross Income</span> <span class="text-[var(--theme-text)]">{{ incomeData.gross | currency:'USD' }}</span></div>
 
-      <div class="flex justify-between text-lg font-bold"><span class="text-app-primary">Total Tax Due (10%)</span> <span class="text-app-primary">{{ taxDue | currency:'USD' }}</span></div>
+      <div class="flex justify-between text-lg font-bold"><span class="text-blue-600 dark:text-app-primary">Deductions</span> <span class="text-[var(--theme-text)]">-{{ incomeData.deductions | currency:'USD' }}</span></div>
+
+      <div class="h-[1px] bg-[var(--theme-border)] my-2"></div>
+
+      <div class="flex justify-between text-lg font-bold"><span class="text-blue-600 dark:text-app-primary">Taxable Income</span> <span class="text-[var(--theme-text)]">{{ taxableIncome | currency:'USD' }}</span></div>
+
+      <div class="flex justify-between text-lg font-bold"><span class="text-blue-600 dark:text-app-primary">Total Tax Due (10%)</span> <span class="text-blue-600 dark:text-app-primary">{{ taxDue | currency:'USD' }}</span></div>
 
 
 
       <div class="pt-6 flex gap-4">
 
-        <button (click)="prevStep()" class="flex-1 border border-[var(--theme-border)] text-[var(--theme-text)] py-2 rounded-lg">Back</button>
+        <button (click)="prevStep()" class="flex-1 border border-[var(--theme-border)] text-[var(--theme-text)] py-2 rounded-lg hover:bg-[var(--theme-bg)] transition-colors">Back</button>
 
-        <button (click)="nextStep()" class="flex-1 bg-app-primary text-white py-2 rounded-lg">Next</button>
+        <button (click)="nextStep()" class="flex-1 bg-blue-600 dark:bg-app-primary text-white py-2 rounded-lg hover:bg-blue-700 dark:hover:brightness-110 transition-all">Next</button>
 
       </div>
 
@@ -148,29 +166,39 @@
 
       <label class="flex items-center gap-3 cursor-pointer">
 
-        <input type="checkbox" [(ngModel)]="declarations.accuracy" class="accent-app-primary">
+        <input type="checkbox" [(ngModel)]="declarations.accuracy" class="accent-blue-600 dark:accent-app-primary">
 
-        <span class="text-sm text-[var(--theme-muted)]">I declare that all information provided is accurate.</span>
+        <span class="text-sm text-[var(--theme-muted)]">I declare that all information provided is accurate and complete.</span>
 
       </label>
 
       <label class="flex items-center gap-3 cursor-pointer">
 
-        <input type="checkbox" [(ngModel)]="declarations.terms" class="accent-app-primary">
+        <input type="checkbox" [(ngModel)]="declarations.terms" class="accent-blue-600 dark:accent-app-primary">
 
-        <span class="text-sm text-[var(--theme-muted)]">I agree to the TaxEase terms of service.</span>
+        <span class="text-sm text-[var(--theme-muted)]">I agree to the TaxEase terms of service and privacy policy.</span>
 
       </label>
+
+      <!-- Error Message -->
+
+      <div *ngIf="submissionError" class="p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-2">
+
+        <svg class="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+
+        <span class="text-xs font-medium text-red-600 dark:text-red-400">{{ submissionError }}</span>
+
+      </div>
 
 
 
       <div class="pt-6 flex gap-4">
 
-        <button (click)="prevStep()" [disabled]="isSubmitting" class="flex-1 border border-[var(--theme-border)] text-[var(--theme-text)] py-2 rounded-lg">Back</button>
+        <button (click)="prevStep()" [disabled]="isSubmitting" class="flex-1 border border-[var(--theme-border)] text-[var(--theme-text)] py-2 rounded-lg hover:bg-[var(--theme-bg)] disabled:opacity-50 transition-colors">Back</button>
 
         <button (click)="submitFiling()" [disabled]="!declarations.accuracy || !declarations.terms || isSubmitting"
 
-                class="flex-1 bg-app-primary text-white py-2 rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                class="flex-1 bg-blue-600 dark:bg-app-primary text-white py-2 rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 dark:hover:brightness-110 flex items-center justify-center gap-2 transition-all">
 
           <span *ngIf="isSubmitting" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
 
@@ -194,7 +222,7 @@
 
     <h2 class="text-3xl font-bold text-[var(--theme-text)] mb-2">Filing Submitted!</h2>
 
-    <p class="text-[var(--theme-muted)] mb-8">Your tax return has been successfully recorded.</p>
+    <p class="text-[var(--theme-muted)] mb-8">Your tax return has been successfully submitted and recorded in the system.</p>
 
 
 
@@ -204,7 +232,7 @@
 
         <span class="text-[var(--theme-muted)]">Filing ID:</span>
 
-        <span class="text-[var(--theme-text)] font-bold">#{{ generatedFilingId }}</span>
+        <span class="text-[var(--theme-text)] font-bold font-mono">#{{ generatedFilingId }}</span>
 
       </div>
 
@@ -212,11 +240,19 @@
 
         <span class="text-[var(--theme-muted)]">Current Status:</span>
 
-        <span class="px-2 py-1 bg-blue-500/10 text-blue-500 rounded text-xs font-bold uppercase tracking-wider">
+        <span class="px-2 py-1 bg-blue-500/10 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 rounded text-xs font-bold uppercase tracking-wider">
 
 {{ filingStatus }}
 
 </span>
+
+      </div>
+
+      <div class="flex justify-between">
+
+        <span class="text-[var(--theme-muted)]">Tax Due:</span>
+
+        <span class="text-[var(--theme-text)] font-bold">{{ taxDue | currency:'USD' }}</span>
 
       </div>
 
@@ -226,13 +262,13 @@
 
     <div class="flex flex-col gap-3 max-w-xs mx-auto">
 
-      <button (click)="goToPayment()" class="w-full bg-app-primary text-white py-3 rounded-xl font-bold shadow-lg shadow-app-primary/20 hover:scale-[1.02] transition-transform">
+      <button (click)="goToPayment()" class="w-full bg-blue-600 dark:bg-app-primary text-white py-3 rounded-xl font-bold shadow-lg shadow-blue-600/20 dark:shadow-app-primary/20 hover:bg-blue-700 dark:hover:brightness-110 transition-all">
 
         Proceed to Payment
 
       </button>
 
-      <button (click)="resetForm()" class="text-[var(--theme-muted)] hover:text-[var(--theme-text)] text-sm">
+      <button (click)="resetForm()" class="text-[var(--theme-muted)] hover:text-[var(--theme-text)] text-sm transition-colors">
 
         File another return
 
