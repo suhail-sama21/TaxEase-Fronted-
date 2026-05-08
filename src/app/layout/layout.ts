@@ -39,6 +39,7 @@ export class LayoutComponent {
     { label: 'Create Record', route: '/portal/create-compliance', icon: 'plus-icon' },
     { label: 'Audit Cases', route: '/portal/audit-cases', icon: 'search-icon' },
     { label: 'Create Audit', route: '/portal/create-audit', icon: 'plus-circle-icon' },
-    { label: 'View Audit', route: '/portal/view-audit', icon: 'plus-square-icon' },
+    { label: 'View Audit', route: '/portal/view-audit', icon: 'plus-square-icon' }, 
+    { label: 'Send Notification', route: '/portal/send-notification', icon: 'send-icon' }
   ];
 }
