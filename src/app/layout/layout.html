@@ -8,21 +8,22 @@
     </div>
 
     <nav class="flex-1 px-2.5 py-3 overflow-y-auto">
-      <a *ngFor="let item of navItems" 
-         [routerLink]="item.route"
-         routerLinkActive="bg-(--theme-card) text-[#1f6feb]"
-         [routerLinkActiveOptions]="{exact: true}"
-         class="flex items-center gap-2.5 px-2.5 py-2 rounded-md cursor-pointer text-sm text-(--theme-muted) hover:bg-(--theme-card) hover:text-(--theme-text) transition-colors duration-300 mb-0.5">
-        
-        <div class="w-4 h-4 bg-(--theme-border) rounded-sm opacity-80 shrink-0 transition-colors duration-300"></div>
-        
-        <span>{{ item.label }}</span>
-        
-        <span *ngIf="item.badge" class="ml-auto bg-[#238636] text-[#7ee787] text-[10px] px-1.5 py-px rounded-full">
+  @for (item of (filteredNavItems$ | async); track item.label) {
+    <a [routerLink]="item.route"
+       routerLinkActive="bg-(--theme-card) text-[#1f6feb]"
+       class="flex items-center gap-2.5 px-2.5 py-2 rounded-md ...">
+      
+      <div class="w-4 h-4 bg-(--theme-border) ..."></div>
+      <span>{{ item.label }}</span>
+      
+      @if (item.badge) {
+        <span class="ml-auto bg-[#238636] text-[#7ee787] text-[10px] px-1.5 py-px rounded-full">
           {{ item.badge }}
         </span>
-      </a>
-    </nav>
+      }
+    </a>
+  }
+</nav>
 
     <div class="px-3.5 py-3 border-t border-(--theme-border) transition-colors duration-300">
       <div class="text-[11px] text-(--theme-muted) bg-(--theme-card) border border-(--theme-border) px-2.5 py-1 rounded-full inline-block transition-colors duration-300">

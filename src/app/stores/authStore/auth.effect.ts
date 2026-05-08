@@ -15,6 +15,20 @@ export class AuthEffects {
   private router = inject(Router);
   private store = inject(Store);
 
+  // 1. New Effect: Runs on app startup to re-fetch profile if token exists
+  initAuth$ = createEffect(() =>
+    of(null).pipe(
+      map(() => {
+        const token = localStorage.getItem('token');
+        const email = localStorage.getItem('user_email');
+        if (token && email) {
+          return AuthActions.getProfile({ email });
+        }
+        return { type: '[Auth] No Persisted Session' };
+      })
+    )
+  );
+
   login$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.login),
@@ -70,11 +84,15 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.loginSuccess),
         tap((action) => {
+          // Store token AND email to survive refreshes
           localStorage.setItem('token', action.response.token);
-          const email = action.email ?? action.response.user?.email ?? action.response.user?.email;
+          const email = action.email ?? action.response.user?.email;
+          
           if (email) {
+            localStorage.setItem('user_email', email);
             this.store.dispatch(AuthActions.getProfile({ email }));
           }
+          
           this.router.navigate(['/portal']);
         }),
       ),
@@ -84,9 +102,9 @@ export class AuthEffects {
   signupSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType( AuthActions.signupSuccess),
+        ofType(AuthActions.signupSuccess),
         tap((action) => {
-            console.log(action.response);
+          console.log(action.response);
           this.router.navigate(['/login']);
         }),
       ),
@@ -98,7 +116,9 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.logout),
         tap(() => {
+          // Clear everything on logout
           localStorage.removeItem('token');
+          localStorage.removeItem('user_email');
           this.router.navigate(['/login']);
         }),
       ),

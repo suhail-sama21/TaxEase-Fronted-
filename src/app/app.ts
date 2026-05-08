@@ -1,13 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { SignupComponent } from './signup-component/signup-component';
-import { LoginComponent } from './login-component/login-component';
-import { ComplianceRecordComponent } from './compliance-record/compliance-record';
-import { CreateComplianceComponent } from './create-compliance/create-compliance';
-import { CreateAuditComponent } from './create-audit/create-audit';
-import { AuditCasesComponent } from './audit-cases/audit-cases';
-import { ViewAuditComponent } from './view-audit/view-audit';
-import { ComplianceDashboard } from './compliance-dashboard/compliance-dashboard';
+import { Store } from '@ngrx/store';
+import * as AuthActions from './stores/authStore/auth.action'; // Adjust path to your actions
 
 @Component({
   selector: 'app-root',
@@ -16,6 +10,21 @@ import { ComplianceDashboard } from './compliance-dashboard/compliance-dashboard
   templateUrl: './app.html',
   styleUrls: ['./app.css'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'TaxEase';
+  
+  // Using inject() to match your LayoutComponent style
+  private store = inject(Store);
+
+  ngOnInit() {
+    // 1. Check if a session exists in the browser storage
+    const token = localStorage.getItem('token');
+    const email = localStorage.getItem('user_email');
+
+    // 2. If we have a token but the Store is empty (e.g., after F5 refresh),
+    // fetch the profile immediately to restore the user's session.
+    if (token && email) {
+      this.store.dispatch(AuthActions.getProfile({ email }));
+    }
+  }
 }
