@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core'; // <-- Imported ChangeDetectorRef
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,23 +12,23 @@ import { CreateAuditRequest } from '../models/audit.model';
   templateUrl: './create-audit.html',
 })
 export class CreateAuditComponent {
-  // State matching the backend DTO exactly, now including taxpayerId
   formData = {
     officerId: '',
-    taxpayerId: '', // <-- ADDED TARGET TAXPAYER ID
+    taxpayerId: '',
     scope: '',
     findings: '',
   };
 
   isLoading = false;
   errorMessage = '';
+  successMessage = ''; // <-- Added success state
 
   constructor(
     private auditService: AuditService,
     private router: Router,
+    private cdr: ChangeDetectorRef, // <-- Injected ChangeDetectorRef
   ) {}
 
-  // Basic validation: Officer ID, Taxpayer ID, and Scope are required
   isFormValid(): boolean {
     return !!(this.formData.officerId && this.formData.taxpayerId && this.formData.scope.trim());
   }
@@ -37,31 +37,46 @@ export class CreateAuditComponent {
     if (!this.isFormValid()) return;
 
     this.isLoading = true;
-    this.errorMessage = ''; // Clear previous errors
+    this.errorMessage = '';
+    this.successMessage = '';
 
-    // Map the string inputs to the exact types expected by Java
     const payload: CreateAuditRequest = {
       officerId: Number(this.formData.officerId),
-      taxpayerId: Number(this.formData.taxpayerId), // <-- MAPPED TO PAYLOAD
+      taxpayerId: Number(this.formData.taxpayerId),
       scope: this.formData.scope,
-      findings: this.formData.findings || undefined, // Send undefined if empty
+      findings: this.formData.findings || undefined,
     };
 
-    // Make the API Call
     this.auditService.createAudit(payload).subscribe({
       next: (response) => {
         this.isLoading = false;
-        alert(`Audit Record created successfully with ID: ${response.id}`);
 
-        // Redirect to the Dashboard/Cases page
-        this.router.navigate(['/portal/audit-cases']); // Note: Updated to route to audit-cases table!
+        // On-screen success message instead of alert
+        this.successMessage = `Audit Record created successfully with ID: AUD-${response.id}`;
+
+        // Delay redirect by 1.5s to show the message
+        setTimeout(() => {
+          this.router.navigate(['/portal/audit-cases']);
+        }, 1500);
       },
       error: (err) => {
+        // 1. Instantly turn off loading
         this.isLoading = false;
         console.error('Error creating audit:', err);
-        // Safely display backend error messages
-        this.errorMessage =
-          err.error?.message || 'Failed to create audit record. Please verify the IDs provided.';
+
+        // 2. Safely extract error message
+        if (err.error && typeof err.error === 'string') {
+          this.errorMessage = err.error;
+        } else if (err.status === 404) {
+          this.errorMessage = 'Officer ID or Taxpayer ID not found in the system.';
+        } else if (err.error && err.error.message) {
+          this.errorMessage = err.error.message;
+        } else {
+          this.errorMessage = 'Failed to create audit record. Please verify the IDs provided.';
+        }
+
+        // 3. Force UI refresh instantly
+        this.cdr.detectChanges();
       },
     });
   }
@@ -69,5 +84,6 @@ export class CreateAuditComponent {
   cancel() {
     this.formData = { officerId: '', taxpayerId: '', scope: '', findings: '' };
     this.errorMessage = '';
+    this.successMessage = '';
   }
 }

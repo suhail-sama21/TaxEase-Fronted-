@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core'; // <-- Add it here
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router'; // <-- To navigate after success
+import { Router } from '@angular/router';
 import { ComplianceService } from '../services/compliance.service';
 import { CreateComplianceRequest } from '../models/compliance.model';
 
@@ -9,27 +9,27 @@ import { CreateComplianceRequest } from '../models/compliance.model';
   selector: 'app-create-compliance',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './create-compliance.html'
+  templateUrl: './create-compliance.html',
 })
 export class CreateComplianceComponent {
-
   formData = {
     taxpayerId: '',
     complianceType: '',
     result: '',
     filingId: '',
     paymentId: '',
-    notes: ''
+    notes: '',
   };
 
-  // Add states for loading and errors
+  // Add states for loading and messages
   isLoading = false;
   errorMessage = '';
+  successMessage = ''; // <-- Added success message variable
 
-  // Inject the service and router
   constructor(
     private complianceService: ComplianceService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef, // <-- Add this line
   ) {}
 
   onTypeChange() {
@@ -60,42 +60,60 @@ export class CreateComplianceComponent {
     if (!this.isFormValid()) return;
 
     this.isLoading = true;
-    this.errorMessage = ''; // Clear old errors
+    this.errorMessage = '';
+    this.successMessage = '';
 
-    // Map the form data to exactly what Spring Boot expects
     const requestPayload: CreateComplianceRequest = {
-      taxpayerId: Number(this.formData.taxpayerId), // Convert string to number
-      type: this.formData.complianceType,           // Map 'complianceType' to 'type'
+      taxpayerId: Number(this.formData.taxpayerId),
+      type: this.formData.complianceType,
       result: this.formData.result,
       notes: this.formData.notes,
-
-      // Only attach Filing ID if type is Filing
       filingId: this.formData.complianceType === 'Filing' ? Number(this.formData.filingId) : null,
-
-      // Only attach Payment ID if type is Payment
-      paymentId: this.formData.complianceType === 'Payment' ? Number(this.formData.paymentId) : null
+      paymentId:
+        this.formData.complianceType === 'Payment' ? Number(this.formData.paymentId) : null,
     };
 
-    // Make the API Call
     this.complianceService.createCompliance(requestPayload).subscribe({
       next: (response) => {
         this.isLoading = false;
-        alert('Compliance Record created successfully!');
-        // Redirect the user to the dashboard (or records table) upon success
-        this.router.navigate(['/portal/compliance-dashboard']);
+        this.successMessage = 'Compliance Record created successfully!';
+
+        setTimeout(() => {
+          this.router.navigate(['/portal/compliance-dashboard']);
+        }, 1500);
       },
       error: (err) => {
+        // 1. Turn off loading
         this.isLoading = false;
         console.error('Error creating compliance record:', err);
-        // Display the specific error message thrown by your Java backend if available
-        this.errorMessage = err.error?.message || 'Failed to create record. Please check the IDs provided.';
-      }
+
+        // 2. Set the error message
+        if (err.error && typeof err.error === 'string') {
+          this.errorMessage = err.error;
+        } else if (err.status === 404) {
+          this.errorMessage = `Entered data not found in Taxpayer Service`;
+        } else if (err.error && err.error.message) {
+          this.errorMessage = err.error.message;
+        } else {
+          this.errorMessage = 'Failed to create record. Please check your backend connection.';
+        }
+
+        // 3. THE FIX: Force Angular to update the UI instantly!
+        this.cdr.detectChanges();
+      },
     });
   }
 
   cancel() {
-    // Reset the form
-    this.formData = { taxpayerId: '', complianceType: '', result: '', filingId: '', paymentId: '', notes: '' };
+    this.formData = {
+      taxpayerId: '',
+      complianceType: '',
+      result: '',
+      filingId: '',
+      paymentId: '',
+      notes: '',
+    };
     this.errorMessage = '';
+    this.successMessage = '';
   }
 }

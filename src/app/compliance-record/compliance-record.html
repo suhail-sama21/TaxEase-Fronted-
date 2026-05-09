@@ -9,6 +9,19 @@
   </div>
 
   <div
+    *ngIf="successMessage"
+    class="mb-6 p-4 bg-[#3fb950]/10 border border-[#3fb950]/30 rounded-xl text-[#3fb950] text-[13px] flex items-center gap-2 animate-fade-in shadow-sm"
+  >
+    <span>✅</span> {{ successMessage }}
+  </div>
+
+  <div
+    *ngIf="errorMessage"
+    class="mb-6 p-4 bg-[#f85149]/10 border border-[#f85149]/30 rounded-xl text-[#f85149] text-[13px] flex items-center gap-2 animate-fade-in shadow-sm"
+  >
+    <span>⚠️</span> {{ errorMessage }}
+  </div>
+  <div
     class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl shadow-sm mb-6"
   >
     <div
@@ -91,7 +104,7 @@
             <td
               class="py-4 px-5 font-mono text-[12px] text-[var(--theme-text)] transition-colors duration-300"
             >
-              {{ rec.id }}
+              CMP-{{ rec.id }}
             </td>
             <td
               class="py-4 px-5 font-mono text-[12px] text-[var(--theme-muted)] transition-colors duration-300"
@@ -101,8 +114,7 @@
             <td
               class="py-4 px-5 font-medium text-[var(--theme-text)] transition-colors duration-300"
             >
-              {{ rec.taxpayerId }}
-              <!-- {{ rec.taxpayerId }} -->
+              Taxpayer #{{ rec.taxpayerId }}
             </td>
             <td class="py-4 px-5 text-[var(--theme-text)] transition-colors duration-300">
               {{ rec.type }}
@@ -111,9 +123,12 @@
               <span
                 class="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border font-medium transition-colors duration-300"
                 [ngClass]="{
-                  'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/20': rec.statusColor === 'green',
-                  'bg-[#e3b341]/10 text-[#e3b341] border-[#e3b341]/20': rec.statusColor === 'amber',
-                  'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/20': rec.statusColor === 'red',
+                  'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/20':
+                    getStatusColor(rec.result) === 'green',
+                  'bg-[#e3b341]/10 text-[#e3b341] border-[#e3b341]/20':
+                    getStatusColor(rec.result) === 'amber',
+                  'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/20':
+                    getStatusColor(rec.result) === 'red',
                 }"
               >
                 {{ rec.result }}
@@ -144,7 +159,7 @@
       class="px-6 py-4 border-b border-[var(--theme-border)] bg-[var(--theme-bg)] transition-colors duration-300"
     >
       <h2 class="text-[16px] font-bold text-[var(--theme-text)] transition-colors duration-300">
-        Update Compliance Record: <span class="text-[#1f6feb]">{{ selectedRecord.id }}</span>
+        Update Compliance Record: <span class="text-[#1f6feb]">CMP-{{ selectedRecord.id }}</span>
       </h2>
     </div>
 
@@ -187,12 +202,12 @@
         >
           Cancel
         </button>
-        <!-- Retaining primary brand colors for the main call to action button -->
         <button
           (click)="saveUpdate()"
-          [disabled]="!updateData.notes"
-          class="bg-[#1f6feb] hover:bg-[#388bfd] text-white transition-colors duration-300 rounded-lg px-6 py-2 text-[13px] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="!updateData.notes || isLoading"
+          class="bg-[#1f6feb] hover:bg-[#388bfd] text-white transition-colors duration-300 rounded-lg px-6 py-2 text-[13px] font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
+          <span *ngIf="isLoading" class="animate-spin">⏳</span>
           Save Update
         </button>
       </div>

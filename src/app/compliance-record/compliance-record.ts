@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ComplianceService } from '../services/compliance.service';
 import { ComplianceResponse, UpdateComplianceRequest } from '../models/compliance.model';
-import { catchError, Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-compliance-record',
@@ -21,21 +20,13 @@ export class ComplianceRecordComponent implements OnInit {
   };
   isLoading = false;
 
-  // Inject the service
+  // Added message state variables
+  successMessage = '';
+  errorMessage = '';
+
   constructor(private complianceService: ComplianceService) {}
 
-  // records$!: Observable<ComplianceResponse[]>;
-
-  // Fetch data automatically when the page loads
   ngOnInit() {
-  //  T   this.complianceService.getAllCompliance().pipe(
-      // Handle the error within the RxJS pipeline
-    //   catchError((err) => {
-    //     console.error('Failed to load records:', err);
-    //     // Return an Observable of an empty array so the stream doesn't completely break
-    //     return of([]);
-    //   }),
-    // );
     this.loadRecords();
   }
 
@@ -43,25 +34,25 @@ export class ComplianceRecordComponent implements OnInit {
     this.complianceService.getAllCompliance().subscribe({
       next: (data) => {
         this.records = data;
-        // console.log('Loaded records:', this.records$);
       },
-      error: (err) => console.error('Failed to load records:', err),
+      error: (err) => {
+        console.error('Failed to load records:', err);
+        this.errorMessage = 'Failed to load compliance records from the server.';
+      },
     });
   }
 
-  // Utility method to dynamically assign colors based on the DB result
   getStatusColor(result: string): string {
     if (result === 'Compliant') return 'green';
     if (result === 'Non-Compliant') return 'red';
-    return 'amber'; // Pending or default
+    return 'amber';
   }
 
   selectForUpdate(record: ComplianceResponse) {
     this.selectedRecord = record;
-    // Pre-fill the form with existing data
     this.updateData = { result: record.result, notes: record.notes || '' };
+    this.errorMessage = ''; // Clear any old errors
 
-    // Smooth scroll to the form
     setTimeout(() => {
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }, 100);
@@ -69,28 +60,36 @@ export class ComplianceRecordComponent implements OnInit {
 
   cancelUpdate() {
     this.selectedRecord = null;
+    this.errorMessage = '';
   }
 
   saveUpdate() {
     if (this.selectedRecord && this.updateData.result) {
       this.isLoading = true;
+      this.successMessage = '';
+      this.errorMessage = '';
 
-      // Make the API PUT call
       this.complianceService.updateCompliance(this.selectedRecord.id, this.updateData).subscribe({
         next: (updatedRecord) => {
-          // Update the local array so the UI refreshes instantly without reloading the page
           const index = this.records.findIndex((r) => r.id === updatedRecord.id);
           if (index !== -1) {
             this.records[index] = updatedRecord;
           }
 
-          alert(`Successfully updated status for Record ID: ${updatedRecord.id}`);
-          this.selectedRecord = null; // Close the form
+          // Set success message instead of alert
+          this.successMessage = `Successfully updated status for Record ID: CMP-${updatedRecord.id}`;
+          this.selectedRecord = null;
           this.isLoading = false;
+
+          // Auto-hide the success message after 4 seconds
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 4000);
         },
         error: (err) => {
           console.error('Failed to update record:', err);
-          alert('Error updating record.');
+          // Set error message instead of alert
+          this.errorMessage = 'Error updating record. Please try again.';
           this.isLoading = false;
         },
       });

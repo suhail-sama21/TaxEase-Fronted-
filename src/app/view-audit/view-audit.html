@@ -1,15 +1,17 @@
 <div class="max-w-4xl mx-auto animate-fade-in pb-12">
-  <!-- This block only renders once the Observable (auditData$) has data -->
   <div *ngIf="auditData$ | async as audit; else loadingTemplate">
     <div class="flex items-center justify-between mb-8">
       <div class="flex items-center gap-3">
-        <button (click)="goBack()" class="text-[var(--theme-muted)] text-xl">←</button>
+        <button
+          (click)="goBack()"
+          class="text-[var(--theme-muted)] text-xl hover:text-[var(--theme-text)] transition-colors"
+        >
+          ←
+        </button>
         <h1 class="text-2xl font-bold text-[var(--theme-text)]">Audit Case Details</h1>
       </div>
 
       <div class="flex gap-3">
-        <!-- Close button shows only if ACTIVE -->
-        <!-- Use .toUpperCase() here to ensure it matches regardless of backend casing -->
         <button
           *ngIf="audit.status.toUpperCase() === 'ACTIVE' && !isClosingAudit"
           (click)="initiateClose()"
@@ -20,7 +22,20 @@
       </div>
     </div>
 
-    <!-- Data Cards -->
+    <div
+      *ngIf="successMessage"
+      class="mb-6 p-4 bg-[#3fb950]/10 border border-[#3fb950]/20 rounded-xl text-[13px] text-[#3fb950] flex items-center gap-2 animate-fade-in shadow-sm"
+    >
+      <span>✅</span> {{ successMessage }}
+    </div>
+
+    <div
+      *ngIf="errorMessage"
+      class="mb-6 p-4 bg-[#f85149]/10 border border-[#f85149]/20 rounded-xl text-[13px] text-[#f85149] flex items-center gap-2 animate-fade-in shadow-sm"
+    >
+      <span class="font-bold">Error:</span> {{ errorMessage }}
+    </div>
+
     <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-6 mb-6">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
         <div>
@@ -34,7 +49,7 @@
           <span
             class="px-2.5 py-0.5 rounded-full border text-[11px] font-medium"
             [ngClass]="
-              audit.status === 'ACTIVE'
+              audit.status.toUpperCase() === 'ACTIVE'
                 ? 'bg-[#1f6feb]/10 text-[#1f6feb] border-[#1f6feb]/20'
                 : 'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/20'
             "
@@ -45,10 +60,8 @@
       </div>
     </div>
 
-    <!-- Scope/Findings Card -->
     <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-6 mb-6">
       <h2 class="text-[14px] font-bold text-[var(--theme-text)] mb-3">Audit Scope</h2>
-      <!-- CHANGED text-white TO text-[var(--theme-text)] -->
       <div
         class="bg-[var(--theme-bg)] p-4 rounded-lg text-[var(--theme-text)] mb-6 border border-[var(--theme-border)]"
       >
@@ -56,7 +69,6 @@
       </div>
 
       <h2 class="text-[14px] font-bold text-[var(--theme-text)] mb-3">Findings</h2>
-      <!-- CHANGED text-white TO text-[var(--theme-text)] -->
       <div
         class="bg-[var(--theme-bg)] p-4 rounded-lg text-[var(--theme-text)] border border-[var(--theme-border)]"
       >
@@ -64,7 +76,6 @@
       </div>
     </div>
 
-    <!-- The Actual Close Functionality Form -->
     <div
       *ngIf="isClosingAudit"
       class="bg-[var(--theme-card)] border-2 border-[#238636] rounded-xl p-6 animate-fade-in shadow-xl"
@@ -75,20 +86,20 @@
       <textarea
         [(ngModel)]="closeRequest.findings"
         placeholder="Enter final summary to close this case..."
-        class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] p-4 rounded-lg text-white mb-4 outline-none focus:border-[#3fb950]"
+        class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] p-4 rounded-lg text-[var(--theme-text)] mb-4 outline-none focus:border-[#3fb950] transition-colors"
         rows="5"
       ></textarea>
 
       <div class="flex justify-end gap-3">
         <button
           (click)="cancelClose()"
-          class="px-5 py-2 text-[var(--theme-muted)] hover:text-white transition-colors"
+          class="px-5 py-2 text-[var(--theme-muted)] hover:text-[var(--theme-text)] transition-colors"
         >
           Cancel
         </button>
         <button
           (click)="submitCloseAudit()"
-          class="bg-[#238636] text-white px-6 py-2 rounded-lg font-bold"
+          class="bg-[#238636] text-white px-6 py-2 rounded-lg font-bold hover:bg-[#2ea043] transition-colors"
         >
           Submit & Close Case
         </button>
@@ -96,7 +107,6 @@
     </div>
   </div>
 
-  <!-- Loading Template (Shown until auditData$ has data) -->
   <ng-template #loadingTemplate>
     <div
       class="text-center py-20 bg-[var(--theme-card)] rounded-xl border border-[var(--theme-border)]"

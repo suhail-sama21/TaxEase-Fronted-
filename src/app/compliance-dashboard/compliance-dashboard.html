@@ -1,5 +1,4 @@
 <div class="max-w-[1400px] mx-auto animate-fade-in pb-10">
-  <!-- Page Header -->
   <div class="flex items-center justify-between mb-8">
     <div>
       <h1 class="text-2xl font-bold text-[var(--theme-text)] transition-colors duration-300 mb-1">
@@ -17,9 +16,14 @@
     </button>
   </div>
 
-  <!-- Top Metrics Row -->
+  <div
+    *ngIf="errorMessage"
+    class="mb-6 p-4 bg-[#f85149]/10 border border-[#f85149]/30 rounded-xl text-[#f85149] text-[13px] flex items-center gap-2 animate-fade-in"
+  >
+    <span>⚠️</span> {{ errorMessage }}
+  </div>
+
   <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-    <!-- Total Checks -->
     <div
       class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl p-5 relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-[#e3b341]"
     >
@@ -39,7 +43,6 @@
       </div>
     </div>
 
-    <!-- Pending Reviews -->
     <div
       class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl p-5 relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-[#1f6feb]"
     >
@@ -61,7 +64,6 @@
       </div>
     </div>
 
-    <!-- Non-Compliant -->
     <div
       class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl p-5 relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-[#f85149]"
     >
@@ -82,9 +84,7 @@
     </div>
   </div>
 
-  <!-- Main Content Split -->
   <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
-    <!-- Left: Table -->
     <div
       class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl overflow-hidden shadow-sm h-fit"
     >
@@ -138,31 +138,26 @@
               *ngFor="let check of recentChecks"
               class="hover:bg-[var(--theme-surface)] transition-colors duration-300"
             >
-              <!-- Record ID -->
               <td
                 class="py-4 px-5 font-mono text-[12px] text-[var(--theme-text)] transition-colors duration-300"
               >
                 CMP-{{ check.id }}
               </td>
 
-              <!-- Taxpayer ID -->
               <td class="py-4 px-5">
                 <div class="font-medium text-[var(--theme-text)] transition-colors duration-300">
                   Taxpayer #{{ check.taxpayerId }}
                 </div>
               </td>
 
-              <!-- Type -->
               <td class="py-4 px-5 text-[var(--theme-text)] transition-colors duration-300">
                 {{ check.type }}
               </td>
 
-              <!-- Date -->
               <td class="py-4 px-5 text-[var(--theme-muted)] transition-colors duration-300">
                 {{ check.date }}
               </td>
 
-              <!-- Status Badge -->
               <td class="py-4 px-5">
                 <span
                   class="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border font-medium transition-colors duration-300"
@@ -184,7 +179,6 @@
       </div>
     </div>
 
-    <!-- Right: System Health Score -->
     <div class="flex flex-col gap-6">
       <div
         class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl overflow-hidden shadow-sm"
