@@ -4,6 +4,8 @@ import { RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
 import { map } from 'rxjs';
+// Import your logout action
+import { logout } from '../stores/authStore/auth.action'; 
 
 @Component({
   selector: 'app-layout',
@@ -12,7 +14,6 @@ import { map } from 'rxjs';
   templateUrl: './layout.html',
 })
 export class LayoutComponent implements OnInit {
-  // Use inject to ensure store is initialized before the observable property
   private store = inject(Store);
 
   userName = 'John Doe';
@@ -26,13 +27,18 @@ export class LayoutComponent implements OnInit {
     this.isDarkMode = !this.isDarkMode;
   }
 
+  // Add the logout method
+  logout() {
+    if (confirm('Are you sure you want to log out?')) {
+      this.store.dispatch(logout());
+    }
+  }
+
   ngOnInit(): void {
-    // Keeping your original subscription for user details
     this.store.select(selectUser).subscribe(user => {
       if (user) {
         this.userData = user;
         this.assignData();
-        console.log('User Data from Store:', this.userData);
       }
     });
   }
@@ -41,12 +47,10 @@ export class LayoutComponent implements OnInit {
     if (this.userData) {
       this.userName = this.userData.name || this.userName;
       this.userRole = this.userData.role || this.userRole;
-      // Simple initials logic
       this.userInitials = this.userName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
     }
   }
 
-  // Master menu items
   navItems = [
     { label: 'Dashboard', route: '/portal/dashboard', icon: 'dashboard-icon', Role: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] },
     { label: 'Profile', route: '/portal/profile', icon: 'profile-icon', Role: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] },
@@ -68,7 +72,6 @@ export class LayoutComponent implements OnInit {
     { label: 'Create Audit', route: '/portal/create-audit', icon: 'plus-circle-icon', Role: ["AUDITOR"] },
   ];
 
-  // Reactive stream for the HTML menu
   filteredNavItems$ = this.store.select(selectUser).pipe(
     map(user => {
       const role = (user?.role || 'TAXPAYER').toUpperCase();

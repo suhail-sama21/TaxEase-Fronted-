@@ -122,6 +122,10 @@ export const routes: Routes = [
         loadComponent: () => import('./view-audit/view-audit').then(m => m.ViewAuditComponent) ,
         data: { roles: ["AUDITOR", "ADMINISTRATOR"] }
       }
+      ,
+       { path: 'send-notification', 
+        loadComponent: () => import('./send-notification/send-notification').then(m => m.SendNotificationComponent) ,
+        data: { roles: ["ADMINISTRATOR", "MANAGER", "COMPLIANCE"] }},
     ],
   },
 ];

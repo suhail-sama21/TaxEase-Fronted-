@@ -59,5 +59,10 @@ export const authReducer = createReducer(
       error: null,
       isLoading: false
     };
-  })
+  }),
+  on(AuthActions.signupSuccess, (state) => ({
+  ...state,
+  isLoading: false, // Turn off spinner
+  error: null
+}))
 );
