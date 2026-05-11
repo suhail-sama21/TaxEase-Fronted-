@@ -1,10 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { PaymentService } from '../service/payment.service';
+import { Router, ActivatedRoute } from '@angular/router'; 
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
+
+// Import BOTH services
+import { PaymentService } from '../service/payment.service';
+import { TaxFilingService } from '../service/tax-filing.service'; 
 
 @Component({
   selector: 'app-make-payment',
@@ -18,65 +21,67 @@ export class MakePaymentComponent implements OnInit {
   paymentSuccess = false;
   generatedPaymentId: string = '';
 
-  // 1. Start with empty/null data instead of hardcoded arrays
   filings: any[] = [];
   selectedFilingId: number | null = null; 
   selectedFiling: any = null;
   paymentAmount: number = 0;
+  userId: number = 0;
 
-  // 2. Add the userId so the fetch function works
-  
   constructor(
     private router: Router, 
+    private route: ActivatedRoute,
     private paymentService: PaymentService,
+    private taxFilingService: TaxFilingService, 
     private cdr: ChangeDetectorRef,
     private store: Store
   ) {}
-  userId: number  =0; // Replace later with your actual logged-in user ID
-
 
   ngOnInit(): void {
+    // Catch the Retry parameters from the Payment History page
+    this.route.queryParams.subscribe(params => {
+      if (params['filingId']) {
+        this.selectedFilingId = Number(params['filingId']);
+      }
+      if (params['amount']) {
+        this.paymentAmount = Number(params['amount']);
+      }
+    });
+
     this.store.select(selectUser).subscribe(user => {
-          if (user) {
-            this.userId = user.id
-            console.log('User Data from Store:', this.userId);
-          }
-        });
-    // 3. Trigger the fetch from the backend when the page loads!
-    this.fetchPendingFilings(); 
+      if (user) {
+        this.userId = user.id;
+        console.log('User Data from Store:', this.userId);
+        this.fetchPendingFilings(); 
+      }
+    });
   }
 
   fetchPendingFilings() {
-    // Call the service method to get ALL history
     this.paymentService.getAllFilings(this.userId).subscribe({
       next: (backendData: any[]) => {
-        
-        // FILTER: Keep only the items where status is 'Pending'
         const pendingData = backendData.filter(filing => 
-         
           filing.status && filing.status.toLowerCase() === 'pending'
         );
-        console.log('Pending filings:', pendingData); // Debug log
-        // MAP: Transform the filtered data to fit your dropdown UI
+        
         this.filings = pendingData.map(filing => ({
           id: filing.id, 
           displayId: 'FIL-' + filing.id,
           period: filing.period || 'Current Period', 
-          amount: filing.amountDeclared || filing.amount // Adjust based on your backend keys
+          amount: filing.amountDeclared || filing.amount 
         }));
 
-        // SELECT: Automatically select the first filing if the list isn't empty
         if (this.filings.length > 0) {
-          this.selectedFilingId = this.filings[0].id;
-          this.onFilingChange(); // Sync the UI amounts
+          // If we DIDN'T come from the Retry button, select the first one by default
+          if (!this.selectedFilingId) {
+            this.selectedFilingId = this.filings[0].id;
+          }
+          this.onFilingChange(); 
         } else {
            this.selectedFilingId = null;
            this.paymentAmount = 0;
         }
         
-        // Tell Angular to update the screen
         this.cdr.detectChanges();
-        console.log('Pending filings loaded:', this.filings);
       },
       error: (err) => {
         console.error('Failed to load filings history', err);
@@ -85,9 +90,7 @@ export class MakePaymentComponent implements OnInit {
     });
   }
 
-  // UPDATES THE UI WHEN SELECTION CHANGES
   onFilingChange() {
-    // Use == instead of === just in case the HTML select turns the ID into a string
     this.selectedFiling = this.filings.find(f => f.id == this.selectedFilingId);
     if (this.selectedFiling) {
       this.paymentAmount = this.selectedFiling.amount;
@@ -111,13 +114,40 @@ export class MakePaymentComponent implements OnInit {
       method: this.selectedMethod,
       status: 'Completed'
     };
-
+    
+    // 1. Process the payment first
     this.paymentService.makePayment(payload).subscribe({
       next: (response: any) => {
-        this.isProcessing = false;
-        this.paymentSuccess = true;
-        this.generatedPaymentId = 'PAY-' + response.id;
-        this.cdr.detectChanges();
+        
+        // 2. If payment is successful, update the tax filing status to 'Completed'
+        this.taxFilingService.updateStatus(this.selectedFilingId!, 'Completed').subscribe({
+          next: (statusUpdateResponse) => {
+            // Both payment AND status update succeeded!
+            this.isProcessing = false;
+            this.paymentSuccess = true;
+            this.generatedPaymentId = 'PAY-' + response.id;
+
+            // Dynamically remove the paid file from the UI
+            this.filings = this.filings.filter(f => f.id != this.selectedFilingId);
+
+            if (this.filings.length > 0) {
+              this.selectedFilingId = this.filings[0].id;
+              this.onFilingChange();
+            } else {
+              this.selectedFilingId = null;
+              this.selectedFiling = null;
+              this.paymentAmount = 0;
+            }
+            
+            this.cdr.detectChanges();
+          },
+          error: (statusErr) => {
+            this.isProcessing = false;
+            console.error('Payment succeeded but filing status update failed:', statusErr);
+            alert('Payment was successful, but we could not update the filing status. Please contact support.');
+          }
+        });
+
       },
       error: (err) => {
         this.isProcessing = false;
