@@ -20,7 +20,7 @@ interface DocumentRow {
   selector: 'app-reg-status',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './reg-status.html'
+  templateUrl: './reg-status.html',
 })
 export class RegStatusComponent implements OnInit {
   taxpayerDocuments: taxpayerDocument[] = [];
@@ -45,7 +45,9 @@ export class RegStatusComponent implements OnInit {
 
   // Dynamic timeline data based on document verification progress
   get timelineSteps() {
-    const verifiedCount = this.taxpayerDocuments.filter(doc => doc.verificationStatus === 'Accepted').length;
+    const verifiedCount = this.taxpayerDocuments.filter(
+      (doc) => doc.verificationStatus === 'Accepted',
+    ).length;
     const totalDocs = 3; // ID Proof, PAN Card, Address Proof
     const progressPercent = (verifiedCount / totalDocs) * 100;
 
@@ -54,42 +56,56 @@ export class RegStatusComponent implements OnInit {
         { title: 'Application Submitted', date: 'March 1, 2026', status: 'completed' },
         { title: 'Documents Received', date: 'March 2, 2026', status: 'completed' },
         { title: 'Under Review', date: 'March 3-5, 2026', status: 'completed' },
-        { title: 'ID Assigned', date: 'March 6, 2026', status: 'completed' }
+        { title: 'ID Assigned', date: 'March 6, 2026', status: 'completed' },
       ];
     } else if (progressPercent >= 75) {
       return [
         { title: 'Application Submitted', date: 'March 1, 2026', status: 'completed' },
         { title: 'Documents Received', date: 'March 2, 2026', status: 'completed' },
-        { title: 'Under Review', date: 'In progress — ' + Math.round(progressPercent) + '% verified', status: 'current' },
-        { title: 'ID Assigned', date: 'Pending', status: 'upcoming' }
+        {
+          title: 'Under Review',
+          date: 'In progress — ' + Math.round(progressPercent) + '% verified',
+          status: 'current',
+        },
+        { title: 'ID Assigned', date: 'Pending', status: 'upcoming' },
       ];
     } else if (progressPercent >= 50) {
       return [
         { title: 'Application Submitted', date: 'March 1, 2026', status: 'completed' },
         { title: 'Documents Received', date: 'March 2, 2026', status: 'completed' },
-        { title: 'Under Review', date: 'In progress — ' + Math.round(progressPercent) + '% verified', status: 'current' },
-        { title: 'ID Assigned', date: 'Pending', status: 'upcoming' }
+        {
+          title: 'Under Review',
+          date: 'In progress — ' + Math.round(progressPercent) + '% verified',
+          status: 'current',
+        },
+        { title: 'ID Assigned', date: 'Pending', status: 'upcoming' },
       ];
     } else if (verifiedCount > 0) {
       return [
         { title: 'Application Submitted', date: 'March 1, 2026', status: 'completed' },
         { title: 'Documents Received', date: 'March 2, 2026', status: 'completed' },
-        { title: 'Under Review', date: 'In progress — ' + Math.round(progressPercent) + '% verified', status: 'current' },
-        { title: 'ID Assigned', date: 'Pending', status: 'upcoming' }
+        {
+          title: 'Under Review',
+          date: 'In progress — ' + Math.round(progressPercent) + '% verified',
+          status: 'current',
+        },
+        { title: 'ID Assigned', date: 'Pending', status: 'upcoming' },
       ];
     } else {
       return [
         { title: 'Application Submitted', date: 'March 1, 2026', status: 'completed' },
         { title: 'Documents Received', date: 'March 2, 2026', status: 'completed' },
         { title: 'Under Review', date: 'Pending document verification', status: 'current' },
-        { title: 'ID Assigned', date: 'Pending', status: 'upcoming' }
+        { title: 'ID Assigned', date: 'Pending', status: 'upcoming' },
       ];
     }
   }
 
   // Progress bar calculation
   get verificationProgress() {
-    const verifiedCount = this.taxpayerDocuments.filter(doc => doc.verificationStatus === 'Accepted').length;
+    const verifiedCount = this.taxpayerDocuments.filter(
+      (doc) => doc.verificationStatus === 'Accepted',
+    ).length;
     return Math.round((verifiedCount / 3) * 100); // 3 required documents
   }
 
@@ -117,9 +133,9 @@ export class RegStatusComponent implements OnInit {
   }
 
   fetchDocuments() {
-  // We assign the Observable itself to the variable
+    // We assign the Observable itself to the variable
     this.requiredDocs$ = this.service.getDocuments().pipe(
-      map(data => {
+      map((data) => {
         console.log('Documents fetched successfully:', data);
         this.taxpayerDocuments = data;
 
@@ -127,12 +143,12 @@ export class RegStatusComponent implements OnInit {
         const newProgress = this.verificationProgress;
         if (newProgress !== this.previousProgress) {
           this.progressChanged = true;
-          setTimeout(() => this.progressChanged = false, 1000); // Reset after animation
+          setTimeout(() => (this.progressChanged = false), 1000); // Reset after animation
           this.previousProgress = newProgress;
         }
 
         return this.transformDocuments(data); // Returns the array to the stream
-      })
+      }),
     );
   }
 
@@ -187,7 +203,7 @@ export class RegStatusComponent implements OnInit {
     const targetId = this.verificationTarget?.id;
 
     if (!targetId) {
-      console.error("No document ID found for verification");
+      console.error('No document ID found for verification');
       return;
     }
 
@@ -197,21 +213,21 @@ export class RegStatusComponent implements OnInit {
     // 3. Use the local variable for the service call
     this.service.verifyDocument(targetId, status).subscribe({
       next: () => this.fetchDocuments(),
-      error: (err) => console.error("Verification failed", err)
-    })
-    
-     // Ensure we refresh the document list after verification
+      error: (err) => console.error('Verification failed', err),
+    });
+
+    // Ensure we refresh the document list after verification
   }
 
   private transformDocuments(documents: taxpayerDocument[]): DocumentRow[] {
     const allTypes = [
       { type: 'ID Proof', backendType: 'ID Proof' },
       { type: 'PAN Card', backendType: 'PAN' },
-      { type: 'Address Proof', backendType: 'Address proof' }
+      { type: 'Address Proof', backendType: 'Address proof' },
     ];
 
-    return allTypes.map(typeInfo => {
-      const matchingDoc = documents.find(doc => this.mapDocType(doc.docType) === typeInfo.type);
+    return allTypes.map((typeInfo) => {
+      const matchingDoc = documents.find((doc) => this.mapDocType(doc.docType) === typeInfo.type);
       if (matchingDoc) {
         return {
           type: typeInfo.type,
@@ -220,7 +236,7 @@ export class RegStatusComponent implements OnInit {
           status: matchingDoc.verificationStatus,
           statusColor: this.getStatusColor(matchingDoc.verificationStatus),
           fileUri: matchingDoc.fileUri,
-          id: matchingDoc.id
+          id: matchingDoc.id,
         };
       }
       return {
@@ -229,7 +245,7 @@ export class RegStatusComponent implements OnInit {
         date: '—',
         status: 'Missing',
         statusColor: 'red',
-        fileUri: null
+        fileUri: null,
       };
     });
   }

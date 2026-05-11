@@ -8,14 +8,12 @@ export interface ComplianceDashboardResponse {
 
 export interface CreateComplianceRequest {
   taxpayerId: number;
-  type: string; // Matches Java's "type" property
+  type: string;
   result: string;
   filingId?: number | null;
   paymentId?: number | null;
   notes?: string;
 }
-
-// Add these below your existing interfaces
 
 export interface ComplianceResponse {
   status: any;
@@ -25,7 +23,7 @@ export interface ComplianceResponse {
   filingId?: number;
   paymentId?: number;
   type: string;
-  result: string; // Note: Your backend uses 'result', not 'status'
+  result: string;
   date: string;
   notes?: string;
   createdAt: string;

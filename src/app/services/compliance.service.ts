@@ -17,26 +17,20 @@ export class ComplianceService {
 
   constructor(private http: HttpClient) {}
 
-  //1
   getDashboardSummary(): Observable<ComplianceDashboardResponse> {
     console.log('hii');
     return this.http.get<ComplianceDashboardResponse>(`${this.apiUrl}/dashboard`);
   }
 
-  //2
   createCompliance(data: CreateComplianceRequest): Observable<any> {
     return this.http.post(`${this.apiUrl}`, data);
   }
 
-  // --- COMPLIANCE RECORDS ---
-
-  // 3. Fetch all records
   getAllCompliance(): Observable<ComplianceResponse[]> {
     console.log('Fetching all compliance records...');
     return this.http.get<ComplianceResponse[]>(this.apiUrl);
   }
 
-  // 4. Update a specific record
   updateCompliance(id: number, data: UpdateComplianceRequest): Observable<ComplianceResponse> {
     return this.http.put<ComplianceResponse>(`${this.apiUrl}/${id}`, data);
   }

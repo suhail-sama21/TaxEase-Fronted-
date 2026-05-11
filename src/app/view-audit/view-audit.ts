@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,10 +18,14 @@ export class ViewAuditComponent implements OnInit {
   isClosingAudit = false;
   closeRequest: CloseAuditRequest = { findings: '' };
 
+  successMessage = '';
+  errorMessage = '';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private auditService: AuditService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -38,36 +42,51 @@ export class ViewAuditComponent implements OnInit {
 
   initiateClose() {
     this.isClosingAudit = true;
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
   cancelClose() {
     this.isClosingAudit = false;
     this.closeRequest.findings = '';
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
   submitCloseAudit() {
+    this.errorMessage = '';
+    this.successMessage = '';
+
     if (!this.closeRequest.findings.trim()) {
-      alert('Findings are required to close the case.');
+      this.errorMessage = 'Findings are required to close the case.';
       return;
     }
 
-    // Call the service to update status and navigate on success
     this.auditService.closeAudit(this.currentAuditId, this.closeRequest).subscribe({
       next: (res) => {
-        alert(`Audit AUD-${res.id} has been closed successfully.`);
+        this.successMessage = `Audit AUD-${res.id} has been closed successfully.`;
         this.isClosingAudit = false;
 
-        // Directly navigate back to dashboard
-        this.router.navigate(['/portal/audit-cases']);
+        setTimeout(() => {
+          this.router.navigate(['/portal/audit-cases']);
+        }, 1500);
       },
       error: (err) => {
         console.error('Close Audit Failed:', err);
-        alert('Failed to close audit. Please try again.');
+
+        if (err.error && typeof err.error === 'string') {
+          this.errorMessage = err.error;
+        } else if (err.error && err.error.message) {
+          this.errorMessage = err.error.message;
+        } else {
+          this.errorMessage = 'Failed to close audit. Please check your backend connection.';
+        }
+
+        this.cdr.detectChanges();
       },
     });
   }
 
-  // Final single implementation of goBack
   goBack() {
     this.router.navigate(['/portal/audit-cases']);
   }

@@ -12,7 +12,6 @@
     class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl overflow-hidden shadow-sm"
   >
     <div class="p-8">
-      <!-- Accent Info Box -->
       <div
         class="mb-8 p-4 bg-[#1f6feb]/10 border border-[#1f6feb]/20 rounded-lg text-[12px] text-[var(--theme-text)] transition-colors duration-300 leading-relaxed border-dashed flex gap-3 items-start"
       >
@@ -34,16 +33,21 @@
         </div>
       </div>
 
-      <!-- ERROR BANNER -->
+      <div
+        *ngIf="successMessage"
+        class="mb-6 p-4 bg-[#3fb950]/10 border border-[#3fb950]/20 rounded-lg text-[13px] text-[#3fb950] flex items-center gap-2 transition-colors duration-300 animate-fade-in shadow-sm"
+      >
+        <span>✅</span> {{ successMessage }}
+      </div>
+
       <div
         *ngIf="errorMessage"
-        class="mb-6 p-4 bg-[#f85149]/10 border border-[#f85149]/20 rounded-lg text-[13px] text-[#f85149] flex items-center gap-2 transition-colors duration-300"
+        class="mb-6 p-4 bg-[#f85149]/10 border border-[#f85149]/20 rounded-lg text-[13px] text-[#f85149] flex items-center gap-2 transition-colors duration-300 animate-fade-in shadow-sm"
       >
         <span class="font-bold">Error:</span> {{ errorMessage }}
       </div>
 
       <div class="grid grid-cols-2 gap-6 mb-6">
-        <!-- Officer ID (Now col-span-1 so it sits next to Taxpayer ID) -->
         <div class="col-span-1">
           <label
             class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2"
@@ -65,7 +69,6 @@
           </div>
         </div>
 
-        <!-- NEW: Target Taxpayer ID (col-span-1) -->
         <div class="col-span-1">
           <label
             class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2"
@@ -87,7 +90,6 @@
           </div>
         </div>
 
-        <!-- Audit Scope -->
         <div class="col-span-2">
           <label
             class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2"
@@ -108,7 +110,6 @@
           </div>
         </div>
 
-        <!-- Findings -->
         <div class="col-span-2">
           <label
             class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2"
@@ -124,7 +125,6 @@
         </div>
       </div>
 
-      <!-- Action Buttons -->
       <div
         class="flex items-center justify-end gap-3 pt-6 border-t border-[var(--theme-border)] transition-colors duration-300"
       >

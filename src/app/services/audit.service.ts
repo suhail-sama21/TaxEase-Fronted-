@@ -12,7 +12,7 @@ import {
   providedIn: 'root',
 })
 export class AuditService {
-  // Ensure this matches your Spring Boot controller mapping!
+
   private apiUrl = 'http://localhost:8088/api/audit';
 
   constructor(private http: HttpClient) {}
@@ -27,7 +27,7 @@ export class AuditService {
 
   getAllAudits(): Observable<AuditResponse[]> {
     return this.http.get<AuditResponse[]>(this.apiUrl);
-  } // <-- This closing brace was missing!
+  }
 
   getAuditById(id: number): Observable<AuditResponse> {
     return this.http.get<AuditResponse>(`${this.apiUrl}/${id}`);
