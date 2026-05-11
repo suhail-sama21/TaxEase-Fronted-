@@ -10,7 +10,6 @@
   </div>
 
   <div class="grid grid-cols-3 gap-4 mb-6">
-    <!-- Total Paid Card (Dynamic) -->
     <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-5 relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-[#3fb950] transition-colors duration-300">
       <div class="flex justify-between items-start mb-3">
         <div class="text-[11px] text-[var(--theme-muted)] uppercase tracking-wider transition-colors duration-300">Total Paid</div>
@@ -20,7 +19,6 @@
       <div class="text-[11px] text-[var(--theme-muted)] transition-colors duration-300">FY 2025–26</div>
     </div>
 
-    <!-- Transactions Card (Dynamic) -->
     <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-5 relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-app-primary transition-colors duration-300">
       <div class="flex justify-between items-start mb-3">
         <div class="text-[11px] text-[var(--theme-muted)] uppercase tracking-wider transition-colors duration-300">Transactions</div>
@@ -30,7 +28,6 @@
       <div class="text-[11px] text-[#3fb950] transition-colors duration-300">All records</div>
     </div>
 
-    <!-- Failed Card (Dynamic) -->
     <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-5 relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-[#f85149] transition-colors duration-300">
       <div class="flex justify-between items-start mb-3">
         <div class="text-[11px] text-[var(--theme-muted)] uppercase tracking-wider transition-colors duration-300">Failed</div>
@@ -45,7 +42,6 @@
     <div class="px-5 py-4 border-b border-[var(--theme-border)] flex items-center justify-between bg-[var(--theme-surface)] transition-colors duration-300">
       <span class="text-[15px] font-medium text-[var(--theme-text)] transition-colors duration-300">Transaction History</span>
       
-      <!-- UPDATED DROPDOWN WITH NEW METHODS AND FILTER LOGIC -->
       <select (change)="filterByMethod($event)" class="bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[12px] px-3 py-1.5 outline-none focus:border-app-primary cursor-pointer appearance-none min-w-[120px] transition-colors duration-300">
         <option value="ALL">All Methods</option>
         <option value="CREDIT_CARD">Credit Card</option>
@@ -69,12 +65,10 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Shows if array is empty (or filter returns 0 results) -->
           <tr *ngIf="transactions.length === 0">
             <td colspan="7" class="px-5 py-8 text-center text-[var(--theme-muted)]">No transactions found for this method.</td>
           </tr>
           
-          <!-- Loops through data -->
           <tr *ngFor="let t of transactions" class="hover:bg-[var(--theme-surface)] border-b border-[var(--theme-border)] last:border-0 transition-colors duration-300">
             <td class="px-5 py-3 text-app-primary font-mono text-[12px] transition-colors duration-300">{{ t.id }}</td>
             <td class="px-5 py-3 text-[var(--theme-muted)] transition-colors duration-300">{{ t.date }}</td>
@@ -87,12 +81,12 @@
                 {{ t.status }}
               </span>
             </td>
-            <td class="px-5 py-3">
+            <td class="px-5 py-3 flex gap-3 items-center">
               <button *ngIf="t.status === 'Completed' || t.status === 'Success'" (click)="downloadReceipt(t.id)" class="bg-transparent border border-[var(--theme-border)] text-[var(--theme-muted)] rounded-md px-2.5 py-1 text-[11px] hover:bg-[var(--theme-surface)] hover:text-[var(--theme-text)] transition-colors duration-300">
                 ↓ Receipt
               </button>
-              <button *ngIf="t.status === 'Failed'" (click)="retryPayment()" class="bg-app-primary text-white border-none rounded-md px-2.5 py-1 text-[11px] hover:bg-app-primary-hover transition-colors duration-300">
-                Retry
+              <button *ngIf="t.status === 'Failed'" (click)="retryPayment(t)" class="bg-transparent border-none text-[#f85149] hover:text-[#ff7b72] hover:underline p-0 m-0 text-[12px] font-medium cursor-pointer transition-all duration-300 flex items-center gap-1">
+                ↻ Retry
               </button>
             </td>
           </tr>
