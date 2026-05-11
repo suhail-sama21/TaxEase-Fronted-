@@ -3,7 +3,7 @@ import { CommonModule, AsyncPipe } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router'; // Added Router & NavigationEnd
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
-import { map, switchMap, Observable, of, startWith, filter, combineLatest } from 'rxjs'; 
+import { map, switchMap, Observable, of, startWith, filter, combineLatest } from 'rxjs';
 import { logout } from '../stores/authStore/auth.action';
 import { NotificationService } from '../core/services/notification';
 
@@ -24,6 +24,10 @@ export class LayoutComponent {
   }
 
   // 1. Core User Streams
+  // Modal State
+  showLogoutModal = false;
+
+  // Reactive User Data
   user$ = this.store.select(selectUser);
   userId$ = this.user$.pipe(map(u => u?.id));
 
@@ -50,12 +54,14 @@ export class LayoutComponent {
   // 4. Derived UI Streams
   userName$: Observable<string> = this.user$.pipe(map(u => u?.name || 'Guest User'));
   userRole$: Observable<string> = this.user$.pipe(map(u => u?.role || 'TAXPAYER'));
+
   userInitials$: Observable<string> = this.userName$.pipe(
     map(name => name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2))
   );
 
   isDarkMode = true;
 
+  // Navigation Items
   navItems = [
     { label: 'Dashboard', route: '/portal/dashboard', icon: 'dashboard-icon', Role: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] },
     { label: 'Profile', route: '/portal/profile', icon: 'profile-icon', Role: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] },
@@ -84,6 +90,17 @@ export class LayoutComponent {
       return this.navItems.filter(item => !item.Role || item.Role.includes(role));
     })
   );
+
+  toggleTheme() { this.isDarkMode = !this.isDarkMode; }
+
+  openLogoutModal() { this.showLogoutModal = true; }
+
+  closeLogoutModal() { this.showLogoutModal = false; }
+
+  confirmLogout() {
+    this.store.dispatch(logout());
+    this.showLogoutModal = false;
+  }
 
   toggleTheme() { this.isDarkMode = !this.isDarkMode; }
   logout() { if (confirm('Are you sure you want to log out?')) { this.store.dispatch(logout()); } }

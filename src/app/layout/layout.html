@@ -1,12 +1,14 @@
 <div class="flex h-screen w-full bg-(--theme-bg) text-(--theme-text) font-sans overflow-hidden min-h-screen transition-colors duration-300"
-  [ngClass]="isDarkMode ? 'dark-mode' : ''">
-  
+     [ngClass]="isDarkMode ? 'dark-mode' : ''">
+
   <aside class="w-55 bg-(--theme-surface) border-r border-(--theme-border) flex flex-col shrink-0 transition-colors duration-300">
-    <div class="px-5 py-4 border-b border-(--theme-border) transition-colors duration-300">
-      <div class="text-lg font-medium text-[#1f6feb] tracking-tight font-display">⬡ TaxEase</div>
-      <div class="text-[10px] text-(--theme-muted) mt-0.5 transition-colors duration-300">Public Tax Filing System</div>
+    <!-- Top Logo Section -->
+    <div class="px-5 py-4 border-b border-(--theme-border)">
+      <div class="text-lg font-medium text-[#1f6feb] tracking-tight">⬡ TaxEase</div>
+      <div class="text-[10px] text-(--theme-muted) mt-0.5">Public Tax Filing System</div>
     </div>
 
+    <!-- Navigation Links -->
     <nav class="flex-1 px-2.5 py-3 overflow-y-auto">
       @for (item of (filteredNavItems$ | async); track item.label) {
         <a [routerLink]="item.route"
@@ -14,7 +16,7 @@
            class="flex items-center gap-2.5 px-2.5 py-2 rounded-md transition-all duration-200 hover:bg-(--theme-card)">
           <div class="w-4 h-4 bg-(--theme-border) opacity-50 rounded-sm"></div>
           <span class="text-[13px]">{{ item.label }}</span>
-          
+
           @if (item.isNotification) {
             @if ((notificationCount$ | async); as count) {
               <span *ngIf="count > 0" class="ml-auto bg-[#238636] text-[#7ee787] text-[10px] px-1.5 py-px rounded-full">
@@ -30,8 +32,9 @@
       }
     </nav>
 
-    <div class="px-3.5 py-3 border-t border-(--theme-border) transition-colors duration-300">
-      <div class="text-[11px] text-(--theme-muted) bg-(--theme-card) border border-(--theme-border) px-2.5 py-1 rounded-full inline-block transition-colors duration-300">
+    <!-- Footer Sidebar -->
+    <div class="px-3.5 py-3 border-t border-(--theme-border)">
+      <div class="text-[11px] text-(--theme-muted) bg-(--theme-card) border border-(--theme-border) px-2.5 py-1 rounded-full inline-block mb-2">
         Role: {{ userRole$ | async }}
       </div>
       <button (click)="logout()" class="flex items-center gap-2 px-2.5 py-2 rounded-md text-[#f85149] hover:bg-[#f85149]/10 transition-all duration-200 text-[13px] font-medium group">
@@ -41,33 +44,72 @@
     </div>
   </aside>
 
+  <!-- Main Content Area -->
   <main class="flex-1 flex flex-col overflow-hidden">
+    <!-- Header -->
     <header class="h-13 border-b border-(--theme-border) flex items-center px-5 gap-3 bg-(--theme-surface) shrink-0 transition-colors duration-300">
       <div class="flex items-center gap-3 ml-auto">
-        <button (click)="toggleTheme()" class="flex items-center justify-between w-12 h-6 bg-(--theme-card) border border-(--theme-border) rounded-full px-1 cursor-pointer transition-colors duration-300">
+        <!-- Theme Toggle -->
+        <button (click)="toggleTheme()" class="flex items-center justify-between w-12 h-6 bg-(--theme-card) border border-(--theme-border) rounded-full px-1 cursor-pointer">
            <span class="text-[12px]">☀️</span>
            <span class="text-[12px]">🌙</span>
         </button>
 
-        <div routerLink="/portal/notifications" class="w-8 h-8 rounded-md bg-(--theme-card) border border-(--theme-border) flex items-center justify-center cursor-pointer relative text-(--theme-muted) text-sm hover:text-(--theme-text) transition-colors duration-300">
+        <!-- Notifications -->
+        <div routerLink="/portal/notifications" class="w-8 h-8 rounded-md bg-(--theme-card) border border-(--theme-border) flex items-center justify-center cursor-pointer relative text-(--theme-muted) text-sm hover:text-(--theme-text)">
           🔔
           <div *ngIf="((notificationCount$ | async)?? 0) > 0" class="w-2 h-2 bg-[#f85149] rounded-full absolute top-1 right-1"></div>
         </div>
 
-        <div routerLink="/portal/profile" class="flex items-center gap-2 cursor-pointer hover:bg-(--theme-card) p-1 rounded-md transition-colors duration-300">
-          <div class="w-7 h-7 rounded-full bg-linear-to-br from-[#1f6feb] to-[#0969da] flex items-center justify-center text-[11px] font-medium text-white font-display">
+        <!-- User Profile -->
+        <div routerLink="/portal/profile" class="flex items-center gap-2 cursor-pointer hover:bg-(--theme-card) p-1 rounded-md">
+          <div class="w-7 h-7 rounded-full bg-gradient-to-br from-[#1f6feb] to-[#0969da] flex items-center justify-center text-[11px] font-medium text-white">
              {{ userInitials$ | async }}
           </div>
-          <div>
-            <div class="text-[13px] text-(--theme-text) leading-tight transition-colors duration-300">{{ userName$ | async}}</div>
-            <div class="text-[10px] text-(--theme-muted) transition-colors duration-300">{{ userRole$ | async}}</div>
+          <div class="hidden sm:block">
+            <div class="text-[13px] text-(--theme-text) leading-tight">{{ userName$ | async }}</div>
+            <div class="text-[10px] text-(--theme-muted)">{{ userRole$ | async }}</div>
           </div>
         </div>
       </div>
     </header>
 
+    <!-- Page Content -->
     <div class="flex-1 overflow-y-auto p-6 bg-(--theme-bg) transition-colors duration-300">
       <router-outlet></router-outlet>
     </div>
   </main>
+
+  <!-- POPUP MODAL (Tailwind Only) -->
+  @if (showLogoutModal) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <!-- Backdrop -->
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="closeLogoutModal()"></div>
+
+      <!-- Modal Card -->
+      <div class="relative bg-(--theme-surface) border border-(--theme-border) rounded-xl shadow-2xl w-full max-w-sm p-6 transform transition-all scale-100">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-full bg-[#f85149]/10 flex items-center justify-center text-[#f85149]">
+            ⚠️
+          </div>
+          <h3 class="text-lg font-semibold text-(--theme-text)">Confirm Logout</h3>
+        </div>
+
+        <p class="text-sm text-(--theme-muted) mb-6">
+          Are you sure you want to log out of your session? You will need to sign in again to access your tax filings.
+        </p>
+
+        <div class="flex gap-3 justify-end">
+          <button (click)="closeLogoutModal()"
+            class="px-4 py-2 text-[13px] font-medium text-(--theme-text) bg-(--theme-card) border border-(--theme-border) rounded-md hover:bg-(--theme-border) transition-colors">
+            Cancel
+          </button>
+          <button (click)="confirmLogout()"
+            class="px-4 py-2 text-[13px] font-medium text-white bg-[#f85149] rounded-md hover:bg-[#da3633] transition-colors shadow-lg shadow-[#f85149]/20">
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>
