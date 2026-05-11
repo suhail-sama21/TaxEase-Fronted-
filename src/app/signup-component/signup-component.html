@@ -122,11 +122,12 @@
 
       <!-- NgRx Loading State on Button -->
       <button 
-        type="submit" 
-        [disabled]="(isLoading$ | async)"
-        class="w-full bg-[#1f6feb] hover:bg-[#0969da] text-white rounded-lg py-3 text-sm font-medium transition-all duration-300 mt-4 disabled:opacity-70">
-        {{ (isLoading$ | async) ? 'Creating Account...' : 'Register' }}
-      </button>
+      type="submit" 
+      [disabled]="(isLoading$ | async)"
+      class="w-full bg-[#1f6feb] hover:bg-[#0969da] text-white rounded-lg py-3 text-sm font-medium transition-all duration-300 mt-4 
+            disabled:opacity-70 cursor-pointer disabled:cursor-not-allowed hover:shadow-md active:scale-[0.98]">
+      {{ (isLoading$ | async) ? 'Creating Account...' : 'Register' }}
+    </button>
     </form>
 
     <div class="text-center mt-6 text-xs text-(--theme-muted) transition-colors duration-300">
