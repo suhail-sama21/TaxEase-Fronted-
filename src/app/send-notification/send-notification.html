@@ -1,0 +1,115 @@
+<div class="max-w-4xl mx-auto animate-fade-in pb-10">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-[var(--theme-text)] transition-colors duration-300 mb-1">
+      Dispatch Notification
+    </h1>
+    <p class="text-[13px] text-[var(--theme-muted)] transition-colors duration-300">
+      Send critical updates directly to specific taxpayers or broadcast system-wide alerts.
+    </p>
+  </div>
+
+  <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl overflow-hidden shadow-sm">
+    <form [formGroup]="notificationForm" class="p-8">
+
+      <div class="mb-8 border-b border-[var(--theme-border)] pb-6">
+        <label class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-3">
+          Notification Target <span class="text-[#f85149]">*</span>
+        </label>
+        <div class="flex bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg p-1 w-fit">
+          <button 
+            type="button"
+            (click)="setNotificationType('DIRECT')"
+            class="px-6 py-2 text-[13px] font-medium rounded-md transition-all duration-200 flex items-center gap-2"
+            [ngClass]="notificationType === 'DIRECT' ? 'bg-[#1f6feb] text-white shadow-sm' : 'text-[var(--theme-muted)] hover:text-[var(--theme-text)]'">
+            👤 Direct User
+          </button>
+          @if(role=='ADMINISTRATOR'){
+          <button 
+            type="button"
+            (click)="setNotificationType('BROADCAST')"
+            class="px-6 py-2 text-[13px] font-medium rounded-md transition-all duration-200 flex items-center gap-2"
+            [ngClass]="notificationType === 'BROADCAST' ? 'bg-[#1f6feb] text-white shadow-sm' : 'text-[var(--theme-muted)] hover:text-[var(--theme-text)]'">
+            📢 Broadcast All
+          </button>
+        }
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-6 mb-6">
+        
+        <div class="col-span-1" *ngIf="notificationType === 'DIRECT'">
+          <label class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2">
+            Target User ID <span class="text-[#f85149]">*</span>
+          </label>
+          <div class="relative">
+            <div class="absolute left-4 top-2.5 text-[var(--theme-muted)]">🎯</div>
+            <input
+              type="number"
+              formControlName="userId"
+              placeholder="e.g., 10"
+              class="w-full pl-10 pr-4 py-2.5 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] outline-none focus:border-[#1f6feb] transition-colors duration-300"
+            />
+          </div>
+        </div>
+
+        <div [ngClass]="notificationType === 'DIRECT' ? 'col-span-1' : 'col-span-2'">
+          <label class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2">
+            Category <span class="text-[#f85149]">*</span>
+          </label>
+          <select
+            formControlName="category"
+            class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] px-4 py-2.5 outline-none focus:border-[#1f6feb] transition-colors duration-300 cursor-pointer appearance-none"
+          >
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+
+        <div class="col-span-2">
+          <label class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2">
+            Notification Message <span class="text-[#f85149]">*</span>
+          </label>
+          <textarea
+            formControlName="message"
+            rows="5"
+            placeholder="Type the notification content here..."
+            class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-[13px] px-4 py-3 outline-none focus:border-[#1f6feb] placeholder-[var(--theme-muted)] resize-y transition-colors duration-300"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-6 border-t border-[var(--theme-border)] transition-colors duration-300">
+        
+        <div>
+          <span *ngIf="statusInfo" 
+                class="text-[13px] font-medium animate-fade-in"
+                [ngClass]="statusInfo.type === 'success' ? 'text-[#3fb950]' : 'text-[#f85149]'">
+            {{ statusInfo.message }}
+          </span>
+        </div>
+
+        <div class="flex gap-3">
+          <button
+            type="button"
+            (click)="cancel()"
+            class="px-6 py-2 border border-[var(--theme-border)] rounded-lg text-[13px] font-medium text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors duration-300"
+          >
+            Clear
+          </button>
+
+          <button
+            type="button"
+            (click)="sendNotification()"
+            [disabled]="notificationForm.invalid || isLoading"
+            class="bg-[#1f6feb] hover:bg-[#388bfd] text-white rounded-lg px-6 py-2 text-[13px] font-medium transition-all duration-300 shadow-lg shadow-blue-500/10 disabled:opacity-50 disabled:cursor-not-allowed min-w-[150px] flex items-center justify-center gap-2"
+          >
+            <span *ngIf="!isLoading">
+              {{ notificationType === 'DIRECT' ? 'Send Direct' : 'Broadcast Now' }}
+            </span>
+            <span *ngIf="isLoading">Sending...</span>
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>

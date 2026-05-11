@@ -76,6 +76,7 @@ export class MakePaymentComponent implements OnInit {
         
         // Tell Angular to update the screen
         this.cdr.detectChanges();
+        console.log('Pending filings loaded:', this.filings);
       },
       error: (err) => {
         console.error('Failed to load filings history', err);

@@ -21,6 +21,10 @@ export class ProfileComponent implements OnInit{
   
   isSaving = false;
   isSavingPassword = false;
+  isEditMode = false;
+  isConfirmModalOpen = false;
+  isSecurityExpanded = false;
+  editChanges: any = {};
 
   // Mock User Data
   userProfile = signal({
@@ -53,19 +57,71 @@ export class ProfileComponent implements OnInit{
         this.assignData();
         console.log('User Data from Store:', this.userData);
       }
+      else{
+        console.log("No user data found in sore")
+      }
     });
   }
 
   assignData() {
-  this.userProfile.update(profile => ({
-    ...profile,                   // 1. Keep everything currently in the signal (dob, pan, etc.)
-    fullName: this.userData.name, // 2. Overwrite only these specific fields
-    email: this.userData.email,
-    address: this.userData.address,
-    phone: this.userData.phone,
-    type: this.userData.role || 'Citizen'
-  }));
-}
+    this.userProfile.update(profile => ({
+      fullName: this.userData.name,
+      email: this.userData.email,
+      address: this.userData.address,
+      phone: this.userData.phone,
+      type: this.userData.role || 'Citizen',
+      dob: this.userData.dob,
+      pan: this.userData.panNumber
+    }));
+  }
+
+  enableEditMode() {
+    this.isEditMode = true;
+  }
+
+  cancelEdit() {
+    this.isEditMode = false;
+    this.assignData();
+  }
+
+  openConfirmModal() {
+    this.editChanges = {
+      name: this.userProfile().fullName,
+      phone: this.userProfile().phone,
+      address: this.userProfile().address,
+      panNumber: this.userProfile().pan,
+      dob: this.userProfile().dob
+    };
+    this.isConfirmModalOpen = true;
+  }
+
+  closeConfirmModal() {
+    this.isConfirmModalOpen = false;
+  }
+
+  confirmProfileUpdate() {
+    if (!this.userData?.id) {
+      console.error('User ID not found');
+      return;
+    }
+
+    this.isSaving = true;
+    this.taxpayerService.updateProfile(this.editChanges).subscribe({
+      next: (response) => {
+        this.isSaving = false;
+        this.isEditMode = false;
+        this.isConfirmModalOpen = false;
+        this.userData = response.user;
+        this.assignData();
+        alert('Profile updated successfully!');
+      },
+      error: (err) => {
+        this.isSaving = false;
+        console.error('Profile update error:', err);
+        alert('Failed to update profile. Please try again.');
+      }
+    });
+  }
 
   saveProfile() {
     this.isSaving = true;
@@ -139,6 +195,33 @@ export class ProfileComponent implements OnInit{
     }
   }
 
+  // Convert PAN to uppercase
+  formatPAN() {
+    if (this.userProfile().pan) {
+      this.userProfile.update(profile => ({
+        ...profile,
+        pan: profile.pan.toUpperCase().replace(/[^A-Z0-9]/g, '')
+      }));
+    }
+  }
+
+  // Toggle Security & Password section
+  toggleSecuritySection() {
+    this.isSecurityExpanded = !this.isSecurityExpanded;
+  }
+
+  // Collapse security section and reset password fields
+  closeSecuritySection() {
+    this.isSecurityExpanded = false;
+    this.security.currentPassword = '';
+    this.security.newPassword = '';
+    this.security.confirmPassword = '';
+    this.passwordInfoAppear = false;
+    this.showCurrentPassword = false;
+    this.showNewPassword = false;
+    this.showConfirmPassword = false;
+  }
+
   passwordInfoAppear = false
   infoMessage: string = ""
   boxColor = ""
@@ -182,4 +265,6 @@ export class ProfileComponent implements OnInit{
       }, 3000);
     }
   }
+
+  
 }

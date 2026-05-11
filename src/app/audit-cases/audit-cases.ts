@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; // CRITICAL for [(ngModel)]
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuditService } from '../services/audit.service';
 import { AuditDashboardResponse, AuditResponse } from '../models/audit.model';
+import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-audit-cases',
@@ -12,18 +14,14 @@ import { AuditDashboardResponse, AuditResponse } from '../models/audit.model';
   templateUrl: './audit-cases.html',
 })
 export class AuditCasesComponent implements OnInit {
-  // Initialize with 0s to prevent undefined HTML errors before data loads
-  metrics: AuditDashboardResponse = {
-    totalCases: 0,
-    open: 0,
-    inProgress: 0,
-    closed: 0,
-  };
+  // Observable streams for the HTML async pipes
+  metrics$!: Observable<AuditDashboardResponse>;
+  filteredCases$!: Observable<AuditResponse[]>;
 
-  auditCases: AuditResponse[] = [];
-  filteredCases: AuditResponse[] = [];
+  // Subject to trigger filtering reactively
+  private filterTrigger$ = new BehaviorSubject<void>(undefined);
 
-  // Filter States
+  // Keep these for [(ngModel)] binding
   searchTerm: string = '';
   statusFilter: string = 'All Statuses';
   isLoading: boolean = true;
@@ -34,61 +32,49 @@ export class AuditCasesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadData();
+    // 1. Assign Metrics Observable
+    this.metrics$ = this.auditService.getDashboardSummary();
+
+    // 2. Setup Filtered Cases Observable
+    const allAudits$ = this.auditService.getAllAudits().pipe(
+      tap(() => this.isLoading = false),
+      map(data => data.sort((a, b) => b.id - a.id))
+    );
+
+    // Combine the data stream with the filter trigger
+    this.filteredCases$ = combineLatest([allAudits$, this.filterTrigger$]).pipe(
+      map(([audits]) => {
+        const term = this.searchTerm.toLowerCase();
+        
+        return audits.filter((audit) => {
+          // Match ID, Scope, or Findings
+          const matchesSearch =
+            !term ||
+            audit.id.toString().includes(term) ||
+            (audit.scope && audit.scope.toLowerCase().includes(term)) ||
+            (audit.findings && audit.findings.toLowerCase().includes(term));
+
+          // Match Status dropdown
+          const matchesStatus =
+            this.statusFilter === 'All Statuses' ||
+            (audit.status && audit.status.toUpperCase() === this.statusFilter.toUpperCase());
+
+          return matchesSearch && matchesStatus;
+        });
+      })
+    );
   }
 
-  loadData() {
-    this.isLoading = true;
-
-    // 1. Fetch Top Metrics
-    this.auditService.getDashboardSummary().subscribe({
-      next: (data) => (this.metrics = data),
-      error: (err) => console.error('Error loading metrics:', err),
-    });
-
-    // 2. Fetch Table Data
-    this.auditService.getAllAudits().subscribe({
-      next: (data) => {
-        // Sort descending so newest cases are at the top
-        const sortedData = data.sort((a, b) => b.id - a.id);
-        this.auditCases = sortedData;
-        this.filteredCases = sortedData;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error loading cases:', err);
-        this.isLoading = false;
-      },
-    });
-  }
-
-  // Live Filtering Logic
+  // This is called by (change) and (input) in your HTML
   applyFilters() {
-    this.filteredCases = this.auditCases.filter((audit) => {
-      const term = this.searchTerm.toLowerCase();
-
-      // Match ID, Scope, or Findings safely
-      const matchesSearch =
-        !term ||
-        audit.id.toString().includes(term) ||
-        (audit.scope && audit.scope.toLowerCase().includes(term)) ||
-        (audit.findings && audit.findings.toLowerCase().includes(term));
-
-      // Match Status dropdown safely
-      const matchesStatus =
-        this.statusFilter === 'All Statuses' ||
-        (audit.status && audit.status.toUpperCase() === this.statusFilter.toUpperCase());
-
-      return matchesSearch && matchesStatus;
-    });
+    this.filterTrigger$.next();
   }
 
-  // Dynamic status colors
   getStatusColor(status: string): string {
     const s = status ? status.toUpperCase() : '';
     if (s === 'ACTIVE' || s === 'OPEN') return 'blue';
     if (s === 'INACTIVE' || s === 'CLOSED') return 'green';
-    return 'amber'; // Default/Pending
+    return 'amber';
   }
 
   createNewAudit() {
