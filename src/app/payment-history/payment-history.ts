@@ -13,7 +13,7 @@ export class PaymentHistoryComponent implements OnInit {
   
   allTransactions: any[] = []; // Backup for filtering
   transactions: any[] = [];    // Data displayed in the table
-  userId: number = 1; // Replace this with dynamic logged-in user ID later
+  userId: number = 10; // Replace this with dynamic logged-in user ID later
   
   // Dashboard calculation variables
   totalPaid: number = 0;
