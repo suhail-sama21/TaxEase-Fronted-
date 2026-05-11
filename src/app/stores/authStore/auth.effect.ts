@@ -18,10 +18,7 @@ export class AuthEffects {
   private router = inject(Router);
   private store = inject(Store);
 
-  // --- Helper function to dynamically extract Spring Boot error messages ---
-  // --- Helper function to dynamically extract Spring Boot error messages ---
-  // --- Helper function to dynamically extract Spring Boot error messages ---
-  private extractErrorMessage(error: any): string {
+   private extractErrorMessage(error: any): string {
     // 1. If the Global Interceptor caught it, it already extracted the clean string for us!
     if (error instanceof Error) {
       console.log('%c Error from Interceptor: ', 'background: #f85149; color: white;', error.message);
@@ -40,8 +37,21 @@ export class AuthEffects {
 
     return error.message || 'An unexpected error occurred. Please try again.';
   }
-  
-  // 1. Handle Login API Call
+
+  // 1. New Effect: Runs on app startup to re-fetch profile if token exists
+  initAuth$ = createEffect(() =>
+    of(null).pipe(
+      map(() => {
+        const token = localStorage.getItem('token');
+        const email = localStorage.getItem('user_email');
+        if (token && email) {
+          return AuthActions.getProfile({ email });
+        }
+        return { type: '[Auth] No Persisted Session' };
+      })
+    )
+  );
+
   login$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.login),
@@ -57,17 +67,22 @@ export class AuthEffects {
 
   // 2. Handle Signup API Call
   signup$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(AuthActions.signup),
-      mergeMap((action) =>
-        this.authService.signup(action.userData).pipe(
-          map((response) => AuthActions.signupSuccess({ response })),
-          // Use the dynamic error extractor!
-          catchError((error: any) => of(AuthActions.signupFailure({ error: this.extractErrorMessage(error) }))),
-        ),
-      ),
-    ),
-  );
+  this.actions$.pipe(
+    ofType(AuthActions.signup),
+    tap(action => console.log('1. Effect received the Signup Action:', action)), 
+    mergeMap((action) => {
+      console.log('2. Calling AuthService.signup now...');
+      return this.authService.signup(action.userData).pipe(
+        tap(res => console.log('3. Backend responded:', res)),
+        map((response) => AuthActions.signupSuccess({ response })),
+        catchError((error: any) => {
+          console.error('3. Backend Error:', error);
+          return of(AuthActions.signupFailure({ error: this.extractErrorMessage(error) }));
+        })
+      );
+    }),
+  ),
+);
 
   // 3. Handle Update Profile API Call
   updateProfile$ = createEffect(() =>
@@ -105,17 +120,15 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.loginSuccess),
         tap((action) => {
+          // Store token AND email to survive refreshes
           localStorage.setItem('token', action.response.token);
+          const email = action.email ?? action.response.user?.email;
           
-          const userId = action.response.user?.id;
-          const userRole = action.response.user?.role || 'TAXPAYER'; 
-
-          // Trigger the profile fetch using the new ID and Type format
-          if (userId) {
-            this.store.dispatch(AuthActions.getProfile({ userId, userType: userRole, email: action.email }));
-          } else {
-            this.store.dispatch(AuthActions.getProfile({ email: action.email }));
+          if (email) {
+            localStorage.setItem('user_email', email);
+            this.store.dispatch(AuthActions.getProfile({ email }));
           }
+          
           
           this.router.navigate(['/portal']);
         }),
@@ -129,7 +142,7 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.signupSuccess),
         tap((action) => {
-          console.log('Signup successful! Response:', action.response);
+          console.log(action.response);
           this.router.navigate(['/login']);
         }),
       ),
@@ -142,7 +155,9 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.logout),
         tap(() => {
+          // Clear everything on logout
           localStorage.removeItem('token');
+          localStorage.removeItem('user_email');
           this.router.navigate(['/login']);
         }),
       ),
