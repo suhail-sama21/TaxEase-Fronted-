@@ -1,8 +1,8 @@
-<div class="min-h-screen bg-[var(--theme-bg)] transition-colors duration-300">
+<div class="min-h-screen bg-[var(--theme-bg)] transition-colors duration-300 profile-page">
   <!-- Header Section with Glassmorphism Effect -->
-  <div class="sticky top-0 z-40 bg-[var(--theme-surface)] border-b border-[var(--theme-border)] backdrop-blur-lg bg-opacity-60 transition-colors duration-300 shadow-lg">
-    <div class="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between animate-fadeInDown">
-      <div class="backdrop-blur-xl bg-white/5 rounded-2xl px-6 py-4 border border-white/10 shadow-lg flex-1 mr-6 hover:shadow-xl hover:bg-white/8 transition-all duration-300">
+  <div class="sticky top-0 z-40 bg-[rgba(15,23,42,0.18)] border-b border-[rgba(255,255,255,0.10)] backdrop-blur-xl transition-colors duration-300 shadow-lg">
+    <div class="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between animate-fadeInDown">
+      <div class="backdrop-blur-xl bg-white/10 rounded-2xl px-5 py-4 border border-white/10 shadow-lg flex-1 mr-4 hover:shadow-xl hover:bg-white/12 transition-all duration-300">
         <h1 class="text-2xl font-bold text-[var(--theme-text)] transition-colors duration-300">Profile Management</h1>
         <p class="text-sm text-[var(--theme-muted)] mt-1 transition-colors duration-300">Manage your personal and contact information.</p>
       </div>
@@ -14,7 +14,7 @@
     </div>
   </div>
 
-  <div class="max-w-6xl mx-auto px-6 py-8">
+  <div class="max-w-5xl mx-auto px-5 py-8 glass-panel">
     <!-- Profile Card Header -->
     <div class="bg-gradient-to-br from-[var(--theme-card)] to-[var(--theme-surface)] border border-[var(--theme-border)] rounded-2xl p-8 mb-8 transition-colors duration-300 hover:shadow-xl animate-fadeInUp hover:border-[#1f6feb]/30 profile-card-hover opacity-100">
       <div class="flex items-center gap-8">
@@ -28,11 +28,11 @@
 
         <!-- User Info -->
         <div class="flex-1">
-          <h2 class="text-3xl font-bold text-[var(--theme-text)] mb-2 transition-colors duration-300">{{userProfile().fullName}}</h2>
+          <h2 class="text-3xl font-bold text-[var(--theme-text)] mb-2 transition-colors duration-300">{{userProfile.fullName}}</h2>
           <div class="text-lg text-[#1f6feb] font-mono font-semibold mb-3">TXP-987654321</div>
           <div class="flex flex-wrap gap-3 mb-4">
             <span class="bg-[#3fb950]/10 text-[#3fb950] px-3 py-1 rounded-full text-xs font-medium border border-[#3fb950]/20">Individual</span>
-            <span class="bg-[#1f6feb]/10 text-[#1f6feb] px-3 py-1 rounded-full text-xs font-medium border border-[#1f6feb]/20">{{userProfile().type}}</span>
+            <span class="bg-[#1f6feb]/10 text-[#1f6feb] px-3 py-1 rounded-full text-xs font-medium border border-[#1f6feb]/20">{{userProfile.type}}</span>
             <span class="bg-[#17a2b8]/10 text-[#17a2b8] px-3 py-1 rounded-full text-xs font-medium border border-[#17a2b8]/20">Active since 2023</span>
           </div>
           <p class="text-sm text-[var(--theme-muted)] transition-colors duration-300">Account Status: <span class="text-[#3fb950] font-semibold">Verified & Active</span></p>
@@ -65,7 +65,7 @@
           <div class="group">
             <label class="block text-xs font-semibold text-[var(--theme-muted)] mb-2.5 uppercase tracking-wide transition-colors duration-300">Full name <span class="text-[#f85149]">*</span></label>
             <div class="relative">
-              <input type="text" [(ngModel)]="userProfile().fullName" [disabled]="!isEditMode" class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text)] text-sm px-4 py-3 outline-none focus:border-[#1f6feb] focus:shadow-lg focus:shadow-blue-500/10 transition-all duration-300 group-hover:border-[var(--theme-text)]/30 disabled:opacity-60 disabled:cursor-not-allowed" />
+              <input type="text" [(ngModel)]="userProfile.fullName" [disabled]="!isEditMode" class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text)] text-sm px-4 py-3 outline-none focus:border-[#1f6feb] focus:shadow-lg focus:shadow-blue-500/10 transition-all duration-300 group-hover:border-[var(--theme-text)]/30 disabled:opacity-60 disabled:cursor-not-allowed" />
               <div class="absolute right-3 top-3.5 text-[var(--theme-muted)] opacity-0 group-focus-within:opacity-100 transition-opacity duration-300">
                 <svg class="w-5 h-5 text-[#3fb950]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
               </div>
@@ -76,7 +76,7 @@
           <div class="group">
             <label class="block text-xs font-semibold text-[var(--theme-muted)] mb-2.5 uppercase tracking-wide transition-colors duration-300">Email address <span class="text-[#f85149]">*</span></label>
             <div class="relative">
-              <input type="email" [(ngModel)]="userProfile().email" disabled class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text)] text-sm px-4 py-3 outline-none focus:border-[#1f6feb] focus:shadow-lg focus:shadow-blue-500/10 transition-all duration-300 group-hover:border-[var(--theme-text)]/30 disabled:opacity-60 disabled:cursor-not-allowed" />
+              <input type="email" [(ngModel)]="userProfile.email" disabled class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text)] text-sm px-4 py-3 outline-none focus:border-[#1f6feb] focus:shadow-lg focus:shadow-blue-500/10 transition-all duration-300 group-hover:border-[var(--theme-text)]/30 disabled:opacity-60 disabled:cursor-not-allowed" />
               <div class="absolute right-3 top-3.5 text-[var(--theme-muted)] opacity-0 group-focus-within:opacity-100 transition-opacity duration-300">
                 <svg class="w-5 h-5 text-[#3fb950]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
               </div>
@@ -87,7 +87,7 @@
           <div class="group">
             <label class="block text-xs font-semibold text-[var(--theme-muted)] mb-2.5 uppercase tracking-wide transition-colors duration-300">Phone number <span class="text-[#f85149]">*</span></label>
             <div class="relative">
-              <input type="text" [(ngModel)]="userProfile().phone" [disabled]="!isEditMode" class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text)] text-sm px-4 py-3 outline-none focus:border-[#1f6feb] focus:shadow-lg focus:shadow-blue-500/10 transition-all duration-300 group-hover:border-[var(--theme-text)]/30 disabled:opacity-60 disabled:cursor-not-allowed" />
+              <input type="text" [(ngModel)]="userProfile.phone" [disabled]="!isEditMode" class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text)] text-sm px-4 py-3 outline-none focus:border-[#1f6feb] focus:shadow-lg focus:shadow-blue-500/10 transition-all duration-300 group-hover:border-[var(--theme-text)]/30 disabled:opacity-60 disabled:cursor-not-allowed" />
               <div class="absolute right-3 top-3.5 text-[var(--theme-muted)] opacity-0 group-focus-within:opacity-100 transition-opacity duration-300">
                 <svg class="w-5 h-5 text-[#3fb950]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
               </div>
@@ -101,7 +101,7 @@
             </label>
             <div class="relative">
               <input type="text" 
-                    [(ngModel)]="userProfile().type" 
+                    [(ngModel)]="userProfile.type" 
                     disabled 
                     class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text)] text-sm px-4 py-3 outline-none focus:border-[#1f6feb] focus:shadow-lg focus:shadow-blue-500/10 transition-all duration-300 group-hover:border-[var(--theme-text)]/30 disabled:opacity-60 disabled:cursor-not-allowed" />
               <div class="absolute right-3 top-3.5 text-[var(--theme-muted)] opacity-0 group-focus-within:opacity-100 transition-opacity duration-300">
@@ -116,7 +116,7 @@
           <div class="col-span-1 md:col-span-2 group">
             <label class="block text-xs font-semibold text-[var(--theme-muted)] mb-2.5 uppercase tracking-wide transition-colors duration-300">Residential address <span class="text-[#f85149]">*</span></label>
             <div class="relative">
-              <input type="text" [(ngModel)]="userProfile().address" [disabled]="!isEditMode" class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text)] text-sm px-4 py-3 outline-none focus:border-[#1f6feb] focus:shadow-lg focus:shadow-blue-500/10 transition-all duration-300 group-hover:border-[var(--theme-text)]/30 disabled:opacity-60 disabled:cursor-not-allowed" />
+              <input type="text" [(ngModel)]="userProfile.address" [disabled]="!isEditMode" class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text)] text-sm px-4 py-3 outline-none focus:border-[#1f6feb] focus:shadow-lg focus:shadow-blue-500/10 transition-all duration-300 group-hover:border-[var(--theme-text)]/30 disabled:opacity-60 disabled:cursor-not-allowed" />
             </div>
           </div>
 
@@ -124,7 +124,7 @@
           <div class="group">
             <label class="block text-xs font-semibold text-[var(--theme-muted)] mb-2.5 uppercase tracking-wide transition-colors duration-300">Date of birth</label>
             <div class="relative">
-              <input type="date" [(ngModel)]="userProfile().dob" [disabled]="!isEditMode" class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text)] text-sm px-4 py-3 outline-none focus:border-[#1f6feb] focus:shadow-lg focus:shadow-blue-500/10 transition-all duration-300 group-hover:border-[var(--theme-text)]/30 disabled:opacity-60 disabled:cursor-not-allowed" />
+              <input type="date" [(ngModel)]="userProfile.dob" [disabled]="!isEditMode" class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text)] text-sm px-4 py-3 outline-none focus:border-[#1f6feb] focus:shadow-lg focus:shadow-blue-500/10 transition-all duration-300 group-hover:border-[var(--theme-text)]/30 disabled:opacity-60 disabled:cursor-not-allowed" />
             </div>
           </div>
 
@@ -132,7 +132,7 @@
           <div class="group">
             <label class="block text-xs font-semibold text-[var(--theme-muted)] mb-2.5 uppercase tracking-wide transition-colors duration-300">National ID / PAN</label>
             <div class="relative">
-              <input type="text" [(ngModel)]="userProfile().pan" (input)="formatPAN()" [disabled]="!isEditMode" class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text)] text-sm px-4 py-3 outline-none focus:border-[#1f6feb] focus:shadow-lg focus:shadow-blue-500/10 transition-all duration-300 group-hover:border-[var(--theme-text)]/30 disabled:opacity-60 disabled:cursor-not-allowed uppercase" placeholder="ENTER PAN IN CAPITALS" />
+              <input type="text" [(ngModel)]="userProfile.pan" (input)="formatPAN()" [disabled]="!isEditMode" class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-[var(--theme-text)] text-sm px-4 py-3 outline-none focus:border-[#1f6feb] focus:shadow-lg focus:shadow-blue-500/10 transition-all duration-300 group-hover:border-[var(--theme-text)]/30 disabled:opacity-60 disabled:cursor-not-allowed uppercase" placeholder="ENTER PAN IN CAPITALS" />
             </div>
             <p class="text-xs text-[var(--theme-muted)] mt-1.5">Letters will be automatically converted to uppercase</p>
           </div>
@@ -185,7 +185,7 @@
     </div>
 
     <!-- Security & Password Section (Collapsible) -->
-    <button (click)="toggleSecuritySection()" *ngIf="!isSecurityExpanded" class="w-full bg-gradient-to-r from-[#f85149]/10 to-[#fb8500]/10 border border-[#f85149]/30 text-[var(--theme-text)] rounded-2xl px-8 py-6 text-left font-semibold transition-all duration-300 hover:from-[#f85149]/20 hover:to-[#fb8500]/20 hover:border-[#f85149]/50 hover:shadow-lg hover:shadow-red-500/10 animate-fadeInUp flex items-center justify-between group" style="animation-delay: 0.2s;">
+    <button type="button" (click)="toggleSecuritySection()" class="w-full bg-gradient-to-r from-[#f85149]/10 to-[#fb8500]/10 border border-[#f85149]/30 text-[var(--theme-text)] rounded-2xl px-8 py-6 text-left font-semibold transition-all duration-300 hover:from-[#f85149]/20 hover:to-[#fb8500]/20 hover:border-[#f85149]/50 hover:shadow-lg hover:shadow-red-500/10 animate-fadeInUp flex items-center justify-between group" style="animation-delay: 0.2s;">
       <div class="flex items-center gap-4">
         <div class="w-12 h-12 rounded-lg bg-[#f85149]/20 flex items-center justify-center group-hover:bg-[#f85149]/30 transition-all duration-300">
           <svg class="w-6 h-6 text-[#f85149]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
@@ -195,22 +195,11 @@
           <p class="text-sm text-[var(--theme-muted)] mt-0.5">Update your security settings</p>
         </div>
       </div>
-      <svg class="w-6 h-6 text-[var(--theme-text)] group-hover:text-[#f85149] transition-all duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+      <svg [class.rotate-90]="isSecurityExpanded" class="w-6 h-6 text-[var(--theme-text)] group-hover:text-[#f85149] transition-all duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
     </button>
 
     <!-- Security & Password Section (Expanded) -->
     <div *ngIf="isSecurityExpanded" class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl animate-expandIn opacity-100" style="animation-delay: 0.2s;">
-      <div class="px-8 py-6 border-b border-[var(--theme-border)] bg-gradient-to-r from-[var(--theme-surface)] to-[var(--theme-card)] transition-colors duration-300 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-[#f85149]/10 flex items-center justify-center">
-            <svg class="w-6 h-6 text-[#f85149]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-          </div>
-          <h2 class="text-lg font-bold text-[var(--theme-text)] transition-colors duration-300">Security & Password</h2>
-        </div>
-        <button (click)="closeSecuritySection()" class="text-[var(--theme-muted)] hover:text-[#f85149] transition-colors duration-300">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-      </div>
       <div class="p-8">
         <div class="space-y-6">
           <!-- Info Box -->

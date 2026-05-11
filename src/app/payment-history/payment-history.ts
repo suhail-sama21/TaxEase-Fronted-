@@ -1,7 +1,9 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { PaymentService } from '../service/payment.service'; // Check path!
+import { Store } from '@ngrx/store';
+import { selectUser } from '../stores/authStore/auth.features';
 
 @Component({
   selector: 'app-payment-history',
@@ -10,10 +12,13 @@ import { PaymentService } from '../service/payment.service'; // Check path!
   templateUrl: './payment-history.html'
 })
 export class PaymentHistoryComponent implements OnInit {
+
+  store = inject(Store)
   
   allTransactions: any[] = []; // Backup for filtering
   transactions: any[] = [];    // Data displayed in the table
-  userId: number = 1; // Replace this with dynamic logged-in user ID later
+  userId: number = 0
+  
   
   // Dashboard calculation variables
   totalPaid: number = 0;
@@ -27,6 +32,15 @@ export class PaymentHistoryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.store.select(selectUser).subscribe(user => {
+      if (user) {
+        this.userId = user.id;
+        console.log('User Data from Store:', this.userId);
+      }
+      else{
+        console.log("No user data found in sore")
+      }
+    });
     this.loadHistory();
   }
 

@@ -338,6 +338,23 @@ input[type="password"]::placeholder {
   }
 }
 
+.profile-page {
+  background-image: radial-gradient(circle at top right, rgba(96, 165, 250, 0.08), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(248, 81, 73, 0.08), transparent 22%);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 30px 90px rgba(15, 23, 42, 0.12);
+}
+
+.rotate-90 {
+  transform: rotate(90deg);
+}
+
 /* Dark mode specific styles (already supported via CSS variables) */
 :root.dark-mode {
   --theme-bg: #0d1117;
