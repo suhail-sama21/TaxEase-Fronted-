@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, RouterLink } from '@angular/router';
 import { OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
 import { Observable , of} from 'rxjs';
+import { NotificationService } from '../core/services/notification';
 
 @Component({
   selector: 'app-layout',
@@ -13,7 +14,7 @@ import { Observable , of} from 'rxjs';
   templateUrl: './layout.html',
 })
 export class LayoutComponent implements OnInit {
-  // Hardcoded for now, but you will later populate this from your IdentityService
+  
   userName$!: Observable<string>;
   userInitials = 'JD';
   userRole$!: Observable<string>;
@@ -23,7 +24,9 @@ export class LayoutComponent implements OnInit {
     this.isDarkMode = !this.isDarkMode;
   }
 
-  constructor(private store: Store) {}
+  constructor(private store: Store,
+              private notificationService: NotificationService
+  ) {}
 
   ngOnInit(): void {
     this.store.select(selectUser).subscribe(user => {
@@ -35,8 +38,8 @@ export class LayoutComponent implements OnInit {
         console.log('User role:', this.userRole$); // Debug log to check userRole assignment
       }
     });
-  }
 
+  }
   // Menu items updated with the new '/portal' base path
   navItems = [
     { label: 'Dashboard', route: '/portal/dashboard', icon: 'dashboard-icon' },
