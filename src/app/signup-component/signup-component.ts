@@ -51,7 +51,7 @@ export class SignupComponent {
     if (registerPayload.panNumber) {
       registerPayload.panNumber = registerPayload.panNumber.toUpperCase();
     }
-    
+    console.log('Register Payload:', registerPayload); // Debug log to check payload structure
     this.store.dispatch(AuthActions.signup({ userData: registerPayload }));
   }
 }

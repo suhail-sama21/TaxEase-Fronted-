@@ -25,7 +25,7 @@ export const authGuard: CanActivateFn = (route, state) => {
         const allowedRoles = route.data?.['roles'] as string[];
         const userRole = authState.user.role?.toUpperCase();
         if (allowedRoles && !allowedRoles.includes(userRole)) {
-          return router.parseUrl('/portal/dashboard');
+          return router.parseUrl('/login');
         }
       }
 
