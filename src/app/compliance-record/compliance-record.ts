@@ -1,35 +1,56 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ComplianceService } from '../services/compliance.service';
+import { ComplianceResponse, UpdateComplianceRequest } from '../models/compliance.model';
 
 @Component({
   selector: 'app-compliance-record',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './compliance-record.html'
+  templateUrl: './compliance-record.html',
 })
-export class ComplianceRecordComponent {
+export class ComplianceRecordComponent implements OnInit {
+  // 1. Inject NgZone instead of ChangeDetectorRef
+  private ngZone = inject(NgZone); 
 
-  // Mock data matching the screenshot's table
-  records = [
-    { id: 'CMP-1042', filingId: 'FIL-2026-089', taxpayer: 'Acme Corp', type: 'Filing', status: 'Compliant', statusColor: 'green', date: '2026-03-01' },
-    { id: 'CMP-1043', filingId: 'FIL-2026-088', taxpayer: 'John Doe', type: 'Payment', status: 'Non-Compliant', statusColor: 'red', date: '2026-03-02' },
-    { id: 'CMP-1044', filingId: 'FIL-2026-085', taxpayer: 'TechFlow LLC', type: 'Filing', status: 'Pending', statusColor: 'amber', date: '2026-03-03' }
-  ];
+  records: ComplianceResponse[] = [];
+  selectedRecord: ComplianceResponse | null = null;
+  updateData: UpdateComplianceRequest = { result: '', notes: '' };
+  
+  isLoading = false;
+  errorMessage: string | null = null;   
+  successMessage: string | null = null; 
 
-  // State for the update form
-  selectedRecord: any = null;
-  updateData = {
-    status: '',
-    notes: ''
-  };
+  constructor(private complianceService: ComplianceService) {}
 
-  // Triggered when clicking "Update" in the table
-  selectForUpdate(record: any) {
+  ngOnInit() {
+    this.loadRecords();
+  }
+
+  loadRecords() {
+    this.complianceService.getAllCompliance().subscribe({
+      next: (data) => {
+        this.records = data;
+      },
+      error: (err) => console.error('Failed to load records:', err),
+    });
+  }
+
+  getStatusColor(result: string): string {
+    if (result === 'Compliant') return 'green';
+    if (result === 'Non-Compliant') return 'red';
+    return 'amber';
+  }
+
+  selectForUpdate(record: ComplianceResponse) {
     this.selectedRecord = record;
-    this.updateData = { status: record.status, notes: '' };
+    this.updateData = { result: record.result, notes: record.notes || '' };
+    
+    // Reset messages when opening a new record
+    this.errorMessage = null; 
+    this.successMessage = null;
 
-    // Smooth scroll to the update form
     setTimeout(() => {
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }, 100);
@@ -37,20 +58,44 @@ export class ComplianceRecordComponent {
 
   cancelUpdate() {
     this.selectedRecord = null;
+    this.errorMessage = null;
+    this.successMessage = null;
   }
 
   saveUpdate() {
-    if (this.selectedRecord && this.updateData.status) {
-      // Update the mock data state
-      this.selectedRecord.status = this.updateData.status;
+    if (this.selectedRecord && this.updateData.result) {
+      this.isLoading = true;
+      this.errorMessage = null;
+      this.successMessage = null;
 
-      // Map the color based on the new status
-      if (this.updateData.status === 'Compliant') this.selectedRecord.statusColor = 'green';
-      else if (this.updateData.status === 'Non-Compliant') this.selectedRecord.statusColor = 'red';
-      else this.selectedRecord.statusColor = 'amber';
+      this.complianceService.updateCompliance(this.selectedRecord.id, this.updateData).subscribe({
+        next: (updatedRecord) => {
+          // 2. Wrap the success update inside NgZone
+          this.ngZone.run(() => {
+            const index = this.records.findIndex((r) => r.id === updatedRecord.id);
+            if (index !== -1) {
+              this.records[index] = updatedRecord;
+            }
 
-      alert(`Successfully updated status for ${this.selectedRecord.id}`);
-      this.selectedRecord = null; // Close the form
+            this.isLoading = false;
+            this.successMessage = `Successfully updated status for Record ID: ${updatedRecord.id}`;
+            
+            // Auto-close the form after 2 seconds
+            setTimeout(() => {
+              this.ngZone.run(() => {
+                 this.cancelUpdate();
+              });
+            }, 2000);
+          });
+        },
+        error: (err: Error) => {
+          // 3. Wrap the error update inside NgZone to force instant UI refresh
+          this.ngZone.run(() => {
+            this.isLoading = false;
+            this.errorMessage = err.message || 'Failed to update record.'; 
+          });
+        },
+      });
     }
   }
 }

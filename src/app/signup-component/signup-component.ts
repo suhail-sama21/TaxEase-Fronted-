@@ -1,31 +1,37 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { selectError, selectIsLoading } from '../stores/authStore/auth.features';
+
+import * as AuthActions from '../stores/authStore/auth.action';
 
 @Component({
-  selector: 'app-signup',
+  selector: 'app-register',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './signup-component.html'
 })
 export class SignupComponent {
   private fb = inject(FormBuilder);
-  private router = inject(Router);
+  private store = inject(Store);
 
-  // Updated to match your exact backend payload requirements
   signupForm: FormGroup = this.fb.group({
     name: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     phone: ['', Validators.required],
     address: ['', Validators.required],
-    contactInfo: [''], // Optional, or add Validators.required if mandatory
+    contactInfo: [''], 
+    dob: ['', Validators.required], // Added Date of Birth
+    panNumber: ['', [Validators.required, Validators.pattern(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i)]], // Added PAN with regex validation
     password: ['', [Validators.required, Validators.minLength(8)]],
     confirmPassword: ['', Validators.required],
     role: ['TAXPAYER', Validators.required]
   }, { validators: this.passwordMatchValidator });
 
-  isLoading = false;
+  isLoading$ = this.store.select(selectIsLoading);
+  error$ = this.store.select(selectError);
 
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password')?.value;
@@ -39,15 +45,13 @@ export class SignupComponent {
       return;
     }
 
-    this.isLoading = true;
-    // Strip confirmPassword before sending to the server
     const { confirmPassword, ...registerPayload } = this.signupForm.value;
     
-    console.log('Sending Registration to IdentityService:', registerPayload);
+    // Ensure PAN is uppercase before sending payload
+    if (registerPayload.panNumber) {
+      registerPayload.panNumber = registerPayload.panNumber.toUpperCase();
+    }
     
-    setTimeout(() => {
-      this.isLoading = false;
-      this.router.navigate(['/login']);
-    }, 1000);
+    this.store.dispatch(AuthActions.signup({ userData: registerPayload }));
   }
 }

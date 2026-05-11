@@ -1,7 +1,7 @@
 <div class="min-h-screen w-full flex items-center justify-center bg-(--theme-bg) relative overflow-hidden font-sans py-10 transition-colors duration-300">
   <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-[#1f6feb]/5 blur-[60px] pointer-events-none transition-colors duration-300"></div>
 
-  <div class="bg-(--theme-card) border border-(--theme-border) rounded-2xl p-10 w-135 relative z-10 shadow-2xl transition-colors duration-300">
+  <div class="bg-(--theme-card) border border-(--theme-border) rounded-2xl p-10 w-[540px] relative z-10 shadow-2xl transition-colors duration-300">
     <div class="text-center mb-8">
       <h1 class="font-display text-2xl font-bold text-(--theme-text) mb-1 transition-colors duration-300">Create an Account</h1>
       <p class="text-sm text-(--theme-muted) transition-colors duration-300">Join TaxEase to manage your filings</p>
@@ -63,6 +63,32 @@
         />
       </div>
 
+      <!-- NEW FIELDS: DOB & PAN -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs text-(--theme-muted) mb-1.5 transition-colors duration-300">Date of Birth <span class="text-[#f85149]">*</span></label>
+          <input 
+            type="date" 
+            formControlName="dob"
+            class="w-full bg-(--theme-surface) border border-(--theme-border) rounded-lg text-(--theme-text) text-sm px-4 py-2.5 outline-none focus:border-[#1f6feb] transition-colors duration-300"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs text-(--theme-muted) mb-1.5 transition-colors duration-300">PAN Number <span class="text-[#f85149]">*</span></label>
+          <input 
+            type="text" 
+            formControlName="panNumber"
+            placeholder="ABCDE1234F"
+            style="text-transform: uppercase;"
+            class="w-full bg-(--theme-surface) border border-(--theme-border) rounded-lg text-(--theme-text) text-sm px-4 py-2.5 outline-none focus:border-[#1f6feb] transition-colors duration-300 uppercase"
+          />
+          <div *ngIf="signupForm.get('panNumber')?.invalid && signupForm.get('panNumber')?.touched" class="text-xs text-[#f85149] mt-1">
+            Valid PAN is required.
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label class="block text-xs text-(--theme-muted) mb-1.5 transition-colors duration-300">Password <span class="text-[#f85149]">*</span></label>
@@ -89,12 +115,19 @@
         Passwords do not match.
       </div>
 
+      <!-- NgRx Error State -->
+      <div *ngIf="error$ | async as errorMessage" class="text-[#f85149] text-xs mt-2 text-center transition-colors duration-300">
+        {{ errorMessage }}
+      </div>
+
+      <!-- NgRx Loading State on Button -->
       <button 
-        type="submit" 
-        [disabled]="isLoading"
-        class="w-full bg-[#1f6feb] hover:bg-[#0969da] text-white rounded-lg py-3 text-sm font-medium transition-all duration-300 mt-4 disabled:opacity-70">
-        {{ isLoading ? 'Creating Account...' : 'Register' }}
-      </button>
+      type="submit" 
+      [disabled]="(isLoading$ | async)"
+      class="w-full bg-[#1f6feb] hover:bg-[#0969da] text-white rounded-lg py-3 text-sm font-medium transition-all duration-300 mt-4 
+            disabled:opacity-70 cursor-pointer disabled:cursor-not-allowed hover:shadow-md active:scale-[0.98]">
+      {{ (isLoading$ | async) ? 'Creating Account...' : 'Register' }}
+    </button>
     </form>
 
     <div class="text-center mt-6 text-xs text-(--theme-muted) transition-colors duration-300">

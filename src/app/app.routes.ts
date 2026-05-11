@@ -1,64 +1,131 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './login-component/login-component';
 import { SignupComponent } from './signup-component/signup-component';
-
-import { DashboardComponent } from './dashboard/dashboard';
-import { MyFilingsComponent } from './my-filings/my-filings';
 import { LayoutComponent } from './layout/layout';
-import { FileTaxesComponent } from './file-taxes/file-taxes';
-import { MakePaymentComponent } from './make-payment/make-payment';
-import { PaymentHistoryComponent } from './payment-history/payment-history';
-import { DocumentsComponent } from './documents/documents';
-import { ProfileComponent } from './profile/profile';
-import { RegStatusComponent } from './reg-status/reg-status';
-import { NotificationsComponent } from './notifications/notifications';
-import { RevenueDashboardComponent } from './reports/revenue-dashboard/revenue-dashboard';
-import { AuditDashboardComponent } from './reports/audit-dashboard/audit-dashboard';
-import { PaymentMetricsComponent } from './reports/payment-metrics/payment-metrics';
-import { ReportDownloadComponent } from './reports/report-download/report-download';
-import { ComplianceDashboard } from './compliance-dashboard/compliance-dashboard';
-import { ComplianceRecordComponent } from './compliance-record/compliance-record';
-import { CreateComplianceComponent } from './create-compliance/create-compliance';
-import { AuditCasesComponent } from './audit-cases/audit-cases';
-import { CreateAuditComponent } from './create-audit/create-audit';
-import { ViewAuditComponent } from './view-audit/view-audit';
+import { authGuard } from './core/guards/auth-guard';
 
 export const routes: Routes = [
-  // 1. Default route now forces the user to the login page
+  // 1. Default route
   { path: '', redirectTo: 'login', pathMatch: 'full' },
 
-  // 2. Public auth routes
+  // 2. Public auth routes (Eagerly loaded for instant access)
   { path: 'login', component: LoginComponent },
-  { path: 'signup', component: SignupComponent },
+  { path: 'signup', component: SignupComponent },       
 
-  // 3. Protected App Routes (Wrapped in a 'portal' path)
+  // 3. Protected App Routes (Lazy Loaded)
   {
     path: 'portal',
+    canActivate: [authGuard],
     component: LayoutComponent,
     children: [
-      { path: 'dashboard', component: DashboardComponent },
-      { path: 'profile', component: ProfileComponent },
-      { path: 'status', component: RegStatusComponent },
-      { path: 'filings', component: MyFilingsComponent },
-      { path: 'file-taxes', component: FileTaxesComponent },
-      { path: 'payment', component: MakePaymentComponent },
-      { path: 'history', component: PaymentHistoryComponent },
-      { path: 'notifications', component: NotificationsComponent },
-      { path: 'documents', component: DocumentsComponent },
-      { path: 'reports/revenue', component: RevenueDashboardComponent },
-      { path: 'reports/audit', component: AuditDashboardComponent },
-      { path: 'reports/payments', component: PaymentMetricsComponent },
-      { path: 'reports/download', component: ReportDownloadComponent },
-      { path: 'compliance-dashboard', component: ComplianceDashboard },
-      { path: 'compliance-records', component: ComplianceRecordComponent },
-      { path: 'create-compliance', component: CreateComplianceComponent },
-
-      { path: 'audit-cases', component: AuditCasesComponent },
-      { path: 'create-audit', component: CreateAuditComponent },
-      { path: 'view-audit/:id', component: ViewAuditComponent }, // Route with ID parameter
-      { path: 'view-audit', component: ViewAuditComponent }, // Fallback route
-      // Default child route redirects to dashboard inside the portal
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+
+      { 
+        path: 'dashboard', 
+        loadComponent: () => import('./dashboard/dashboard').then(m => m.DashboardComponent) ,
+        data: { roles: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] }
+      },
+      { 
+        path: 'profile', 
+        loadComponent: () => import('./profile/profile').then(m => m.ProfileComponent) ,
+        data: { roles: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] }
+      },
+      { 
+        path: 'status', 
+        loadComponent: () => import('./reg-status/reg-status').then(m => m.RegStatusComponent) ,
+        data: { roles: ["TAXPAYER", "OFFICER"] }
+      },
+      { 
+        path: 'filings', 
+        loadComponent: () => import('./my-filings/my-filings').then(m => m.MyFilingsComponent) 
+      , data: { roles: ["TAXPAYER", "OFFICER"] }
+      },
+      { 
+        path: 'file-taxes', 
+        loadComponent: () => import('./file-taxes/file-taxes').then(m => m.FileTaxesComponent) ,
+        data: { roles: ["TAXPAYER"] }
+      },
+      { 
+        path: 'payment', 
+        loadComponent: () => import('./make-payment/make-payment').then(m => m.MakePaymentComponent) ,
+        data: { roles: ["TAXPAYER"] }
+      },
+      { 
+        path: 'history', 
+        loadComponent: () => import('./payment-history/payment-history').then(m => m.PaymentHistoryComponent) ,
+        data: { roles: ["TAXPAYER", "OFFICER"] }
+      },
+      { 
+        path: 'notifications', 
+        loadComponent: () => import('./notifications/notifications').then(m => m.NotificationsComponent) ,
+        data: { roles: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] }
+      },
+      { 
+        path: 'documents', 
+        loadComponent: () => import('./documents/documents').then(m => m.DocumentsComponent) ,
+        data: { roles: ["TAXPAYER", "OFFICER"] }
+      },
+
+      // Reports Section
+      { 
+        path: 'reports/revenue', 
+        loadComponent: () => import('./reports/revenue-dashboard/revenue-dashboard').then(m => m.RevenueDashboardComponent) ,
+        data: { roles: ["MANAGER", "AUDITOR", "ADMINISTRATOR"] }
+      },
+      { 
+        path: 'reports/audit', 
+        loadComponent: () => import('./reports/audit-dashboard/audit-dashboard').then(m => m.AuditDashboardComponent) 
+      , data: { roles: ["AUDITOR", "ADMINISTRATOR"] }
+      },
+      { 
+        path: 'reports/payments', 
+        loadComponent: () => import('./reports/payment-metrics/payment-metrics').then(m => m.PaymentMetricsComponent) ,
+        data: { roles: ["MANAGER", "AUDITOR"] }
+
+      },
+      { 
+        path: 'reports/download', 
+        loadComponent: () => import('./reports/report-download/report-download').then(m => m.ReportDownloadComponent) ,
+        data: { roles: ["ADMINISTRATOR", "MANAGER"] }
+      },
+
+      // Compliance Section
+      { 
+        path: 'compliance-dashboard', 
+        loadComponent: () => import('./compliance-dashboard/compliance-dashboard').then(m => m.ComplianceDashboard) 
+        ,data: { roles: ["COMPLIANCE"] }
+      },
+      { 
+        path: 'compliance-records', 
+        loadComponent: () => import('./compliance-record/compliance-record').then(m => m.ComplianceRecordComponent) 
+        ,data: { roles: ["COMPLIANCE"] }
+      },
+      { 
+        path: 'create-compliance', 
+        loadComponent: () => import('./create-compliance/create-compliance').then(m => m.CreateComplianceComponent) ,
+        data: { roles: ["COMPLIANCE"] }
+      },
+
+      // Audit Section
+      { 
+        path: 'audit-cases', 
+        loadComponent: () => import('./audit-cases/audit-cases').then(m => m.AuditCasesComponent) ,
+        data: { roles: ["AUDITOR"] }
+      },
+      { 
+        path: 'create-audit', 
+        loadComponent: () => import('./create-audit/create-audit').then(m => m.CreateAuditComponent) ,
+        data: { roles: ["AUDITOR"] }
+      },
+      { 
+        path: 'view-audit/:id', 
+        loadComponent: () => import('./view-audit/view-audit').then(m => m.ViewAuditComponent) ,
+        data: { roles: ["AUDITOR", "ADMINISTRATOR"] }
+      }
+      ,
+       { path: 'send-notification', 
+        loadComponent: () => import('./send-notification/send-notification').then(m => m.SendNotificationComponent) ,
+        data: { roles: ["ADMINISTRATOR", "MANAGER", "COMPLIANCE"] }},
     ],
   },
 ];

@@ -1,160 +1,28 @@
-<div class="max-w-[1400px] mx-auto animate-fade-in pb-12">
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-[var(--theme-text)] transition-colors duration-300 mb-1">
-      Compliance Records
-    </h1>
-    <p class="text-[13px] text-[var(--theme-muted)] transition-colors duration-300">
-      Search, filter, and update taxpayer compliance records.
-    </p>
-  </div>
-
-  <div
-    class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl shadow-sm mb-6"
-  >
-    <div
-      class="p-5 border-b border-[var(--theme-border)] bg-[var(--theme-bg)] transition-colors duration-300 rounded-t-xl flex flex-col sm:flex-row gap-4 items-center"
-    >
-      <select
-        aria-label="Filter Status"
-        class="w-full sm:w-48 bg-[var(--theme-surface)] border border-[var(--theme-border)] transition-colors duration-300 rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-2 outline-none focus:border-[#1f6feb] cursor-pointer appearance-none"
-      >
-        <option value="">All Statuses</option>
-        <option value="Compliant">Compliant</option>
-        <option value="Non-Compliant">Non-Compliant</option>
-        <option value="Pending">Pending</option>
-      </select>
-
-      <div class="relative w-full">
-        <input
-          type="text"
-          placeholder="Search Filing ID or Taxpayer..."
-          class="w-full bg-[var(--theme-surface)] border border-[var(--theme-border)] transition-colors duration-300 rounded-lg text-[var(--theme-text)] text-[13px] px-4 py-2 outline-none focus:border-[#1f6feb] placeholder-[var(--theme-muted)]"
-        />
-      </div>
-
-      <button
-        class="w-full sm:w-auto bg-[var(--theme-surface)] hover:bg-[var(--theme-border)] text-[var(--theme-text)] border border-[var(--theme-border)] transition-colors duration-300 rounded-lg px-6 py-2 text-[13px] font-medium"
-      >
-        Filter
-      </button>
-    </div>
-
-    <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse text-[13px] whitespace-nowrap">
-        <thead>
-          <tr
-            class="bg-[var(--theme-card)] border-b border-[var(--theme-border)] transition-colors duration-300"
-          >
-            <th
-              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
-            >
-              Compliance ID
-            </th>
-            <th
-              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
-            >
-              Filing ID
-            </th>
-            <th
-              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
-            >
-              Taxpayer Name
-            </th>
-            <th
-              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
-            >
-              Type
-            </th>
-            <th
-              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
-            >
-              Status
-            </th>
-            <th
-              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
-            >
-              Created Date
-            </th>
-            <th
-              class="py-4 px-5 text-[10px] font-medium uppercase text-[var(--theme-muted)] transition-colors duration-300 tracking-wider"
-            >
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-[var(--theme-border)] transition-colors duration-300">
-          <tr
-            *ngFor="let rec of records"
-            class="hover:bg-[var(--theme-surface)] transition-colors duration-300"
-            [class.bg-[var(--theme-surface)]]="selectedRecord?.id === rec.id"
-          >
-            <td
-              class="py-4 px-5 font-mono text-[12px] text-[var(--theme-text)] transition-colors duration-300"
-            >
-              {{ rec.id }}
-            </td>
-            <td
-              class="py-4 px-5 font-mono text-[12px] text-[var(--theme-muted)] transition-colors duration-300"
-            >
-              {{ rec.filingId }}
-            </td>
-            <td
-              class="py-4 px-5 font-medium text-[var(--theme-text)] transition-colors duration-300"
-            >
-              {{ rec.taxpayer }}
-            </td>
-            <td class="py-4 px-5 text-[var(--theme-text)] transition-colors duration-300">
-              {{ rec.type }}
-            </td>
-            <td class="py-4 px-5">
-              <span
-                class="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border font-medium transition-colors duration-300"
-                [ngClass]="{
-                  'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/20': rec.statusColor === 'green',
-                  'bg-[#e3b341]/10 text-[#e3b341] border-[#e3b341]/20': rec.statusColor === 'amber',
-                  'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/20': rec.statusColor === 'red',
-                }"
-              >
-                {{ rec.status }}
-              </span>
-            </td>
-            <td class="py-4 px-5 text-[var(--theme-muted)] transition-colors duration-300">
-              {{ rec.date }}
-            </td>
-            <td class="py-4 px-5">
-              <button
-                (click)="selectForUpdate(rec)"
-                class="bg-transparent border border-[var(--theme-border)] text-[var(--theme-text)] transition-colors duration-300 rounded-md px-4 py-1.5 text-[12px] hover:bg-[var(--theme-surface)]"
-              >
-                Update
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div
+<div
     *ngIf="selectedRecord"
-    class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl shadow-lg animate-fade-in overflow-hidden"
+    class="bg-[var(--theme-card)] border border-[var(--theme-border)] transition-colors duration-300 rounded-xl shadow-lg animate-fade-in overflow-hidden mt-6"
   >
-    <div
-      class="px-6 py-4 border-b border-[var(--theme-border)] bg-[var(--theme-bg)] transition-colors duration-300"
-    >
+    <div class="px-6 py-4 border-b border-[var(--theme-border)] bg-[var(--theme-bg)] transition-colors duration-300">
       <h2 class="text-[16px] font-bold text-[var(--theme-text)] transition-colors duration-300">
         Update Compliance Record: <span class="text-[#1f6feb]">{{ selectedRecord.id }}</span>
       </h2>
     </div>
 
     <div class="p-6">
+      <div *ngIf="successMessage" class="bg-[#3fb950]/10 text-[#3fb950] border border-[#3fb950]/20 p-4 rounded-md mb-5 text-[13px] font-medium">
+        ✓ {{ successMessage }}
+      </div>
+
+      <div *ngIf="errorMessage" class="bg-[#f85149]/10 text-[#f85149] border border-[#f85149]/20 p-4 rounded-md mb-5 text-[13px] font-medium">
+        ⚠ Error: {{ errorMessage }}
+      </div>
+
       <div class="mb-5 max-w-sm">
-        <label
-          class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2"
-          >Update Status <span class="text-[#f85149]">*</span></label
-        >
+        <label class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2">
+          Update Status <span class="text-[#f85149]">*</span>
+        </label>
         <select
-          [(ngModel)]="updateData.status"
+          [(ngModel)]="updateData.result"
           aria-label="Update Status"
           class="w-full bg-[var(--theme-bg)] border border-[var(--theme-border)] transition-colors duration-300 rounded-lg text-[var(--theme-text)] text-[13px] px-3 py-2.5 outline-none focus:border-[#1f6feb] cursor-pointer appearance-none"
         >
@@ -165,10 +33,9 @@
       </div>
 
       <div class="mb-6">
-        <label
-          class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2"
-          >Reason / Notes <span class="text-[#f85149]">*</span></label
-        >
+        <label class="block text-[12px] font-medium text-[var(--theme-text)] transition-colors duration-300 mb-2">
+          Reason / Notes <span class="text-[#f85149]">*</span>
+        </label>
         <textarea
           [(ngModel)]="updateData.notes"
           rows="4"
@@ -177,24 +44,21 @@
         ></textarea>
       </div>
 
-      <div
-        class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--theme-border)] transition-colors duration-300"
-      >
+      <div class="flex items-center justify-end gap-3 pt-4 border-t border-[var(--theme-border)] transition-colors duration-300">
         <button
           (click)="cancelUpdate()"
           class="bg-transparent border border-[var(--theme-border)] text-[var(--theme-text)] transition-colors duration-300 rounded-lg px-5 py-2 text-[13px] font-medium hover:bg-[var(--theme-surface)]"
         >
           Cancel
         </button>
-        <!-- Retaining primary brand colors for the main call to action button -->
+        
         <button
           (click)="saveUpdate()"
-          [disabled]="!updateData.notes"
-          class="bg-[#1f6feb] hover:bg-[#388bfd] text-white transition-colors duration-300 rounded-lg px-6 py-2 text-[13px] font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="!updateData.notes || isLoading"
+          class="bg-[#1f6feb] hover:bg-[#388bfd] text-white transition-colors duration-300 rounded-lg px-6 py-2 text-[13px] font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[120px]"
         >
-          Save Update
+          {{ isLoading ? 'Saving...' : 'Save Update' }}
         </button>
       </div>
     </div>
   </div>
-</div>

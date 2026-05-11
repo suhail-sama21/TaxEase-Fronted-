@@ -1,63 +1,43 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuditService } from '../services/audit.service';
+import { AuditResponse, CloseAuditRequest } from '../models/audit.model';
+import { Observable, tap } from 'rxjs';
 
 @Component({
   selector: 'app-view-audit',
   standalone: true,
-  imports: [CommonModule, FormsModule], // <-- Add FormsModule here
+  imports: [CommonModule, FormsModule],
   templateUrl: './view-audit.html',
 })
-export class ViewAuditComponent {
-  // Mock data
-  auditData = {
-    id: 1042,
-    officerId: 4001,
-    scope:
-      'Q2 2026 Corporate Tax Filings for Tech Sector, specifically focusing on R&D credit claims exceeding $50,000.',
-    findings:
-      'Initial review indicates 3 out of 15 selected filings have missing supporting documentation for R&D vendor expenses. Follow-up requested via taxpayer portal.',
-    status: 'ACTIVE',
-    createdAt: '2026-04-28T14:30:00Z',
-  };
+export class ViewAuditComponent implements OnInit {
+  auditData$!: Observable<AuditResponse>;
+  currentAuditId!: number;
+  isClosingAudit = false;
+  closeRequest: CloseAuditRequest = { findings: '' };
 
-  // --- NEW: State for Closing Workflow ---
-  isClosingAudit: boolean = false;
-  closeRequest = {
-    findings: '',
-  };
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private auditService: AuditService,
+  ) {}
 
-  getFormattedDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+  ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.currentAuditId = Number(idParam);
+      this.auditData$ = this.auditService
+        .getAuditById(this.currentAuditId)
+        .pipe(tap((data) => console.log('Stream received data:', data)));
+    } else {
+      this.router.navigate(['/portal/audit-cases']);
+    }
   }
 
-  goBack() {
-    alert('Navigating back to Audit Cases list...');
-  }
-
-  editFindings() {
-    alert(`Opening edit modal for Audit ID: ${this.auditData.id}`);
-  }
-
-  // --- NEW: Closing Methods ---
-
-  // Toggles the closing form
   initiateClose() {
     this.isClosingAudit = true;
-    // Pre-fill with existing findings, or leave blank. Let's start fresh for final remarks.
-    this.closeRequest.findings = '';
-
-    // Smooth scroll down to the form
-    setTimeout(() => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }, 100);
   }
 
   cancelClose() {
@@ -66,25 +46,29 @@ export class ViewAuditComponent {
   }
 
   submitCloseAudit() {
-    if (this.closeRequest.findings.trim() === '') {
-      alert('Findings cannot be empty.');
-      return;
-    }
-    if (this.closeRequest.findings.length > 2000) {
-      alert('Findings cannot exceed 2000 characters.');
+    if (!this.closeRequest.findings.trim()) {
+      alert('Findings are required to close the case.');
       return;
     }
 
-    // Here you would call: PUT /api/audit/{id}/close with this.closeRequest
+    // Call the service to update status and navigate on success
+    this.auditService.closeAudit(this.currentAuditId, this.closeRequest).subscribe({
+      next: (res) => {
+        alert(`Audit AUD-${res.id} has been closed successfully.`);
+        this.isClosingAudit = false;
 
-    alert(`Audit ${this.auditData.id} has been successfully closed.`);
+        // Directly navigate back to dashboard
+        this.router.navigate(['/portal/audit-cases']);
+      },
+      error: (err) => {
+        console.error('Close Audit Failed:', err);
+        alert('Failed to close audit. Please try again.');
+      },
+    });
+  }
 
-    // Update local state to reflect changes
-    this.auditData.status = 'CLOSED';
-
-    // Append final findings to existing findings for the record
-    this.auditData.findings += '\n\n--- FINAL CLOSURE NOTES ---\n' + this.closeRequest.findings;
-
-    this.isClosingAudit = false;
+  // Final single implementation of goBack
+  goBack() {
+    this.router.navigate(['/portal/audit-cases']);
   }
 }
