@@ -15,31 +15,20 @@ import { logout } from '../stores/authStore/auth.action';
 export class LayoutComponent {
   private store = inject(Store);
 
-  // 1. Core User Stream
-  user$ = this.store.select(selectUser);
+  // Modal State
+  showLogoutModal = false;
 
-  // 2. Derived Streams for the UI
-  // We handle the "Guest/Default" logic right here
+  // Reactive User Data
+  user$ = this.store.select(selectUser);
   userName$: Observable<string> = this.user$.pipe(map(u => u?.name || 'Guest User'));
   userRole$: Observable<string> = this.user$.pipe(map(u => u?.role || 'TAXPAYER'));
-
-  // Logic for initials derived reactively
+  
   userInitials$: Observable<string> = this.userName$.pipe(
     map(name => name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2))
   );
 
   notificationCount = 2;
   isDarkMode = true;
-
-  toggleTheme() {
-    this.isDarkMode = !this.isDarkMode;
-  }
-
-  logout() {
-    if (confirm('Are you sure you want to log out?')) {
-      this.store.dispatch(logout());
-    }
-  }
 
   // Navigation Items
   navItems = [
@@ -67,9 +56,18 @@ export class LayoutComponent {
   filteredNavItems$ = this.user$.pipe(
     map(user => {
       const role = (user?.role || 'TAXPAYER').toUpperCase();
-      return this.navItems.filter(item =>
-        !item.Role || item.Role.includes(role)
-      );
+      return this.navItems.filter(item => !item.Role || item.Role.includes(role));
     })
   );
+
+  toggleTheme() { this.isDarkMode = !this.isDarkMode; }
+  
+  openLogoutModal() { this.showLogoutModal = true; }
+  
+  closeLogoutModal() { this.showLogoutModal = false; }
+
+  confirmLogout() {
+    this.store.dispatch(logout());
+    this.showLogoutModal = false;
+  }
 }
