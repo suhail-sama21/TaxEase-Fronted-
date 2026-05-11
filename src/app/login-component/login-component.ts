@@ -28,7 +28,6 @@ export class LoginComponent {
   error$ = this.store.select(selectError);
 
   ngOnInit(){
-    
   }
   onSubmit() {
     if (this.loginForm.invalid) {

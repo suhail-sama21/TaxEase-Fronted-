@@ -22,7 +22,7 @@ export class LayoutComponent {
   // We handle the "Guest/Default" logic right here
   userName$: Observable<string> = this.user$.pipe(map(u => u?.name || 'Guest User'));
   userRole$: Observable<string> = this.user$.pipe(map(u => u?.role || 'TAXPAYER'));
-  
+
   // Logic for initials derived reactively
   userInitials$: Observable<string> = this.userName$.pipe(
     map(name => name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2))
@@ -67,7 +67,7 @@ export class LayoutComponent {
   filteredNavItems$ = this.user$.pipe(
     map(user => {
       const role = (user?.role || 'TAXPAYER').toUpperCase();
-      return this.navItems.filter(item => 
+      return this.navItems.filter(item =>
         !item.Role || item.Role.includes(role)
       );
     })

@@ -1,10 +1,11 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TaxFilingService } from '../service/tax-filing.service';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
+import { Subscription } from 'rxjs';
 
 export interface TaxFilingRequestDTO {
   taxpayerId: number;
@@ -18,7 +19,7 @@ export interface TaxFilingRequestDTO {
   imports: [CommonModule, FormsModule],
   templateUrl: './file-taxes.html'
 })
-export class FileTaxesComponent {
+export class FileTaxesComponent implements OnInit, OnDestroy {
   currentStep = 1;
   isSubmitting = false;
   submissionError: string = '';
@@ -32,7 +33,7 @@ export class FileTaxesComponent {
     other: 0 as number
   };
 
-  taxpayerId: number= 0;
+  taxpayerId: number = 0;
   readonly period = "FY2025-26";
 
   declarations = {
@@ -40,21 +41,30 @@ export class FileTaxesComponent {
     accuracy: false
   };
 
+  private userSubscription: Subscription | undefined;
+
   constructor(
     private router: Router,
     private taxFilingService: TaxFilingService,
     private cdr: ChangeDetectorRef,
     private store: Store
-  ){
-    //let id:number;
-    this.store.select(selectUser).subscribe(user => {
-      if(user){
-        //id =user.id
-         this.taxpayerId = user.id;
+  ) {}
+
+  ngOnInit(): void {
+    // Moved the subscription from the constructor to ngOnInit (Angular Best Practice)
+    this.userSubscription = this.store.select(selectUser).subscribe(user => {
+      if (user) {
+        this.taxpayerId = user.id;
       }
-    })
+    });
   }
 
+  ngOnDestroy(): void {
+    // Clean up the subscription when the component is destroyed to prevent memory leaks
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+  }
 
   get taxableIncome(): number {
     const g = this.incomeData.gross || 0;
@@ -67,17 +77,17 @@ export class FileTaxesComponent {
     return this.taxableIncome * 0.10;
   }
 
-  nextStep() {
+  nextStep(): void {
     this.submissionError = '';
     if (this.currentStep < 5) this.currentStep++;
   }
 
-  prevStep() {
+  prevStep(): void {
     this.submissionError = '';
     if (this.currentStep > 1) this.currentStep--;
   }
 
-  resetForm() {
+  resetForm(): void {
     this.currentStep = 1;
     this.isSubmitting = false;
     this.submissionError = '';
@@ -87,7 +97,7 @@ export class FileTaxesComponent {
     this.cdr.detectChanges();
   }
 
-  submitFiling() {
+  submitFiling(): void {
     console.log("File Taxes Component Initialized with taxpayerId:", this.taxpayerId);
     this.submissionError = '';
 
@@ -175,7 +185,7 @@ export class FileTaxesComponent {
     });
   }
 
-  goToPayment() {
+  goToPayment(): void {
     this.router.navigate(['/portal/payment'], {
       queryParams: { id: this.generatedFilingId, amount: this.taxDue }
     });

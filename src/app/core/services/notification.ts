@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable , of} from 'rxjs';
 import { environment } from '../../environment/environment';
 
 export interface AppNotification {
@@ -26,6 +26,16 @@ export class NotificationService {
 
   getNotifications(userId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/user/${userId}`);
+  }
+  getNotificationCount(userId: number): Observable<number> {
+    return this.http.get<any[]>(`${this.apiUrl}/user/${userId}`).pipe(
+      map( notification => {
+        if (notification){
+          return notification.length;
+        }
+        return 0;
+      })
+    )
   }
 
   markAsRead(notificationId: number, userId: number): Observable<any> {
