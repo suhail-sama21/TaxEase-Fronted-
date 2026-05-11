@@ -2,6 +2,8 @@ import { Component, inject, NgZone, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; // Switched to Reactive Forms
 import { NotificationService, SendNotificationRequest } from '../core/services/notification';
+import { Store } from '@ngrx/store';
+import { selectUser } from '../stores/authStore/auth.features';
 
 @Component({
   selector: 'app-send-notification',
@@ -10,6 +12,7 @@ import { NotificationService, SendNotificationRequest } from '../core/services/n
   templateUrl: './send-notification.html'
 })
 export class SendNotificationComponent implements OnInit {
+  private store = inject(Store);
   private ngZone = inject(NgZone);
   private fb = inject(FormBuilder);
   private notificationService = inject(NotificationService);
@@ -20,7 +23,7 @@ export class SendNotificationComponent implements OnInit {
   isLoading = false;
   statusInfo: { message: string, type: 'success' | 'error' } | null = null;
   categories = ['FILING', 'PAYMENT', 'AUDIT', 'SYSTEM', 'BROADCAST'];
-
+  role= 'USER';
   ngOnInit() {
     // 1. Initialize the strict Reactive Form
     this.notificationForm = this.fb.group({
@@ -28,6 +31,13 @@ export class SendNotificationComponent implements OnInit {
       category: ['SYSTEM', Validators.required],
       message: ['', Validators.required]
     });
+
+    this.store.select(selectUser).subscribe(user => {
+          if (user) {
+            this.role = user.role;
+            console.log('User Data from Store:', this.role);
+          }
+        });
   }
 
   setNotificationType(type: 'DIRECT' | 'BROADCAST') {
