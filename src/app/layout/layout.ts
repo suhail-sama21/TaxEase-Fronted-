@@ -70,6 +70,7 @@ export class LayoutComponent implements OnInit {
     { label: 'Create Record', route: '/portal/create-compliance', icon: 'plus-icon', Role: ["COMPLIANCE"] },
     { label: 'Audit Cases', route: '/portal/audit-cases', icon: 'search-icon', Role: ["AUDITOR"] },
     { label: 'Create Audit', route: '/portal/create-audit', icon: 'plus-circle-icon', Role: ["AUDITOR"] },
+    {label: 'Send Notification', route: '/portal/send-notification', icon: 'send-icon', Role: ["ADMINISTRATOR", "MANAGER", "COMPLIANCE","OFFICER"] }
   ];
 
   filteredNavItems$ = this.store.select(selectUser).pipe(

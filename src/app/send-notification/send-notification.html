@@ -23,6 +23,7 @@
             [ngClass]="notificationType === 'DIRECT' ? 'bg-[#1f6feb] text-white shadow-sm' : 'text-[var(--theme-muted)] hover:text-[var(--theme-text)]'">
             👤 Direct User
           </button>
+          @if(role=='ADMINISTRATOR'){
           <button 
             type="button"
             (click)="setNotificationType('BROADCAST')"
@@ -30,6 +31,7 @@
             [ngClass]="notificationType === 'BROADCAST' ? 'bg-[#1f6feb] text-white shadow-sm' : 'text-[var(--theme-muted)] hover:text-[var(--theme-text)]'">
             📢 Broadcast All
           </button>
+        }
         </div>
       </div>
 
