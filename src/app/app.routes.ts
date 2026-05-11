@@ -22,6 +22,7 @@ import { CreateComplianceComponent } from './create-compliance/create-compliance
 import { AuditCasesComponent } from './audit-cases/audit-cases';
 import { CreateAuditComponent } from './create-audit/create-audit';
 import { ViewAuditComponent } from './view-audit/view-audit';
+import { SendNotificationComponent } from './send-notification/send-notification';
 
 export const routes: Routes = [
   // 1. Default route now forces the user to the login page
@@ -57,6 +58,7 @@ export const routes: Routes = [
       { path: 'create-audit', component: CreateAuditComponent },
       { path: 'view-audit/:id', component: ViewAuditComponent }, // Route with ID parameter
       { path: 'view-audit/:id', component: ViewAuditComponent }, // Fallback route
+      { path: 'send-notification', component: SendNotificationComponent },
       // Default child route redirects to dashboard inside the portal
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],

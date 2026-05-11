@@ -17,7 +17,8 @@ getAllFilings(userId: number): Observable<any[]> {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    
+    console.log('Fetching filings for userId:', userId); // Debug log
+
     // FIXED: Added { headers } to the request!
     return this.http.get<any[]>(`${this.taxFilingApiUrl}/taxpayer/${userId}`, { headers }); 
   }

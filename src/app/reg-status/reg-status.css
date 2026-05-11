@@ -1,0 +1,162 @@
+/* Registration Status Component Animations */
+
+/* Smooth progress bar transitions */
+.progress-transition {
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Status badge color transitions */
+.status-badge-transition {
+  transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+}
+
+/* Timeline step animations */
+.timeline-step-enter {
+  animation: slideInFromLeft 0.6s ease-out forwards;
+}
+
+.timeline-step-update {
+  transition: all 0.4s ease-out;
+}
+
+/* Progress indicator animations */
+@keyframes progressPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+.progress-indicator {
+  animation: progressPulse 2s ease-in-out infinite;
+}
+
+/* Status change animations */
+@keyframes statusChange {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.status-change-animation {
+  animation: statusChange 0.6s ease-out;
+}
+
+/* Document verification button states */
+.verify-button-success {
+  animation: successPulse 0.8s ease-out;
+}
+
+@keyframes successPulse {
+  0% {
+    background-color: #3fb950;
+    transform: scale(1);
+  }
+  50% {
+    background-color: #34a83b;
+    transform: scale(1.05);
+  }
+  100% {
+    background-color: #3fb950;
+    transform: scale(1);
+  }
+}
+
+/* Modal animations */
+.modal-enter {
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Progress completion celebration */
+@keyframes completionSparkle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    opacity: 0.8;
+    transform: scale(1.1) rotate(5deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(-5deg);
+  }
+  75% {
+    opacity: 0.9;
+    transform: scale(1.1) rotate(3deg);
+  }
+}
+
+.completion-celebration {
+  animation: completionSparkle 1.5s ease-in-out;
+}
+
+/* Smooth color transitions for status changes */
+.status-text-transition {
+  transition: color 0.4s ease, background-color 0.4s ease;
+}
+
+/* Timeline connector animation */
+.timeline-connector {
+  transition: background-color 0.6s ease;
+}
+
+/* Badge update animation */
+.badge-update {
+  animation: badgeGlow 0.8s ease-out;
+}
+
+@keyframes badgeGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(227, 179, 65, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(227, 179, 65, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(227, 179, 65, 0);
+  }
+}
+
+/* Scrollbar styling for documents table */
+::-webkit-scrollbar {
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(31, 111, 235, 0.3);
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(31, 111, 235, 0.6);
+}

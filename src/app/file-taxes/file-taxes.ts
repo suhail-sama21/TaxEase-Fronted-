@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TaxFilingService } from '../service/tax-filing.service'; // Ensure this path is correct
+import { TaxFilingService } from '../service/tax-filing.service';
+import { Store } from '@ngrx/store';
+import { selectUser } from '../stores/authStore/auth.features';
 
-// Interface matching com.cognizant.taxFilingService.dto.requestdto.TaxFilingRequestDTO
 export interface TaxFilingRequestDTO {
   taxpayerId: number;
   period: string;
@@ -20,20 +21,18 @@ export interface TaxFilingRequestDTO {
 export class FileTaxesComponent {
   currentStep = 1;
   isSubmitting = false;
+  submissionError: string = '';
 
-  // Variables for response display
   generatedFilingId: number | null = null;
   filingStatus: string = '';
 
-  // Form Data
   incomeData = {
     gross: null as number | null,
-    deductions: null as number | null,
-    other: null as number | null
+    deductions: 0 as number,
+    other: 0 as number
   };
 
-  // Constants to match Backend constraints
-  readonly taxpayerId = 987654321;
+  taxpayerId: number= 0;
   readonly period = "FY2025-26";
 
   declarations = {
@@ -41,13 +40,22 @@ export class FileTaxesComponent {
     accuracy: false
   };
 
-  // Inject the service in the constructor
   constructor(
     private router: Router,
-    private taxFilingService: TaxFilingService
-  ) {}
+    private taxFilingService: TaxFilingService,
+    private cdr: ChangeDetectorRef,
+    private store: Store
+  ){
+    //let id:number;
+    this.store.select(selectUser).subscribe(user => {
+      if(user){
+        //id =user.id
+         this.taxpayerId = user.id;
+      }
+    })
+  }
 
-  // Calculation for the amountDeclared field
+
   get taxableIncome(): number {
     const g = this.incomeData.gross || 0;
     const d = this.incomeData.deductions || 0;
@@ -60,43 +68,114 @@ export class FileTaxesComponent {
   }
 
   nextStep() {
+    this.submissionError = '';
     if (this.currentStep < 5) this.currentStep++;
   }
 
   prevStep() {
+    this.submissionError = '';
     if (this.currentStep > 1) this.currentStep--;
   }
 
-  // FIXED: Single, clean method calling the backend service
+  resetForm() {
+    this.currentStep = 1;
+    this.isSubmitting = false;
+    this.submissionError = '';
+    this.incomeData = { gross: null, deductions: 0, other: 0 };
+    this.declarations = { terms: false, accuracy: false };
+    this.generatedFilingId = null;
+    this.cdr.detectChanges();
+  }
+
   submitFiling() {
+    console.log("File Taxes Component Initialized with taxpayerId:", this.taxpayerId);
+    this.submissionError = '';
+
+    // Validation checks
+    if (!this.incomeData.gross || this.incomeData.gross <= 0) {
+      this.submissionError = 'Error: Please enter a valid gross income amount.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (this.incomeData.deductions < 0) {
+      this.submissionError = 'Error: Deductions cannot be negative.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (this.incomeData.deductions > this.incomeData.gross) {
+      this.submissionError = 'Error: Deductions cannot exceed gross income.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (!this.declarations.accuracy) {
+      this.submissionError = 'Error: Please confirm the accuracy of your information.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (!this.declarations.terms) {
+      this.submissionError = 'Error: Please agree to the terms of service.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (this.isSubmitting) return;
+
     this.isSubmitting = true;
+    this.submissionError = '';
+    this.cdr.detectChanges();
 
     const filingRequest: TaxFilingRequestDTO = {
-      taxpayerId: this.taxpayerId,
+      taxpayerId: Number(this.taxpayerId),
       period: this.period,
-      amountDeclared: this.taxableIncome
+      amountDeclared: Number(this.taxableIncome.toFixed(2))
     };
-
-    console.log("Submitting to /api/filings/submit:", filingRequest);
 
     this.taxFilingService.submitFiling(filingRequest).subscribe({
       next: (res) => {
-        // 'res' here is the TaxFilingResponseDTO from your Java Backend
+        console.log("Response Received:", res);
+
         this.generatedFilingId = res.id;
-        this.filingStatus = res.status;
-        this.currentStep = 5; // Move to the success step
+        this.filingStatus = res.status || 'Pending';
+        this.submissionError = '';
+
+        // Update state
+        this.currentStep = 5;
         this.isSubmitting = false;
+
+        // Trigger UI refresh
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error("Submission failed:", err);
+        console.error("Backend Error:", err);
         this.isSubmitting = false;
-        alert("There was an error submitting your taxes. Please check the console.");
+
+        // Handle specific error cases
+        if (err.status === 400) {
+          this.submissionError = 'Error: Invalid data provided. Please check your entries and try again.';
+        } else if (err.status === 409) {
+          this.submissionError = 'Error: A filing for this period already exists. Please contact support.';
+        } else if (err.status === 422) {
+          this.submissionError = 'Error: Invalid taxable income. Please ensure deductions do not exceed gross income.';
+        } else if (err.status === 0) {
+          this.submissionError = 'Error: Network error. Please check your internet connection and try again.';
+        } else if (err.status === 500 || err.status === 503) {
+          this.submissionError = 'Error: Server error. Please try again later.';
+        } else if (err.error?.message) {
+          this.submissionError = `Error: ${err.error.message}`;
+        } else {
+          this.submissionError = 'Error: Failed to submit your filing. Please try again later.';
+        }
+
+        this.cdr.detectChanges();
       }
     });
   }
 
   goToPayment() {
-    // Navigating to the payment route with the generated ID
     this.router.navigate(['/portal/payment'], {
       queryParams: { id: this.generatedFilingId, amount: this.taxDue }
     });
