@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // <-- Imported ChangeDetectorRef
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,7 +18,6 @@ export class ViewAuditComponent implements OnInit {
   isClosingAudit = false;
   closeRequest: CloseAuditRequest = { findings: '' };
 
-  // Message state variables
   successMessage = '';
   errorMessage = '';
 
@@ -26,7 +25,7 @@ export class ViewAuditComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private auditService: AuditService,
-    private cdr: ChangeDetectorRef, // <-- Injected ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -63,14 +62,11 @@ export class ViewAuditComponent implements OnInit {
       return;
     }
 
-    // Call the service to update status and navigate on success
     this.auditService.closeAudit(this.currentAuditId, this.closeRequest).subscribe({
       next: (res) => {
-        // Set on-screen success message instead of alert
         this.successMessage = `Audit AUD-${res.id} has been closed successfully.`;
         this.isClosingAudit = false;
 
-        // Delay navigation so the user can read the green message
         setTimeout(() => {
           this.router.navigate(['/portal/audit-cases']);
         }, 1500);
@@ -78,7 +74,6 @@ export class ViewAuditComponent implements OnInit {
       error: (err) => {
         console.error('Close Audit Failed:', err);
 
-        // Safely extract backend error message
         if (err.error && typeof err.error === 'string') {
           this.errorMessage = err.error;
         } else if (err.error && err.error.message) {
@@ -87,13 +82,11 @@ export class ViewAuditComponent implements OnInit {
           this.errorMessage = 'Failed to close audit. Please check your backend connection.';
         }
 
-        // Force UI refresh instantly
         this.cdr.detectChanges();
       },
     });
   }
 
-  // Final single implementation of goBack
   goBack() {
     this.router.navigate(['/portal/audit-cases']);
   }

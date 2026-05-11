@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core'; // <-- Imported ChangeDetectorRef
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -21,12 +21,12 @@ export class CreateAuditComponent {
 
   isLoading = false;
   errorMessage = '';
-  successMessage = ''; // <-- Added success state
+  successMessage = '';
 
   constructor(
     private auditService: AuditService,
     private router: Router,
-    private cdr: ChangeDetectorRef, // <-- Injected ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   isFormValid(): boolean {
@@ -51,20 +51,16 @@ export class CreateAuditComponent {
       next: (response) => {
         this.isLoading = false;
 
-        // On-screen success message instead of alert
         this.successMessage = `Audit Record created successfully with ID: AUD-${response.id}`;
 
-        // Delay redirect by 1.5s to show the message
         setTimeout(() => {
           this.router.navigate(['/portal/audit-cases']);
         }, 1500);
       },
       error: (err) => {
-        // 1. Instantly turn off loading
         this.isLoading = false;
         console.error('Error creating audit:', err);
 
-        // 2. Safely extract error message
         if (err.error && typeof err.error === 'string') {
           this.errorMessage = err.error;
         } else if (err.status === 404) {
@@ -75,7 +71,6 @@ export class CreateAuditComponent {
           this.errorMessage = 'Failed to create audit record. Please verify the IDs provided.';
         }
 
-        // 3. Force UI refresh instantly
         this.cdr.detectChanges();
       },
     });

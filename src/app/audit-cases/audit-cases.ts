@@ -14,14 +14,11 @@ import { map, tap } from 'rxjs/operators';
   templateUrl: './audit-cases.html',
 })
 export class AuditCasesComponent implements OnInit {
-  // Observable streams for the HTML async pipes
   metrics$!: Observable<AuditDashboardResponse>;
   filteredCases$!: Observable<AuditResponse[]>;
 
-  // Subject to trigger filtering reactively
   private filterTrigger$ = new BehaviorSubject<void>(undefined);
 
-  // Keep these for [(ngModel)] binding
   searchTerm: string = '';
   statusFilter: string = 'All Statuses';
   isLoading: boolean = true;
@@ -32,40 +29,34 @@ export class AuditCasesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // 1. Assign Metrics Observable
     this.metrics$ = this.auditService.getDashboardSummary();
 
-    // 2. Setup Filtered Cases Observable
     const allAudits$ = this.auditService.getAllAudits().pipe(
-      tap(() => this.isLoading = false),
-      map(data => data.sort((a, b) => b.id - a.id))
+      tap(() => (this.isLoading = false)),
+      map((data) => data.sort((a, b) => b.id - a.id)),
     );
 
-    // Combine the data stream with the filter trigger
     this.filteredCases$ = combineLatest([allAudits$, this.filterTrigger$]).pipe(
       map(([audits]) => {
         const term = this.searchTerm.toLowerCase();
-        
+
         return audits.filter((audit) => {
-          // Match ID, Scope, or Findings
           const matchesSearch =
             !term ||
             audit.id.toString().includes(term) ||
             (audit.scope && audit.scope.toLowerCase().includes(term)) ||
             (audit.findings && audit.findings.toLowerCase().includes(term));
 
-          // Match Status dropdown
           const matchesStatus =
             this.statusFilter === 'All Statuses' ||
             (audit.status && audit.status.toUpperCase() === this.statusFilter.toUpperCase());
 
           return matchesSearch && matchesStatus;
         });
-      })
+      }),
     );
   }
 
-  // This is called by (change) and (input) in your HTML
   applyFilters() {
     this.filterTrigger$.next();
   }

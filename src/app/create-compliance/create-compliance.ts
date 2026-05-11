@@ -83,11 +83,9 @@ export class CreateComplianceComponent {
         }, 1500);
       },
       error: (err) => {
-        // 1. Turn off loading
         this.isLoading = false;
         console.error('Error creating compliance record:', err);
 
-        // 2. Set the error message
         if (err.error && typeof err.error === 'string') {
           this.errorMessage = err.error;
         } else if (err.status === 404) {
@@ -98,7 +96,6 @@ export class CreateComplianceComponent {
           this.errorMessage = 'Failed to create record. Please check your backend connection.';
         }
 
-        // 3. THE FIX: Force Angular to update the UI instantly!
         this.cdr.detectChanges();
       },
     });
