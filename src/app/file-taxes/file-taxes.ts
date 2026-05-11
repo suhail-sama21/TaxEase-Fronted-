@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TaxFilingService } from '../service/tax-filing.service';
+import { Store } from '@ngrx/store';
+import { selectUser } from '../stores/authStore/auth.features';
 
 export interface TaxFilingRequestDTO {
   taxpayerId: number;
@@ -19,7 +21,7 @@ export interface TaxFilingRequestDTO {
 export class FileTaxesComponent {
   currentStep = 1;
   isSubmitting = false;
-  submissionError = '';
+  submissionError: string = '';
 
   generatedFilingId: number | null = null;
   filingStatus: string = '';
@@ -30,7 +32,7 @@ export class FileTaxesComponent {
     other: 0 as number
   };
 
-  readonly taxpayerId = 10;
+  taxpayerId: number= 0;
   readonly period = "FY2025-26";
 
   declarations = {
@@ -41,8 +43,18 @@ export class FileTaxesComponent {
   constructor(
     private router: Router,
     private taxFilingService: TaxFilingService,
-    private cdr: ChangeDetectorRef
-  ) {}
+    private cdr: ChangeDetectorRef,
+    private store: Store
+  ){
+    //let id:number;
+    this.store.select(selectUser).subscribe(user => {
+      if(user){
+        //id =user.id
+         this.taxpayerId = user.id;
+      }
+    })
+  }
+
 
   get taxableIncome(): number {
     const g = this.incomeData.gross || 0;
@@ -76,6 +88,7 @@ export class FileTaxesComponent {
   }
 
   submitFiling() {
+    console.log("File Taxes Component Initialized with taxpayerId:", this.taxpayerId);
     this.submissionError = '';
 
     // Validation checks

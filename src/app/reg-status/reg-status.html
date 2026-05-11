@@ -15,8 +15,12 @@
   </div>
 
   <div class="bg-(--theme-card) border border-(--theme-border) rounded-2xl p-8 text-center shadow-sm hover:shadow-md transition-all duration-300">
-    <div class="inline-block bg-[#e3b341]/10 text-[#e3b341] border border-[#e3b341]/30 font-semibold text-xs px-4 py-1.5 rounded-full mb-4 tracking-wide shadow-sm transition-colors duration-300">
-      PENDING VERIFICATION
+    <div class="inline-block font-semibold text-xs px-4 py-1.5 rounded-full mb-4 tracking-wide shadow-sm transition-all duration-300 animate-in fade-in slide-in-from-top-2"
+         [class.badge-update]="progressChanged"
+         [style.backgroundColor]="statusBadge.color + '1A'"
+         [style.color]="statusBadge.color"
+         [style.borderColor]="statusBadge.color">
+      {{ statusBadge.text }}
     </div>
     <div class="text-4xl font-extrabold text-(--theme-text) mb-1 tracking-tight transition-colors duration-300">{{ taxpayerId }}</div>
     <div class="text-sm font-medium text-(--theme-muted) mb-8 transition-colors duration-300">Temporary Taxpayer ID</div>
@@ -42,22 +46,22 @@
       <div class="p-8">
         <div class="relative pl-2">
           
-          <div *ngFor="let step of timelineSteps; let last = last" class="flex gap-5 relative" [class.pb-8]="!last">
-            <div *ngIf="!last" class="absolute left-4 top-8 bottom-0 w-[2px] transition-colors duration-300"
+          <div *ngFor="let step of timelineSteps; let last = last; trackBy: trackByStep" class="flex gap-5 relative animate-in fade-in slide-in-from-left-4 timeline-step-update" [style.animation-delay.ms]="last ? 400 : 0">
+            <div *ngIf="!last" class="absolute left-4 top-8 bottom-0 w-[2px] transition-all duration-500 ease-out timeline-connector"
                  [ngClass]="step.status === 'completed' ? 'bg-[#3fb950]' : 'bg-(--theme-border)'"></div>
             
-            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 z-10 border-2 mt-0.5 shadow-sm transition-colors duration-300"
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 z-10 border-2 mt-0.5 shadow-sm transition-all duration-300"
                  [ngClass]="{
                    'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/40': step.status === 'completed',
                    'bg-[#e3b341]/10 text-[#e3b341] border-[#e3b341]/40': step.status === 'current',
                    'bg-(--theme-surface) text-(--theme-muted) border-(--theme-border)': step.status === 'upcoming'
                  }">
-              <span *ngIf="step.status === 'completed'" class="font-bold">✓</span>
+              <span *ngIf="step.status === 'completed'" class="font-bold animate-in zoom-in duration-300">✓</span>
               <span *ngIf="step.status === 'current'" class="animate-pulse">●</span>
               <span *ngIf="step.status === 'upcoming'">○</span>
             </div>
             
-            <div>
+            <div class="transition-all duration-300 status-text-transition">
               <div class="text-base font-bold transition-colors duration-300" 
                    [ngClass]="step.status === 'upcoming' ? 'text-(--theme-muted)' : 'text-(--theme-text)'">
                 {{ step.title }}
@@ -77,48 +81,50 @@
         <h2 class="text-base font-bold text-(--theme-text) transition-colors duration-300">Required Documents</h2>
       </div>
       
-      <table class="w-full text-sm text-left">
-        <thead class="bg-(--theme-surface) text-(--theme-muted) uppercase text-[11px] font-semibold border-b border-(--theme-border) transition-colors duration-300">
-          <tr>
-            <th class="px-6 py-3">Document Type</th>
-            <th class="px-6 py-3">Upload Date</th>
-            <th class="px-6 py-3">Status</th>
-            <th class="px-6 py-3">Verify</th>
-            <th class="px-6 py-3">Upload / Update</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-(--theme-border)">
-          <tr *ngFor="let doc of requiredDocs$ | async; let i = index" class="hover:bg-(--theme-surface) transition-colors duration-300">
-            <td class="px-6 py-4 font-semibold text-(--theme-text) transition-colors duration-300">{{ doc.type }}</td>
-            <td class="px-6 py-4 text-(--theme-muted) font-medium transition-colors duration-300">{{ doc.date }}</td>
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border transition-colors duration-300"
-                    [ngClass]="{
-                      'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/30': doc.statusColor === 'green',
-                      'bg-[#e3b341]/10 text-[#e3b341] border-[#e3b341]/30': doc.statusColor === 'amber',
-                      'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/30': doc.statusColor === 'red'
-                    }">
-                {{ doc.status }}
-              </span>
-            </td>
-            <td class="px-6 py-4">
-              <button
-                (click)="openVerifyModal(doc)"
-                [disabled]="!doc.fileUri || doc.statusColor === 'green'"
-                class="rounded-lg px-3 py-2 text-xs font-semibold transition-colors duration-300 border border-(--theme-border) bg-(--theme-surface) hover:border-[#1f6feb] hover:text-[#1f6feb] disabled:opacity-40 disabled:cursor-not-allowed">
-                Verify
-              </button>
-            </td>
-            <td class="px-6 py-4">
-              <button
-                (click)="openUploadModal(doc)"
-                class="rounded-lg px-3 py-2 text-xs font-semibold transition-colors duration-300 border border-(--theme-border) bg-(--theme-surface) hover:border-[#1f6feb] hover:text-[#1f6feb]">
-                {{ doc.fileUri ? 'Update Document' : 'Upload Document' }}
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left min-w-max">
+          <thead class="bg-(--theme-surface) text-(--theme-muted) uppercase text-[11px] font-semibold border-b border-(--theme-border) transition-colors duration-300 sticky top-0">
+            <tr>
+              <th class="px-6 py-3 whitespace-nowrap">Document Type</th>
+              <th class="px-6 py-3 whitespace-nowrap">Upload Date</th>
+              <th class="px-6 py-3 whitespace-nowrap">Status</th>
+              <th class="px-6 py-3 whitespace-nowrap">Verify</th>
+              <th class="px-6 py-3 whitespace-nowrap">Upload / Update</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-(--theme-border)">
+            <tr *ngFor="let doc of requiredDocs$ | async; let i = index" class="hover:bg-(--theme-surface) transition-colors duration-300">
+              <td class="px-6 py-4 font-semibold text-(--theme-text) transition-colors duration-300 whitespace-nowrap">{{ doc.type }}</td>
+              <td class="px-6 py-4 text-(--theme-muted) font-medium transition-colors duration-300 whitespace-nowrap">{{ doc.date }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border transition-colors duration-300"
+                      [ngClass]="{
+                        'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/30': doc.statusColor === 'green',
+                        'bg-[#e3b341]/10 text-[#e3b341] border-[#e3b341]/30': doc.statusColor === 'amber',
+                        'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/30': doc.statusColor === 'red'
+                      }">
+                  {{ doc.status }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <button
+                  (click)="openVerifyModal(doc)"
+                  [disabled]="!doc.fileUri || doc.statusColor === 'green'"
+                  class="rounded-lg px-3 py-2 text-xs font-semibold transition-colors duration-300 border border-(--theme-border) bg-(--theme-surface) hover:border-[#1f6feb] hover:text-[#1f6feb] disabled:opacity-40 disabled:cursor-not-allowed">
+                  Verify
+                </button>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <button
+                  (click)="openUploadModal(doc)"
+                  class="rounded-lg px-3 py-2 text-xs font-semibold transition-colors duration-300 border border-(--theme-border) bg-(--theme-surface) hover:border-[#1f6feb] hover:text-[#1f6feb]">
+                  {{ doc.fileUri ? 'Update Document' : 'Upload Document' }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <div *ngIf="isUploadModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
         <div class="w-full max-w-lg rounded-3xl bg-(--theme-card) border border-(--theme-border) p-6 shadow-2xl">
@@ -142,18 +148,16 @@
       </div>
 
       <div *ngIf="isVerifyModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-        <div class="w-full max-w-md rounded-3xl bg-(--theme-card) border border-(--theme-border) p-6 shadow-2xl">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <h3 class="text-lg font-bold text-(--theme-text)">Verify Document</h3>
-              <p class="text-sm text-(--theme-muted)">Choose accept or reject for {{ verificationTarget?.type }}</p>
-            </div>
-            <button (click)="closeVerifyModal()" class="text-(--theme-muted) hover:text-(--theme-text)">✕</button>
+        <div class="w-full max-w-sm rounded-2xl bg-(--theme-card) border border-(--theme-border) p-5 shadow-xl animate-in fade-in zoom-in-95 duration-200">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-base font-bold text-(--theme-text)">Verify Document</h3>
+            <button (click)="closeVerifyModal()" class="text-(--theme-muted) hover:text-(--theme-text) text-lg">×</button>
           </div>
-          <div class="grid gap-3">
-            <button (click)="verifyDocument('Accepted')" class="rounded-xl bg-[#3fb950] px-4 py-3 text-sm font-semibold text-white hover:bg-[#34a83b]">Verify / Accept</button>
-            <button (click)="verifyDocument('Rejected')" class="rounded-xl bg-[#f85149] px-4 py-3 text-sm font-semibold text-white hover:bg-[#d63d3d]">Reject</button>
-            <button (click)="closeVerifyModal()" class="rounded-xl border border-(--theme-border) px-4 py-3 text-sm font-semibold text-(--theme-text) bg-(--theme-surface)">Cancel</button>
+          <p class="text-sm text-(--theme-muted) mb-4">Choose action for {{ verificationTarget?.type }}</p>
+          <div class="grid gap-2">
+            <button (click)="verifyDocument('Accepted')" class="rounded-lg bg-[#3fb950] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#34a83b] transition-colors duration-200">✓ Accept</button>
+            <button (click)="verifyDocument('Rejected')" class="rounded-lg bg-[#f85149] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#d63d3d] transition-colors duration-200">✗ Reject</button>
+            <button (click)="closeVerifyModal()" class="rounded-lg border border-(--theme-border) px-4 py-2.5 text-sm font-semibold text-(--theme-text) bg-(--theme-surface) hover:bg-(--theme-bg) transition-colors duration-200">Cancel</button>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environment/environment';
 
 export interface AppNotification {
   id: number;
@@ -21,7 +22,7 @@ export interface SendNotificationRequest {
 export class NotificationService {
   private http = inject(HttpClient);
   // Using 8088 as seen in your Postman screenshot!
-  private apiUrl = 'http://localhost:8088/api/notifications';
+  private apiUrl = environment.apiUrl + '/notifications';
 
   getNotifications(userId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/user/${userId}`);

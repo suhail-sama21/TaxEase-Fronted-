@@ -26,10 +26,9 @@
       }
     </nav>
 
-    <!-- Bottom Action Section (Role & Logout) -->
-    <div class="p-3.5 border-t border-(--theme-border) flex flex-col gap-2 transition-colors duration-300">
-      <div class="text-[11px] text-(--theme-muted) bg-(--theme-card) border border-(--theme-border) px-2.5 py-1 rounded-full text-center transition-colors duration-300">
-        Role: {{ userRole }}
+    <div class="px-3.5 py-3 border-t border-(--theme-border) transition-colors duration-300">
+      <div class="text-[11px] text-(--theme-muted) bg-(--theme-card) border border-(--theme-border) px-2.5 py-1 rounded-full inline-block transition-colors duration-300">
+        Role: {{ userRole$ | async }}
       </div>
       
       <button (click)="logout()" 
@@ -57,11 +56,11 @@
 
         <div routerLink="/portal/profile" class="flex items-center gap-2 cursor-pointer hover:bg-(--theme-card) p-1 rounded-md transition-colors duration-300">
           <div class="w-7 h-7 rounded-full bg-linear-to-br from-[#1f6feb] to-[#0969da] flex items-center justify-center text-[11px] font-medium text-white font-display">
-             {{ userInitials }}
+             {{ userInitials$ | async }}
           </div>
           <div>
-            <div class="text-[13px] text-(--theme-text) leading-tight transition-colors duration-300">{{ userName }}</div>
-            <div class="text-[10px] text-(--theme-muted) transition-colors duration-300">{{ userRole }}</div>
+            <div class="text-[13px] text-(--theme-text) leading-tight transition-colors duration-300">{{ userName$ | async}}</div>
+            <div class="text-[10px] text-(--theme-muted) transition-colors duration-300">{{ userRole$ |async}}</div>
           </div>
         </div>
       </div>

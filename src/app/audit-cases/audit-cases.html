@@ -29,7 +29,7 @@
         <div class="text-[var(--theme-muted)]">🗂️</div>
       </div>
       <div class="text-3xl font-bold text-[var(--theme-text)]">
-        {{ metrics.totalCases }}
+        {{ (metrics$ | async)?.totalCases }}
       </div>
     </div>
 
@@ -43,7 +43,7 @@
         <div class="text-[#1f6feb]">📂</div>
       </div>
       <div class="text-3xl font-bold text-[var(--theme-text)]">
-        {{ metrics.open }}
+        {{ (metrics$ | async)?.open }}
       </div>
     </div>
 
@@ -57,7 +57,7 @@
         <div class="text-[#e3b341]">⏱️</div>
       </div>
       <div class="text-3xl font-bold text-[var(--theme-text)]">
-        {{ metrics.inProgress }}
+        {{ (metrics$ | async)?.inProgress }}
       </div>
     </div>
 
@@ -71,7 +71,7 @@
         <div class="text-[#3fb950]">☑️</div>
       </div>
       <div class="text-3xl font-bold text-[var(--theme-text)]">
-        {{ metrics.closed }}
+        {{ (metrics$ | async)?.closed }}
       </div>
     </div>
   </div>
@@ -162,7 +162,7 @@
 
           <!-- Data Rows -->
           <tr
-            *ngFor="let audit of filteredCases"
+            *ngFor="let audit of (filteredCases$ | async)"
             class="hover:bg-[var(--theme-surface)] transition-colors duration-300"
           >
             <td class="py-3 px-5 font-mono text-[12px] text-[var(--theme-text)]">
@@ -210,7 +210,7 @@
           </tr>
 
           <!-- Empty State -->
-          <tr *ngIf="!isLoading && filteredCases.length === 0">
+          <tr *ngIf="!isLoading && (filteredCases$ | async)?.length === 0">
             <td colspan="8" class="py-8 text-center text-[var(--theme-muted)]">
               No audit cases found matching your criteria.
             </td>

@@ -30,6 +30,8 @@ export class RegStatusComponent implements OnInit {
   isUploadModalOpen = false;
   isVerifyModalOpen = false;
   verificationTarget?: DocumentRow;
+  private previousProgress = 0;
+  progressChanged = false;
 
   ngOnInit(): void {
     this.fetchDocuments();
@@ -41,13 +43,74 @@ export class RegStatusComponent implements OnInit {
   regDate = 'March 1, 2026';
   lastUpdated = 'March 5, 2026';
 
-  // Timeline data
-  timelineSteps = [
-    { title: 'Application Submitted', date: 'March 1, 2026', status: 'completed' },
-    { title: 'Documents Received', date: 'March 2, 2026', status: 'completed' },
-    { title: 'Under Review', date: 'In progress — Est. March 10, 2026', status: 'current' },
-    { title: 'ID Assigned', date: 'Pending', status: 'upcoming' }
-  ];
+  // Dynamic timeline data based on document verification progress
+  get timelineSteps() {
+    const verifiedCount = this.taxpayerDocuments.filter(doc => doc.verificationStatus === 'Accepted').length;
+    const totalDocs = 3; // ID Proof, PAN Card, Address Proof
+    const progressPercent = (verifiedCount / totalDocs) * 100;
+
+    if (progressPercent === 100) {
+      return [
+        { title: 'Application Submitted', date: 'March 1, 2026', status: 'completed' },
+        { title: 'Documents Received', date: 'March 2, 2026', status: 'completed' },
+        { title: 'Under Review', date: 'March 3-5, 2026', status: 'completed' },
+        { title: 'ID Assigned', date: 'March 6, 2026', status: 'completed' }
+      ];
+    } else if (progressPercent >= 75) {
+      return [
+        { title: 'Application Submitted', date: 'March 1, 2026', status: 'completed' },
+        { title: 'Documents Received', date: 'March 2, 2026', status: 'completed' },
+        { title: 'Under Review', date: 'In progress — ' + Math.round(progressPercent) + '% verified', status: 'current' },
+        { title: 'ID Assigned', date: 'Pending', status: 'upcoming' }
+      ];
+    } else if (progressPercent >= 50) {
+      return [
+        { title: 'Application Submitted', date: 'March 1, 2026', status: 'completed' },
+        { title: 'Documents Received', date: 'March 2, 2026', status: 'completed' },
+        { title: 'Under Review', date: 'In progress — ' + Math.round(progressPercent) + '% verified', status: 'current' },
+        { title: 'ID Assigned', date: 'Pending', status: 'upcoming' }
+      ];
+    } else if (verifiedCount > 0) {
+      return [
+        { title: 'Application Submitted', date: 'March 1, 2026', status: 'completed' },
+        { title: 'Documents Received', date: 'March 2, 2026', status: 'completed' },
+        { title: 'Under Review', date: 'In progress — ' + Math.round(progressPercent) + '% verified', status: 'current' },
+        { title: 'ID Assigned', date: 'Pending', status: 'upcoming' }
+      ];
+    } else {
+      return [
+        { title: 'Application Submitted', date: 'March 1, 2026', status: 'completed' },
+        { title: 'Documents Received', date: 'March 2, 2026', status: 'completed' },
+        { title: 'Under Review', date: 'Pending document verification', status: 'current' },
+        { title: 'ID Assigned', date: 'Pending', status: 'upcoming' }
+      ];
+    }
+  }
+
+  // Progress bar calculation
+  get verificationProgress() {
+    const verifiedCount = this.taxpayerDocuments.filter(doc => doc.verificationStatus === 'Accepted').length;
+    return Math.round((verifiedCount / 3) * 100); // 3 required documents
+  }
+
+  // Status badge text based on progress
+  get statusBadge() {
+    const progress = this.verificationProgress;
+    if (progress === 100) {
+      return { text: 'VERIFICATION COMPLETE', color: '#3fb950' };
+    } else if (progress >= 75) {
+      return { text: 'MOSTLY VERIFIED', color: '#e3b341' };
+    } else if (progress >= 25) {
+      return { text: 'PARTIALLY VERIFIED', color: '#e3b341' };
+    } else {
+      return { text: 'PENDING VERIFICATION', color: '#e3b341' };
+    }
+  }
+
+  // TrackBy function for timeline steps to optimize rendering
+  trackByStep(index: number, step: any): string {
+    return step.title + step.status;
+  }
 
   refreshStatus() {
     this.fetchDocuments();
@@ -59,6 +122,15 @@ export class RegStatusComponent implements OnInit {
       map(data => {
         console.log('Documents fetched successfully:', data);
         this.taxpayerDocuments = data;
+
+        // Check if progress changed for animation
+        const newProgress = this.verificationProgress;
+        if (newProgress !== this.previousProgress) {
+          this.progressChanged = true;
+          setTimeout(() => this.progressChanged = false, 1000); // Reset after animation
+          this.previousProgress = newProgress;
+        }
+
         return this.transformDocuments(data); // Returns the array to the stream
       })
     );
@@ -111,22 +183,31 @@ export class RegStatusComponent implements OnInit {
   }
 
   verifyDocument(status: 'Accepted' | 'Rejected') {
-    if (!this.verificationTarget?.id) {
+    // 1. Capture the ID into a local variable immediately
+    const targetId = this.verificationTarget?.id;
+
+    if (!targetId) {
+      console.error("No document ID found for verification");
       return;
     }
 
-    this.service.verifyDocument(this.verificationTarget.id, status).subscribe(() => {
-      this.closeVerifyModal();
-      this.fetchDocuments();
-    });
+    // 2. Now it's safe to close/clear the modal state
+    this.closeVerifyModal();
+
+    // 3. Use the local variable for the service call
+    this.service.verifyDocument(targetId, status).subscribe({
+      next: () => this.fetchDocuments(),
+      error: (err) => console.error("Verification failed", err)
+    })
+    
+     // Ensure we refresh the document list after verification
   }
 
   private transformDocuments(documents: taxpayerDocument[]): DocumentRow[] {
     const allTypes = [
       { type: 'ID Proof', backendType: 'ID Proof' },
       { type: 'PAN Card', backendType: 'PAN' },
-      { type: 'Address Proof', backendType: 'Address proof' },
-      { type: 'Income Proof', backendType: 'Income Proof' }
+      { type: 'Address Proof', backendType: 'Address proof' }
     ];
 
     return allTypes.map(typeInfo => {
