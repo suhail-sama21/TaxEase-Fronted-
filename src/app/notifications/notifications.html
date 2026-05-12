@@ -12,7 +12,7 @@
   <div class="bg-(--theme-card) border border-(--theme-border) rounded-xl overflow-hidden shadow-sm transition-colors duration-300">
     <div class="flex flex-col">
       
-      <div *ngFor="let n of notifications"
+      <div *ngFor="let n of (notifications$ | async)"
            (click)="markAsRead(n)"
            class="flex gap-4 p-5 border-b border-(--theme-border) last:border-0 cursor-pointer transition-colors duration-300 relative"
            [ngClass]="n.read ? 'hover:bg-(--theme-surface)' : 'bg-[#1f6feb]/5 hover:bg-[#1f6feb]/10'">

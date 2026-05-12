@@ -24,9 +24,10 @@ export class UserService {
   getUser(sub: string): Observable<User> {
     return this.http.get<User>(this.apiURL + '/username/' + sub);
   }
-  updatePassword(id: number, password: any){
-    return this.http.patch<any>(this.apiURL + `/${id}/changePassword`, password, {
-      responseType: 'text' as any
-    });
+  updatePassword(id: number, password: any): Observable<string> {
+    return this.http.patch(this.apiURL + `/${id}/changePassword`, password, {
+      responseType: 'text',
+      observe: 'body'
+    }) as Observable<string>;
   }
 }
