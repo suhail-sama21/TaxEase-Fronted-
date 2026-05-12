@@ -91,7 +91,7 @@ export class LayoutComponent {
     })
   );
 
-  toggleTheme() { this.isDarkMode = !this.isDarkMode; }
+  // toggleTheme() { this.isDarkMode = !this.isDarkMode; }
 
   openLogoutModal() { this.showLogoutModal = true; }
 
