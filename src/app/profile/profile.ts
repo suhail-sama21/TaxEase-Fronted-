@@ -1,10 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OnInit } from '@angular/core';
 import { TaxpayerService } from '../service/taxpayer-service';
 import { User } from '../dto/taxpayer-profile';
-import { Signal } from '@angular/core';
 import { delay } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
@@ -27,7 +26,7 @@ export class ProfileComponent implements OnInit{
   editChanges: any = {};
 
   // Mock User Data
-  userProfile = signal({
+  userProfile: any = {
     fullName: 'John Doe',
     email: 'auditmazhai@example.com',
     phone: '+1 (555) 123-4567',
@@ -35,7 +34,7 @@ export class ProfileComponent implements OnInit{
     address: '123 Main St, Springfield, IL 62701',
     dob: '1985-06-15',
     pan: 'ABCDE1234F'
-  });
+  };
 
   security = {
     currentPassword: '',
@@ -48,7 +47,7 @@ export class ProfileComponent implements OnInit{
   showConfirmPassword = false;
 
   userData: any;
-  constructor(private taxpayerService: TaxpayerService, private store: Store){}
+  constructor(private taxpayerService: TaxpayerService, private store: Store, private cdr: ChangeDetectorRef){}
 
   ngOnInit(): void {
     this.store.select(selectUser).subscribe(user => {
@@ -64,7 +63,7 @@ export class ProfileComponent implements OnInit{
   }
 
   assignData() {
-    this.userProfile.update(profile => ({
+    this.userProfile = {
       fullName: this.userData.name,
       email: this.userData.email,
       address: this.userData.address,
@@ -72,7 +71,7 @@ export class ProfileComponent implements OnInit{
       type: this.userData.role || 'Citizen',
       dob: this.userData.dob,
       pan: this.userData.panNumber
-    }));
+    };
   }
 
   enableEditMode() {
@@ -86,11 +85,11 @@ export class ProfileComponent implements OnInit{
 
   openConfirmModal() {
     this.editChanges = {
-      name: this.userProfile().fullName,
-      phone: this.userProfile().phone,
-      address: this.userProfile().address,
-      panNumber: this.userProfile().pan,
-      dob: this.userProfile().dob
+      name: this.userProfile.fullName,
+      phone: this.userProfile.phone,
+      address: this.userProfile.address,
+      panNumber: this.userProfile.pan,
+      dob: this.userProfile.dob
     };
     this.isConfirmModalOpen = true;
   }
@@ -157,30 +156,58 @@ export class ProfileComponent implements OnInit{
     }
 
     this.isSavingPassword = true;
+    console.log('Sending password update request for user:', this.userData.id);
 
     this.taxpayerService.updatePassword(this.userData.id, {
       oldPassword: this.security.currentPassword,
       newPassword: this.security.newPassword
     }).subscribe({
-      next: (response) => {
+      next: (response: string) => {
+        console.log('Password update response:', response);
         this.isSavingPassword = false;
-        this.passwordInfoBox('successful');
+        this.cdr.markForCheck();
+        
+        // Extract message from response (could be plain text or wrapped)
+        const successMessage = response && typeof response === 'string' 
+          ? response 
+          : 'Password changed successfully';
+        
+        console.log('Success message:', successMessage);
+        this.passwordInfoAppear = true;
+        this.boxColor = '#3fb950';
+        this.infoMessage = successMessage;
+        this.cdr.markForCheck();
+        
+        // Clear form fields
         this.security.currentPassword = '';
         this.security.newPassword = '';
         this.security.confirmPassword = '';
-      },
-      error: (err) => {
-        this.isSavingPassword = false;
-        const errorMessage = typeof err?.error === 'string' ? err.error : err?.message || 'Unable to update password';
-        console.error('Password update error:', err);
+        this.cdr.markForCheck();
         
-        if (err.status === 401 || /incorrect/i.test(errorMessage)) {
+        // Auto-hide success message after 4 seconds
+        setTimeout(() => {
+          this.passwordInfoAppear = false;
+          this.cdr.markForCheck();
+        }, 4000);
+      },
+      error: (err: any) => {
+        console.error('Password update error:', err);
+        this.isSavingPassword = false;
+        this.cdr.markForCheck();
+        
+        const errorMessage = err?.error || err?.message || 'Unable to update password';
+        console.error('Error message:', errorMessage);
+        
+        if (err.status === 401 || /incorrect|invalid/i.test(errorMessage)) {
           this.passwordInfoBox('incorrect');
+        } else if (err.status === 400 || /already used|recently used/i.test(errorMessage)) {
+          this.passwordInfoBox('serverError', errorMessage);
         } else if (err.status === 0) {
           this.passwordInfoBox('networkError');
         } else {
-          this.passwordInfoBox('serverError');
+          this.passwordInfoBox('serverError', errorMessage);
         }
+        this.cdr.markForCheck();
       }
     });
   }
@@ -197,11 +224,8 @@ export class ProfileComponent implements OnInit{
 
   // Convert PAN to uppercase
   formatPAN() {
-    if (this.userProfile().pan) {
-      this.userProfile.update(profile => ({
-        ...profile,
-        pan: profile.pan.toUpperCase().replace(/[^A-Z0-9]/g, '')
-      }));
+    if (this.userProfile.pan) {
+      this.userProfile.pan = this.userProfile.pan.toUpperCase().replace(/[^A-Z0-9]/g, '');
     }
   }
 
@@ -225,7 +249,7 @@ export class ProfileComponent implements OnInit{
   passwordInfoAppear = false
   infoMessage: string = ""
   boxColor = ""
-  passwordInfoBox(message: string){
+  passwordInfoBox(message: string, customMessage?: string){
     this.boxColor="#f85149"
     if (message === "minimumError"){
       this.passwordInfoAppear = true
@@ -249,7 +273,7 @@ export class ProfileComponent implements OnInit{
     }
     else if (message === "serverError"){
       this.passwordInfoAppear = true
-      this.infoMessage = "Unable to update password right now. Please try again later."
+      this.infoMessage = customMessage || "Unable to update password right now. Please try again later."
     }
     else if (message === "networkError"){
       this.passwordInfoAppear = true
@@ -258,7 +282,7 @@ export class ProfileComponent implements OnInit{
     else if (message === "successful"){
       this.passwordInfoAppear = true;
       this.boxColor ="#3fb950"
-      this.infoMessage = "Password changed successfully"
+      this.infoMessage = customMessage || "Password changed successfully"
       // Auto-hide success message after 3 seconds
       setTimeout(() => {
         this.passwordInfoAppear = false;

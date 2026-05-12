@@ -1,60 +1,78 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, AsyncPipe } from '@angular/common';
 import { Store } from '@ngrx/store';
-import { Subject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
+import { Observable, of, Subject, BehaviorSubject, combineLatest } from 'rxjs';
+import { filter, takeUntil, map, switchMap, tap } from 'rxjs/operators';
 import { AppNotification, NotificationService } from '../core/services/notification';
 import { selectUser } from '../stores/authStore/auth.features';
 
 @Component({
   selector: 'app-notifications',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AsyncPipe],
   templateUrl: './notifications.html'
 })
 export class NotificationsComponent implements OnInit, OnDestroy {
   private store = inject(Store);
   private notificationService = inject(NotificationService);
   private destroy$ = new Subject<void>();
-
-  notifications: AppNotification[] = [];
+  
+  // Local list to allow for "Mark All as Read" logic and immediate UI updates
+  private _notifications = new BehaviorSubject<any[]>([]);
+  notifications$ = this._notifications.asObservable();
+  
   currentUserId!: number;
 
   ngOnInit() {
     this.store.select(selectUser).pipe(
       takeUntil(this.destroy$),
-      filter((user): user is any => !!user && !!user.id)
-    ).subscribe(user => {
-      this.currentUserId = user.id;
-      this.loadNotifications();
+      filter((user): user is any => !!user && !!user.id),
+      tap(user => this.currentUserId = user.id),
+      switchMap(user => this.notificationService.getNotifications(user.id))
+    ).subscribe({
+      next: (backendData) => {
+        const mapped = backendData.map(n => ({
+          id: n.id,
+          title: this.formatTitle(n.category),
+          desc: n.message,
+          time: this.formatDate(n.createdAt),
+          type: this.getIconType(n.category),
+          icon: this.getIconSymbol(n.category),
+          read: n.status === 'READ'
+        }));
+        this._notifications.next(mapped);
+      },
+      error: (err) => console.error('Error fetching notifications:', err)
     });
   }
 
-  loadNotifications() {
-    this.notificationService.getNotifications(this.currentUserId)
+  markAsRead(notif: any) {
+    if (notif.read) return;
+
+    // 1. Optimistic UI update
+    notif.read = true;
+
+    // 2. Persist to Backend
+    this.notificationService.markAsRead(notif.id, this.currentUserId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (backendData) => {
-          // MAP the backend JSON to the format your HTML expects
-          this.notifications = backendData.map(n => ({
-            id: n.id,
-            title: this.formatTitle(n.category), 
-            desc: n.message, // Map 'message' to 'desc'
-            time: this.formatDate(n.createdAt), // Map 'createdAt' to 'time'
-            type: this.getIconType(n.category),
-            icon: this.getIconSymbol(n.category),
-            read: n.status === 'READ' // Map 'status' to boolean
-          }));
-        },
-        error: (err) => console.error('Error fetching notifications:', err)
+        error: (err) => {
+          console.error('Failed to mark as read:', err);
+          notif.read = false; // Revert on failure
+        }
       });
   }
 
-  // --- Helper Methods to generate UI styling based on Backend Category ---
-  
+  markAllAsRead() {
+    const currentList = this._notifications.getValue();
+    currentList.forEach(n => {
+      if (!n.read) this.markAsRead(n);
+    });
+  }
+
+  // --- Helpers (Kept exactly as provided) ---
   formatTitle(category: string): string {
     if (!category) return 'System Alert';
-    // Turns "FILING" into "Filing Update"
     return category.charAt(0).toUpperCase() + category.slice(1).toLowerCase() + ' Update';
   }
 
@@ -80,29 +98,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     if (!dateString) return 'Just now';
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-
-  // -----------------------------------------------------------------------
-
-  markAsRead(notif: AppNotification) {
-    if (notif.read) return;
-
-    notif.read = true; // Instantly update UI
-
-    this.notificationService.markAsRead(notif.id, this.currentUserId)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => console.log('Successfully marked as read'),
-        error: (err) => {
-          console.error('Failed to mark as read:', err);
-          notif.read = false; // Revert if API fails
-        }
-      });
-  }
-
-  markAllAsRead() {
-    const unreadNotifs = this.notifications.filter(n => !n.read);
-    unreadNotifs.forEach(notif => this.markAsRead(notif));
   }
 
   ngOnDestroy() {

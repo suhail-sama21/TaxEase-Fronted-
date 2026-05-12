@@ -1,8 +1,9 @@
-import { Component, OnInit, inject, NgZone } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ComplianceService } from '../services/compliance.service';
 import { ComplianceResponse, UpdateComplianceRequest } from '../models/compliance.model';
+import { Observable, BehaviorSubject, map, catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-compliance-record',
@@ -11,29 +12,33 @@ import { ComplianceResponse, UpdateComplianceRequest } from '../models/complianc
   templateUrl: './compliance-record.html',
 })
 export class ComplianceRecordComponent implements OnInit {
-  // 1. Inject NgZone instead of ChangeDetectorRef
-  private ngZone = inject(NgZone); 
+  private complianceService = inject(ComplianceService);
 
-  records: ComplianceResponse[] = [];
+  // 1. BehaviorSubject acts as the "source of truth" for your data
+  private recordsSubject = new BehaviorSubject<ComplianceResponse[]>([]);
+  
+  // 2. The HTML will subscribe to this via | async
+  records$: Observable<ComplianceResponse[]> = this.recordsSubject.asObservable();
+
   selectedRecord: ComplianceResponse | null = null;
   updateData: UpdateComplianceRequest = { result: '', notes: '' };
-  
   isLoading = false;
-  errorMessage: string | null = null;   
-  successMessage: string | null = null; 
-
-  constructor(private complianceService: ComplianceService) {}
+  errorMessage = '';
+  successMessage = '';
 
   ngOnInit() {
     this.loadRecords();
   }
 
   loadRecords() {
-    this.complianceService.getAllCompliance().subscribe({
-      next: (data) => {
-        this.records = data;
-      },
-      error: (err) => console.error('Failed to load records:', err),
+    this.complianceService.getAllCompliance().pipe(
+      catchError(err => {
+        console.error('Failed to load records:', err);
+        this.errorMessage = 'Failed to load compliance records from the server.';
+        return of([]); // Return empty array on error
+      })
+    ).subscribe(data => {
+      this.recordsSubject.next(data); // Push data into the stream
     });
   }
 
@@ -46,10 +51,8 @@ export class ComplianceRecordComponent implements OnInit {
   selectForUpdate(record: ComplianceResponse) {
     this.selectedRecord = record;
     this.updateData = { result: record.result, notes: record.notes || '' };
-    
-    // Reset messages when opening a new record
-    this.errorMessage = null; 
-    this.successMessage = null;
+    this.errorMessage = '';
+    this.successMessage = '';
 
     setTimeout(() => {
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -58,42 +61,37 @@ export class ComplianceRecordComponent implements OnInit {
 
   cancelUpdate() {
     this.selectedRecord = null;
-    this.errorMessage = null;
-    this.successMessage = null;
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
   saveUpdate() {
     if (this.selectedRecord && this.updateData.result) {
       this.isLoading = true;
-      this.errorMessage = null;
-      this.successMessage = null;
+      this.successMessage = '';
+      this.errorMessage = '';
 
       this.complianceService.updateCompliance(this.selectedRecord.id, this.updateData).subscribe({
         next: (updatedRecord) => {
-          // 2. Wrap the success update inside NgZone
-          this.ngZone.run(() => {
-            const index = this.records.findIndex((r) => r.id === updatedRecord.id);
-            if (index !== -1) {
-              this.records[index] = updatedRecord;
-            }
+          // --- FIXED INDEX LOGIC FOR OBSERVABLES ---
+          const currentRecords = this.recordsSubject.value; // Get the current array
+          const updatedList = currentRecords.map(r => 
+            r.id === updatedRecord.id ? updatedRecord : r
+          );
+          
+          this.recordsSubject.next(updatedList); // Update the stream (HTML refreshes automatically)
+          
+          this.isLoading = false;
+          this.successMessage = `Successfully updated Record ID: CMP-${updatedRecord.id}`;
 
-            this.isLoading = false;
-            this.successMessage = `Successfully updated status for Record ID: ${updatedRecord.id}`;
-            
-            // Auto-close the form after 2 seconds
-            setTimeout(() => {
-              this.ngZone.run(() => {
-                 this.cancelUpdate();
-              });
-            }, 2000);
-          });
+          setTimeout(() => {
+            this.cancelUpdate();
+          }, 2500);
         },
-        error: (err: Error) => {
-          // 3. Wrap the error update inside NgZone to force instant UI refresh
-          this.ngZone.run(() => {
-            this.isLoading = false;
-            this.errorMessage = err.message || 'Failed to update record.'; 
-          });
+        error: (err: any) => {
+          console.error('Failed to update record:', err);
+          this.isLoading = false;
+          this.errorMessage = err.message || 'Error updating record. Please try again.';
         },
       });
     }
