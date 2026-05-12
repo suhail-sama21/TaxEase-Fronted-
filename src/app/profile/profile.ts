@@ -112,12 +112,12 @@ export class ProfileComponent implements OnInit{
         this.isConfirmModalOpen = false;
         this.userData = response.user;
         this.assignData();
-        alert('Profile updated successfully!');
+        //alert('Profile updated successfully!');
       },
       error: (err) => {
         this.isSaving = false;
         console.error('Profile update error:', err);
-        alert('Failed to update profile. Please try again.');
+        //alert('Failed to update profile. Please try again.');
       }
     });
   }
@@ -127,7 +127,7 @@ export class ProfileComponent implements OnInit{
     // Simulate API call to Update Profile
     setTimeout(() => {
       this.isSaving = false;
-      alert('Profile updated successfully!');
+      //alert('Profile updated successfully!');
     }, 1000);
   }
 

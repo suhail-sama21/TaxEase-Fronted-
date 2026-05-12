@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { authFeature, selectError, selectIsLoading } from '../stores/authStore/auth.features';
 
 import * as AuthActions from '../stores/authStore/auth.action';
-import { catchError, tap } from 'rxjs';
+
 
 @Component({
   selector: 'app-login',
@@ -53,7 +53,7 @@ export class LoginComponent {
 
     this.loginForm.patchValue({
       email: emails[role],
-      password: 'Password123' // Assuming this is the default password for all test accounts
+      password: 'password123' // Assuming this is the default password for all test accounts
     });
 
     // Trigger the submission with the patched values
