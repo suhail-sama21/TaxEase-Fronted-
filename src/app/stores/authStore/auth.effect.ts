@@ -130,7 +130,7 @@ export class AuthEffects {
           }
           
           
-          this.router.navigate(['/portal']);
+          this.router.navigate(['/portal/profile']);
         }),
       ),
     { dispatch: false },
