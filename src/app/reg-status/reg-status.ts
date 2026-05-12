@@ -3,8 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaxpayerService } from '../service/taxpayer-service';
 import { OnInit } from '@angular/core';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { taxpayerDocument } from '../dto/taxpayer-profile';
 import { Observable, map } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { selectUser } from '../stores/authStore/auth.features';
 
 interface DocumentRow {
   type: string;
@@ -19,7 +22,7 @@ interface DocumentRow {
 @Component({
   selector: 'app-reg-status',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './reg-status.html'
 })
 export class RegStatusComponent implements OnInit {
@@ -29,15 +32,40 @@ export class RegStatusComponent implements OnInit {
   documentInputUrl = '';
   isUploadModalOpen = false;
   isVerifyModalOpen = false;
+  isSubmitting = false; // Prevent double submission
   verificationTarget?: DocumentRow;
   private previousProgress = 0;
   progressChanged = false;
+  selectedTaxpayerId?: number;
+  taxpayerIdLabel = 'My Registration';
+  currentUserRole = '';
 
   ngOnInit(): void {
-    this.fetchDocuments();
+    this.route.paramMap.subscribe(params => {
+      const taxpayerId = params.get('taxpayerId');
+      this.selectedTaxpayerId = taxpayerId ? Number(taxpayerId) : undefined;
+      this.taxpayerIdLabel = this.selectedTaxpayerId ? `Taxpayer #${this.selectedTaxpayerId}` : 'My Registration';
+      this.fetchDocuments(this.selectedTaxpayerId);
+    });
+
+    // Get current user role
+    this.store.select(selectUser).subscribe(user => {
+      if (user) {
+        this.currentUserRole = user.role || '';
+      }
+    });
   }
 
-  constructor(private service: TaxpayerService) {}
+  constructor(private service: TaxpayerService, private route: ActivatedRoute, private store: Store) {}
+
+  // Role-based column visibility
+  get showVerifyColumn(): boolean {
+    return this.currentUserRole !== 'TAXPAYER';
+  }
+
+  get showUploadColumn(): boolean {
+    return this.currentUserRole !== 'OFFICER';
+  }
 
   taxpayerId = 'TXP-2026-00142';
   regDate = 'March 1, 2026';
@@ -113,12 +141,12 @@ export class RegStatusComponent implements OnInit {
   }
 
   refreshStatus() {
-    this.fetchDocuments();
+    this.fetchDocuments(this.selectedTaxpayerId);
   }
 
-  fetchDocuments() {
+  fetchDocuments(taxpayerId?: number) {
   // We assign the Observable itself to the variable
-    this.requiredDocs$ = this.service.getDocuments().pipe(
+    this.requiredDocs$ = this.service.getDocuments(taxpayerId).pipe(
       map(data => {
         console.log('Documents fetched successfully:', data);
         this.taxpayerDocuments = data;
@@ -146,26 +174,58 @@ export class RegStatusComponent implements OnInit {
     this.isUploadModalOpen = false;
     this.activeDoc = undefined;
     this.documentInputUrl = '';
+    this.isSubmitting = false; // Reset submission flag
+  }
+
+  openDocument(fileUri: string) {
+    if (fileUri) {
+      // Only open if it's a valid external URL (starts with http:// or https://)
+      if (fileUri.startsWith('http://') || fileUri.startsWith('https://')) {
+        window.open(fileUri, '_blank');
+      } else {
+        console.warn('Invalid or local file URI. Expected a full URL (Google Drive link, etc.):', fileUri);
+      }
+    }
   }
 
   submitDocument() {
-    if (!this.activeDoc) {
+    console.log('submitDocument called, isSubmitting:', this.isSubmitting);
+    
+    if (!this.activeDoc || this.isSubmitting) {
+      console.log('Early return - no activeDoc or already submitting');
       return;
     }
 
     const payloadDocType = this.activeDoc.backendDocType;
     const fileUri = this.documentInputUrl.trim();
     if (!fileUri) {
+      console.log('Early return - no fileUri');
       return;
     }
+
+    this.isSubmitting = true;
+    console.log('Starting document submission...');
 
     const request$ = this.activeDoc.id
       ? this.service.updateDocument(this.activeDoc.id, payloadDocType, fileUri)
       : this.service.uploadDocument(payloadDocType, fileUri);
 
-    request$.subscribe(() => {
-      this.closeUploadModal();
-      this.fetchDocuments();
+    request$.subscribe({
+      next: (response) => {
+        console.log('Document submission successful, response:', response);
+        this.isSubmitting = false;
+        console.log('isSubmitting set to false');
+        this.fetchDocuments();
+      },
+      error: (err) => {
+        console.error('Document submission failed:', err);
+        this.isSubmitting = false;
+        console.log('isSubmitting set to false due to error');
+        // Modal is already closed, but we could show an error message here
+      },
+      complete: () => {
+        console.log('Document submission observable completed');
+      }
     });
   }
 
@@ -191,16 +251,11 @@ export class RegStatusComponent implements OnInit {
       return;
     }
 
-    // 2. Now it's safe to close/clear the modal state
-    this.closeVerifyModal();
-
-    // 3. Use the local variable for the service call
+    // 2. Modal is already closed by the button click, so we just make the API call
     this.service.verifyDocument(targetId, status).subscribe({
-      next: () => this.fetchDocuments(),
+      next: () => this.fetchDocuments(this.selectedTaxpayerId),
       error: (err) => console.error("Verification failed", err)
-    })
-    
-     // Ensure we refresh the document list after verification
+    });
   }
 
   private transformDocuments(documents: taxpayerDocument[]): DocumentRow[] {

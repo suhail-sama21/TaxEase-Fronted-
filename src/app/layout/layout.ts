@@ -65,8 +65,9 @@ export class LayoutComponent {
   navItems = [
     { label: 'Dashboard', route: '/portal/dashboard', icon: 'dashboard-icon', Role: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] },
     { label: 'Profile', route: '/portal/profile', icon: 'profile-icon', Role: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] },
-    { label: 'Reg. Status', route: '/portal/status', icon: 'status-icon', Role: ["TAXPAYER","OFFICER"] },
+    { label: 'Reg. Status', route: '/portal/status', icon: 'status-icon', Role: ["TAXPAYER"] },
     { label: 'Documents', route: '/portal/documents', icon: 'docs-icon', Role: ["TAXPAYER", "OFFICER"] },
+    { label: 'Documents verification', route: '/portal/documents-verification', icon: 'shield-icon', Role: ["OFFICER"] },
     { label: 'My Filings', route: '/portal/filings', icon: 'filings-icon', badge: 3, Role: ["TAXPAYER","OFFICER"] },
     { label: 'File Taxes', route: '/portal/file-taxes', icon: 'file-icon', Role: ["TAXPAYER"] },
     { label: 'Make Payment', route: '/portal/payment', icon: 'pay-icon', Role: ["TAXPAYER"] },
@@ -91,7 +92,7 @@ export class LayoutComponent {
     })
   );
 
-  toggleTheme() { this.isDarkMode = !this.isDarkMode; }
+  
 
   openLogoutModal() { this.showLogoutModal = true; }
 

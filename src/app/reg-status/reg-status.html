@@ -22,7 +22,7 @@
          [style.borderColor]="statusBadge.color">
       {{ statusBadge.text }}
     </div>
-    <div class="text-4xl font-extrabold text-(--theme-text) mb-1 tracking-tight transition-colors duration-300">{{ taxpayerId }}</div>
+    <div class="text-4xl font-extrabold text-(--theme-text) mb-1 tracking-tight transition-colors duration-300">{{ taxpayerIdLabel }}</div>
     <div class="text-sm font-medium text-(--theme-muted) mb-8 transition-colors duration-300">Temporary Taxpayer ID</div>
     
     <div class="flex justify-center gap-16 border-t border-(--theme-border) pt-6 transition-colors duration-300">
@@ -88,13 +88,23 @@
               <th class="px-6 py-3 whitespace-nowrap">Document Type</th>
               <th class="px-6 py-3 whitespace-nowrap">Upload Date</th>
               <th class="px-6 py-3 whitespace-nowrap">Status</th>
-              <th class="px-6 py-3 whitespace-nowrap">Verify</th>
-              <th class="px-6 py-3 whitespace-nowrap">Upload / Update</th>
+              <th *ngIf="showVerifyColumn" class="px-6 py-3 whitespace-nowrap">Verify</th>
+              <th *ngIf="showUploadColumn" class="px-6 py-3 whitespace-nowrap">Upload / Update</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-(--theme-border)">
             <tr *ngFor="let doc of requiredDocs$ | async; let i = index" class="hover:bg-(--theme-surface) transition-colors duration-300">
-              <td class="px-6 py-4 font-semibold text-(--theme-text) transition-colors duration-300 whitespace-nowrap">{{ doc.type }}</td>
+              <td class="px-6 py-4 font-semibold text-(--theme-text) transition-colors duration-300 whitespace-nowrap">
+                <span 
+                  *ngIf="doc.fileUri" 
+                  (click)="openDocument(doc.fileUri)" 
+                  class="cursor-pointer hover:text-[#1f6feb] underline decoration-dotted underline-offset-2 transition-colors duration-200">
+                  {{ doc.type }}
+                </span>
+                <span *ngIf="!doc.fileUri" class="text-(--theme-muted)">
+                  {{ doc.type }}
+                </span>
+              </td>
               <td class="px-6 py-4 text-(--theme-muted) font-medium transition-colors duration-300 whitespace-nowrap">{{ doc.date }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border transition-colors duration-300"
@@ -106,7 +116,7 @@
                   {{ doc.status }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td *ngIf="showVerifyColumn" class="px-6 py-4 whitespace-nowrap">
                 <button
                   (click)="openVerifyModal(doc)"
                   [disabled]="!doc.fileUri || doc.statusColor === 'green'"
@@ -114,7 +124,7 @@
                   Verify
                 </button>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td *ngIf="showUploadColumn" class="px-6 py-4 whitespace-nowrap">
                 <button
                   (click)="openUploadModal(doc)"
                   class="rounded-lg px-3 py-2 text-xs font-semibold transition-colors duration-300 border border-(--theme-border) bg-(--theme-surface) hover:border-[#1f6feb] hover:text-[#1f6feb]">
@@ -142,7 +152,9 @@
           </div>
           <div class="mt-6 flex justify-end gap-3">
             <button (click)="closeUploadModal()" class="rounded-xl border border-(--theme-border) px-4 py-2 text-sm font-semibold text-(--theme-text) bg-(--theme-surface)">Cancel</button>
-            <button (click)="submitDocument()" class="rounded-xl bg-[#1f6feb] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1054d1]">Submit</button>
+            <button (click)="submitDocument(); closeUploadModal()" [disabled]="isSubmitting" class="rounded-xl bg-[#1f6feb] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1054d1] disabled:opacity-50 disabled:cursor-not-allowed">
+              {{ isSubmitting ? 'Submitting...' : 'Submit' }}
+            </button>
           </div>
         </div>
       </div>
@@ -155,8 +167,8 @@
           </div>
           <p class="text-sm text-(--theme-muted) mb-4">Choose action for {{ verificationTarget?.type }}</p>
           <div class="grid gap-2">
-            <button (click)="verifyDocument('Accepted')" class="rounded-lg bg-[#3fb950] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#34a83b] transition-colors duration-200">✓ Accept</button>
-            <button (click)="verifyDocument('Rejected')" class="rounded-lg bg-[#f85149] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#d63d3d] transition-colors duration-200">✗ Reject</button>
+            <button (click)="verifyDocument('Accepted'); closeVerifyModal()" class="rounded-lg bg-[#3fb950] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#34a83b] transition-colors duration-200">✓ Accept</button>
+            <button (click)="verifyDocument('Rejected'); closeVerifyModal()" class="rounded-lg bg-[#f85149] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#d63d3d] transition-colors duration-200">✗ Reject</button>
             <button (click)="closeVerifyModal()" class="rounded-lg border border-(--theme-border) px-4 py-2.5 text-sm font-semibold text-(--theme-text) bg-(--theme-surface) hover:bg-(--theme-bg) transition-colors duration-200">Cancel</button>
           </div>
         </div>

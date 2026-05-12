@@ -22,3 +22,10 @@ export interface taxpayerDocument{
   uploadedDate: string,
   verificationStatus: string
 }
+
+export interface PendingTaxpayerSummary {
+  userId: number;
+  name: string;
+  panNumber: string;
+  verificationStatus: string;
+}

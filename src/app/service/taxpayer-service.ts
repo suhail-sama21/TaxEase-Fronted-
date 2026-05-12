@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, switchMap, map, catchError } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { Jwt } from './jwt';
 import { UserService } from './user-service';
-import { taxpayerDocument, User , TaxpayerProfile} from '../dto/taxpayer-profile';
+import { taxpayerDocument, User, TaxpayerProfile, PendingTaxpayerSummary } from '../dto/taxpayer-profile';
 import { environment } from '../environment/environment';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
@@ -54,7 +55,11 @@ export class TaxpayerService {
     return this.userService.updatePassword(id, passwordData);
   }
 
-  getDocuments(): Observable<taxpayerDocument[]> {
+  getDocuments(taxpayerId?: number): Observable<taxpayerDocument[]> {
+    if (taxpayerId) {
+      return this.http.get<taxpayerDocument[]>(`${environment.apiUrl}/taxpayers/user/${taxpayerId}/documents`);
+    }
+
     return this.store.select(selectUser).pipe(
       switchMap(user => {
         if (user) {
@@ -67,9 +72,14 @@ export class TaxpayerService {
     );
   }
 
+  getPendingTaxpayerDocuments(): Observable<PendingTaxpayerSummary[]> {
+    return this.http.get<PendingTaxpayerSummary[]>(`${environment.apiUrl}/taxpayers/pending-documents`);
+  }
+
   uploadDocument(docType: string, fileUri: string): Observable<any> {
     return this.store.select(selectUser).pipe(
-      switchMap(user => {
+      take(1),
+      switchMap((user: any) => {
         if (user) {
           return this.http.post(`${environment.apiUrl}/taxpayers/user/${user.id}/documents/upload`, {
             docType,
@@ -83,7 +93,8 @@ export class TaxpayerService {
 
   updateDocument(documentId: number, docType: string, fileUri: string): Observable<any> {
     return this.store.select(selectUser).pipe(
-      switchMap(user => {
+      take(1),
+      switchMap((user: any) => {
         if (user) {
           return this.http.put(`${environment.apiUrl}/taxpayers/user/${user.id}/documents/${documentId}`, {
             docType,
