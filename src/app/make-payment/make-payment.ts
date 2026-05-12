@@ -127,7 +127,7 @@ export class MakePaymentComponent implements OnInit {
             this.paymentSuccess = true;
             this.generatedPaymentId = 'PAY-' + response.id;
 
-            // Dynamically remove the paid file from the UI
+            // Dynamically remove the paid file from the UI hello
             this.filings = this.filings.filter(f => f.id != this.selectedFilingId);
 
             if (this.filings.length > 0) {
