@@ -58,7 +58,7 @@ export class NotificationService {
   }
 
   sendBroadcastNotification(payload: SendNotificationRequest) {
-    // Add { responseType: 'text' } here
-    return this.http.post(`${this.apiUrl}`, payload, { responseType: 'text' });
+    // FIX: Added /broadcast to the URL!
+    return this.http.post(`${this.apiUrl}/broadcast`, payload, { responseType: 'text' });
   }
 }

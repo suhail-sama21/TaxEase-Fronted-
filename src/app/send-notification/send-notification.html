@@ -23,15 +23,16 @@
             [ngClass]="notificationType === 'DIRECT' ? 'bg-[#1f6feb] text-white shadow-sm' : 'text-[var(--theme-muted)] hover:text-[var(--theme-text)]'">
             👤 Direct User
           </button>
+          
           @if(role=='ADMINISTRATOR'){
-          <button 
-            type="button"
-            (click)="setNotificationType('BROADCAST')"
-            class="px-6 py-2 text-[13px] font-medium rounded-md transition-all duration-200 flex items-center gap-2"
-            [ngClass]="notificationType === 'BROADCAST' ? 'bg-[#1f6feb] text-white shadow-sm' : 'text-[var(--theme-muted)] hover:text-[var(--theme-text)]'">
-            📢 Broadcast All
-          </button>
-        }
+            <button 
+              type="button"
+              (click)="setNotificationType('BROADCAST')"
+              class="px-6 py-2 text-[13px] font-medium rounded-md transition-all duration-200 flex items-center gap-2"
+              [ngClass]="notificationType === 'BROADCAST' ? 'bg-[#1f6feb] text-white shadow-sm' : 'text-[var(--theme-muted)] hover:text-[var(--theme-text)]'">
+              📢 Broadcast All
+            </button>
+          }
         </div>
       </div>
 
@@ -77,17 +78,16 @@
         </div>
       </div>
 
-      <div class="flex items-center justify-between pt-6 border-t border-[var(--theme-border)] transition-colors duration-300">
+      <div class="pt-6 border-t border-[var(--theme-border)] transition-colors duration-300">
         
-        <div>
-          <span *ngIf="statusInfo" 
-                class="text-[13px] font-medium animate-fade-in"
-                [ngClass]="statusInfo.type === 'success' ? 'text-[#3fb950]' : 'text-[#f85149]'">
+        <div *ngIf="statusInfo" class="mb-5">
+          <div class="p-3 rounded-lg border text-[13px] font-medium animate-fade-in flex items-center gap-2"
+               [ngClass]="statusInfo.type === 'success' ? 'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/20' : 'bg-[#f85149]/10 text-[#f85149] border-[#f85149]/20'">
             {{ statusInfo.message }}
-          </span>
+          </div>
         </div>
 
-        <div class="flex gap-3">
+        <div class="flex items-center justify-end gap-3">
           <button
             type="button"
             (click)="cancel()"

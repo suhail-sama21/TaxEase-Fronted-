@@ -31,9 +31,19 @@ export const routes: Routes = [
         data: { roles: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] }
       },
       { 
+        path: 'status/:taxpayerId', 
+        loadComponent: () => import('./reg-status/reg-status').then(m => m.RegStatusComponent) ,
+        data: { roles: ["TAXPAYER", "OFFICER"] }
+      },
+      { 
         path: 'status', 
         loadComponent: () => import('./reg-status/reg-status').then(m => m.RegStatusComponent) ,
         data: { roles: ["TAXPAYER", "OFFICER"] }
+      },
+      { 
+        path: 'documents-verification', 
+        loadComponent: () => import('./documents-verification/documents-verification').then(m => m.DocumentsVerificationComponent) ,
+        data: { roles: ["OFFICER"] }
       },
       { 
         path: 'filings', 
