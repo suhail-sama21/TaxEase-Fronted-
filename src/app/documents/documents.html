@@ -80,9 +80,8 @@
         </div>
       </div>
     </div>
-
     <!-- Search Records Section -->
-    <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-2xl p-8 shadow-sm">
+    <div  *ngIf="userRole=='OFFICER'" class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-2xl p-8 shadow-sm">
       <h2 class="text-xl font-bold text-[var(--theme-text)] mb-6">Search Records</h2>
 
       <div class="flex gap-2 mb-8">
@@ -97,7 +96,6 @@
           {{ isFetching ? 'Fetching...' : 'Fetch' }}
         </button>
       </div>
-
       <!-- Error/Status Messages -->
       <div *ngIf="fetchMessage && !isFetching"
            [ngClass]="{'bg-red-500/10 border border-red-500/30': fetchMessage.includes('Failed') || fetchMessage.includes('Error'), 'bg-blue-500/10 border border-blue-500/30': fetchMessage.includes('No documents')}"

@@ -12,24 +12,25 @@ export const authGuard: CanActivateFn = (route, state) => {
   return store.select(selectAuthState).pipe(
     take(1),
     map((authState) => {
-      // 1. If we have a token in storage, allow entry (survives refresh)
-      if (token) return true;
 
       // 2. If no token and not authenticated, force login
-      if (!authState.isAuthenticated) {
+      if (!token || !authState.isAuthenticated) {
         return router.parseUrl('/login');
       }
+      const data = route.data?.['roles'] ? route : route.firstChild;
+      const allowedRoles = data?.data?.['roles'] as string[];
 
-      // 3. Role-Based Check (if user object has arrived)
+      console.log('AuthGuard - Target Allowed Roles:', allowedRoles);
+
       if (authState.user) {
-        const allowedRoles = route.data?.['roles'] as string[];
         const userRole = authState.user.role?.toUpperCase();
+        
         if (allowedRoles && !allowedRoles.includes(userRole)) {
+          console.warn(`Access Denied: Role ${userRole} not in ${allowedRoles}`);
           return router.parseUrl('/login');
         }
       }
-
-      return true;
+      return true;// User is authenticated but profile is still loading, allow access for now
     })
   );
 };

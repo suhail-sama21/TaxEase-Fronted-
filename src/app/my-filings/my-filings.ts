@@ -28,6 +28,7 @@ export class MyFilingsComponent implements OnInit {
   isLoading = false;
   isUpdating = false;
   errorMessage = '';
+  userRole = 'USER';
 
   constructor(
     private taxFilingService: TaxFilingService,
@@ -40,6 +41,7 @@ export class MyFilingsComponent implements OnInit {
       if(user){
         //assigning taxpayer id
          this.taxpayerId = user.id;
+         this.userRole= user.role;
       }
     })
   }

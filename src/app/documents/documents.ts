@@ -2,6 +2,8 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DocumentService } from '../service/document.service';
+import { Store } from '@ngrx/store';
+import { selectUser } from '../stores/authStore/auth.features';
 
 @Component({
   selector: 'app-documents',
@@ -18,6 +20,8 @@ export class DocumentsComponent {
   isUploaded = false;
   uploadMessage = '';
   showErrors = false;
+  userId= 0;
+  userRole= 'USER';
 
   // Fetch States
   fetchFilingId: number | null = null;
@@ -27,8 +31,21 @@ export class DocumentsComponent {
 
   constructor(
     private documentService: DocumentService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private store: Store
   ) {}
+
+  ngOnInit() {
+    this.store.select(selectUser).subscribe(user => {
+        if (user) {
+          this.userId = user.id;
+          console.log('User Data from Store:', this.userId);
+          this.userRole = user.role;
+          console.log('User Role from Store:', this.userRole);
+        }
+      });
+  }
+  
 
   // Validate Document URL
   validateDocumentUrl() {
