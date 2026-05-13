@@ -23,9 +23,11 @@ export class ProfileComponent implements OnInit{
   isEditMode = false;
   isConfirmModalOpen = false;
   isSecurityExpanded = false;
+
+  //this object will hold the edit profile data, this will be send to the backend
   editChanges: any = {};
 
-  // Mock User Data
+  // Mock User Data, and actual data will replace this moc data 
   userProfile: any = {
     fullName: 'John Doe',
     email: 'auditmazhai@example.com',
@@ -46,6 +48,7 @@ export class ProfileComponent implements OnInit{
   showNewPassword = false;
   showConfirmPassword = false;
 
+  //this is where i am storing user data from store 
   userData: any;
   constructor(private taxpayerService: TaxpayerService, private store: Store, private cdr: ChangeDetectorRef){}
 
@@ -57,11 +60,12 @@ export class ProfileComponent implements OnInit{
         console.log('User Data from Store:', this.userData);
       }
       else{
-        console.log("No user data found in sore")
+        console.log("No user data found in store")
       }
     });
   }
 
+  //this method is used for assigning user data from the service to userprofile object.
   assignData() {
     this.userProfile = {
       fullName: this.userData.name,

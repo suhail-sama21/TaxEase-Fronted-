@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MetricCardComponent } from '../components/metric-card/metric-card';
+import { MyFilingsComponent } from '../my-filings/my-filings';
 
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, MetricCardComponent],
+  imports: [CommonModule, MetricCardComponent, MyFilingsComponent],
   templateUrl: './dashboard.html'
 })
 export class DashboardComponent {
