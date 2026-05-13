@@ -12,11 +12,9 @@ export const authGuard: CanActivateFn = (route, state) => {
   return store.select(selectAuthState).pipe(
     take(1),
     map((authState) => {
-      // 1. If we have a token in storage, allow entry (survives refresh)
-      if (token) return true;
 
       // 2. If no token and not authenticated, force login
-      if (!authState.isAuthenticated) {
+      if (!token &&!authState.isAuthenticated) {
         return router.parseUrl('/login');
       }
 
