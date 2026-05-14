@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
-import { RouterModule, Router, NavigationEnd } from '@angular/router'; // Added Router & NavigationEnd
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
 import { map, switchMap, Observable, of, startWith, filter, combineLatest } from 'rxjs';
@@ -16,30 +16,24 @@ import { NotificationService } from '../core/services/notification';
 export class LayoutComponent {
   private store = inject(Store);
   private notificationService = inject(NotificationService);
-  private router = inject(Router); // Inject Router
+  private router = inject(Router);
 
-  constructor() {
-    // Trigger the count updates on navigation
-    this.triggerCountUpdate$.subscribe();
-  }
-
-  // 1. Core User Streams
-  // Modal State
+  // 1. UI State
   showLogoutModal = false;
+  isDarkMode = true;
 
-  // Reactive User Data
+  // 2. Core User Streams
   user$ = this.store.select(selectUser);
   userId$ = this.user$.pipe(map(u => u?.id));
 
-  // 2. Navigation Trigger Stream
-  // Emits every time a route change successfully finishes
+  // 3. Navigation Trigger Stream
   private navigationEnd$ = this.router.events.pipe(
     filter(event => event instanceof NavigationEnd),
-    startWith(null) // Emit immediately so the count loads on first page hit
+    startWith(null) 
   );
 
-  // 3. Notification Stream (Reactive & Refreshes on Navigation)
-  // Trigger fetch on navigation
+  // 4. Notification Logic
+  // Triggers the service to fetch new data whenever the Route or User ID changes
   private triggerCountUpdate$ = combineLatest([
     this.userId$,
     this.navigationEnd$
@@ -49,40 +43,38 @@ export class LayoutComponent {
     })
   );
 
-  notificationCount$ = this.notificationService.notificationCount$.pipe(startWith(0));
+  // The stream the HTML actually listens to
+  notificationCount$: Observable<number> = this.notificationService.notificationCount$.pipe(startWith(0));
 
-  // 4. Derived UI Streams
+  // 5. Derived UI Streams
   userName$: Observable<string> = this.user$.pipe(map(u => u?.name || 'Guest User'));
   userRole$: Observable<string> = this.user$.pipe(map(u => u?.role || 'TAXPAYER'));
-
   userInitials$: Observable<string> = this.userName$.pipe(
     map(name => name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2))
   );
 
-  isDarkMode = true;
-
-  // Navigation Items
+  // 6. Navigation Items Configuration
   navItems = [
-    { label: 'Dashboard', route: '/portal/dashboard', icon: 'dashboard-icon', Role: ["TAXPAYER"] },
-    { label: 'Profile', route: '/portal/profile', icon: 'profile-icon', Role: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] },
-    { label: 'Reg. Status', route: '/portal/status', icon: 'status-icon', Role: ["TAXPAYER"] },
-    { label: 'Documents', route: '/portal/documents', icon: 'docs-icon', Role: ["TAXPAYER", "OFFICER"] },
-    { label: 'Documents verification', route: '/portal/documents-verification', icon: 'shield-icon', Role: ["OFFICER"] },
-    { label: 'My Filings', route: '/portal/filings', icon: 'filings-icon', badge: 3, Role: ["TAXPAYER","OFFICER"] },
-    { label: 'File Taxes', route: '/portal/file-taxes', icon: 'file-icon', Role: ["TAXPAYER"] },
-    { label: 'Make Payment', route: '/portal/payment', icon: 'pay-icon', Role: ["TAXPAYER"] },
-    { label: 'Payment History', route: '/portal/history', icon: 'history-icon', Role: ["TAXPAYER", "OFFICER"] },
-    { label: 'Notifications', route: '/portal/notifications', icon: 'bell-icon', isNotification: true, Role: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] },
-    { label: 'Revenue Dashboard', route: '/portal/reports/revenue', icon: 'chart-icon', Role: ["MANAGER", "AUDITOR"] },
-    { label: 'Audit Dashboard', route: '/portal/reports/audit', icon: 'shield-icon', Role: ["AUDITOR", "ADMINISTRATOR"] },
-    { label: 'Payment Analytics', route: '/portal/reports/payments', icon: 'pay-icon', Role: ["MANAGER", "AUDITOR"] },
-    { label: 'Report Exports', route: '/portal/reports/download', icon: 'download-icon', Role: ["ADMINISTRATOR", "MANAGER"] },
-    { label: 'Compliance Hub', route: '/portal/compliance-dashboard', icon: 'shield-icon', Role: ["COMPLIANCE"] },
-    { label: 'Compliance Records', route: '/portal/compliance-records', icon: 'folder-icon', Role: ["COMPLIANCE"] },
-    { label: 'Create Record', route: '/portal/create-compliance', icon: 'plus-icon', Role: ["COMPLIANCE"] },
-    { label: 'Audit Cases', route: '/portal/audit-cases', icon: 'search-icon', Role: ["AUDITOR"] },
-    { label: 'Create Audit', route: '/portal/create-audit', icon: 'plus-circle-icon', Role: ["AUDITOR"] },
-    { label: 'Send Notification', route: '/portal/send-notification', icon: 'send-icon', Role: ["ADMINISTRATOR", "MANAGER", "COMPLIANCE","OFFICER"] }
+    { label: 'Dashboard', route: '/portal/dashboard', Role: ["TAXPAYER"] },
+    { label: 'Profile', route: '/portal/profile', Role: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] },
+    { label: 'Reg. Status', route: '/portal/status', Role: ["TAXPAYER"] },
+    { label: 'Documents', route: '/portal/documents', Role: ["TAXPAYER", "OFFICER"] },
+    { label: 'Documents verification', route: '/portal/documents-verification', Role: ["OFFICER"] },
+    { label: 'My Filings', route: '/portal/filings', badge: 3, Role: ["TAXPAYER","OFFICER"] },
+    { label: 'File Taxes', route: '/portal/file-taxes', Role: ["TAXPAYER"] },
+    { label: 'Make Payment', route: '/portal/payment', Role: ["TAXPAYER"] },
+    { label: 'Payment History', route: '/portal/history', Role: ["TAXPAYER", "OFFICER"] },
+    { label: 'Notifications', route: '/portal/notifications', isNotification: true, Role: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] },
+    { label: 'Revenue Dashboard', route: '/portal/reports/revenue', Role: ["MANAGER", "AUDITOR"] },
+    { label: 'Audit Dashboard', route: '/portal/reports/audit', Role: ["AUDITOR", "ADMINISTRATOR"] },
+    { label: 'Payment Analytics', route: '/portal/reports/payments', Role: ["MANAGER", "AUDITOR"] },
+    { label: 'Report Exports', route: '/portal/reports/download', Role: ["ADMINISTRATOR", "MANAGER"] },
+    { label: 'Compliance Hub', route: '/portal/compliance-dashboard', Role: ["COMPLIANCE"] },
+    { label: 'Compliance Records', route: '/portal/compliance-records', Role: ["COMPLIANCE"] },
+    { label: 'Create Record', route: '/portal/create-compliance', Role: ["COMPLIANCE"] },
+    { label: 'Audit Cases', route: '/portal/audit-cases', Role: ["AUDITOR"] },
+    { label: 'Create Audit', route: '/portal/create-audit', Role: ["AUDITOR"] },
+    { label: 'Send Notification', route: '/portal/send-notification', Role: ["ADMINISTRATOR", "MANAGER", "COMPLIANCE","OFFICER"] }
   ];
 
   filteredNavItems$ = this.user$.pipe(
@@ -92,18 +84,16 @@ export class LayoutComponent {
     })
   );
 
-  // toggleTheme() { this.isDarkMode = !this.isDarkMode; }
+  constructor() {
+    this.triggerCountUpdate$.subscribe();
+  }
 
-
+  // 7. Actions
+  toggleTheme() { this.isDarkMode = !this.isDarkMode; }
   openLogoutModal() { this.showLogoutModal = true; }
-
   closeLogoutModal() { this.showLogoutModal = false; }
-
   confirmLogout() {
     this.store.dispatch(logout());
     this.showLogoutModal = false;
   }
-
-  toggleTheme() { this.isDarkMode = !this.isDarkMode; }
-  logout() { if (confirm('Are you sure you want to log out?')) { this.store.dispatch(logout()); } }
 }
