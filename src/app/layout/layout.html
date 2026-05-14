@@ -18,8 +18,8 @@
           <span class="text-[13px]">{{ item.label }}</span>
 
           @if (item.isNotification) {
-            @if ((notificationCount$ | async); as count) {
-              <span *ngIf="count > 0" class="ml-auto bg-[#238636] text-[#7ee787] text-[10px] px-1.5 py-px rounded-full">
+            @if ((notificationCount$ | async); as count){
+              <span *ngIf="(count ?? 0) > 0" class="ml-auto bg-[#238636] text-[#7ee787] text-[10px] px-1.5 py-px rounded-full">
                 {{ count }}
               </span>
             }

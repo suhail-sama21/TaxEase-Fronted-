@@ -63,7 +63,7 @@ export class LayoutComponent {
 
   // Navigation Items
   navItems = [
-    { label: 'Dashboard', route: '/portal/dashboard', icon: 'dashboard-icon', Role: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] },
+    { label: 'Dashboard', route: '/portal/dashboard', icon: 'dashboard-icon', Role: ["TAXPAYER"] },
     { label: 'Profile', route: '/portal/profile', icon: 'profile-icon', Role: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] },
     { label: 'Reg. Status', route: '/portal/status', icon: 'status-icon', Role: ["TAXPAYER"] },
     { label: 'Documents', route: '/portal/documents', icon: 'docs-icon', Role: ["TAXPAYER", "OFFICER"] },
