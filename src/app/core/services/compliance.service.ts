@@ -7,7 +7,7 @@ import {
   CreateComplianceRequest,
   ComplianceResponse,
   UpdateComplianceRequest,
-} from '../models/compliance.model';
+} from '../../models/compliance.model';
 
 @Injectable({
   providedIn: 'root',

@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OnInit } from '@angular/core';
-import { TaxpayerService } from '../service/taxpayer-service';
+import { TaxpayerService } from '../core/services/taxpayer-service';
 import { User } from '../dto/taxpayer-profile';
 import { delay } from 'rxjs';
 import { Store } from '@ngrx/store';

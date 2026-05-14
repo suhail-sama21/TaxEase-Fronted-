@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { PaymentService } from '../service/payment.service'; // Check path!
+import { PaymentService } from '../core/services/payment.service'; // Check path!
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
 

@@ -8,7 +8,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import * as AuthActions from './auth.action';
 import { AuthService } from '../../core/services/auth';
-import { TaxpayerService } from '../../service/taxpayer-service';
+import { TaxpayerService } from '../../core/services/taxpayer-service';
 
 @Injectable()
 export class AuthEffects {
