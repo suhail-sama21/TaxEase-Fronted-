@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TaxpayerService } from '../service/taxpayer-service';
+import { TaxpayerService } from '../core/services/taxpayer-service';
 import { OnInit } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { taxpayerDocument } from '../dto/taxpayer-profile';

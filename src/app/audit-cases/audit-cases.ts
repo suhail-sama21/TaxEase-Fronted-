@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuditService } from '../services/audit.service';
+import { AuditService } from '../core/services/audit.service';
 import { AuditDashboardResponse, AuditResponse } from '../models/audit.model';
 import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { map, tap } from 'rxjs/operators';

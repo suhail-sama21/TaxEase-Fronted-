@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { TaxpayerService } from '../service/taxpayer-service';
+import { TaxpayerService } from '../core/services/taxpayer-service';
 import { PendingTaxpayerSummary } from '../dto/taxpayer-profile';
 
 @Component({

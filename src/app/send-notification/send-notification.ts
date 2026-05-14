@@ -1,7 +1,7 @@
 import { Component, inject, NgZone, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpErrorResponse } from '@angular/common/http'; // 1. IMPORT THIS
+import { HttpErrorResponse } from '@angular/common/http';
 import { NotificationService, SendNotificationRequest } from '../core/services/notification';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
@@ -24,7 +24,7 @@ export class SendNotificationComponent implements OnInit {
   
   isLoading = false;
   statusInfo: { message: string, type: 'success' | 'error' } | null = null;
-  categories = ['FILING', 'PAYMENT', 'AUDIT', 'BROADCAST'];
+  categories = ['FILING', 'PAYMENT', 'AUDIT', 'BROADCAST','SYSTEM_UPDATE'];
   role = 'USER';
 
   ngOnInit() {
@@ -41,24 +41,39 @@ export class SendNotificationComponent implements OnInit {
     });
   }
 
-  // 2. ADD YOUR EXTRACTION LOGIC HERE
-  private extractErrorMessage(error: any): string {
-    if (error instanceof HttpErrorResponse) {
-      const backendResponse = error.error;
-      
-      // If the backend sent a JSON object with a message
-      if (backendResponse && backendResponse.message) {
-        if (typeof backendResponse.message === 'string') return backendResponse.message;
-        if (typeof backendResponse.message === 'object') return Object.values(backendResponse.message).join(' | '); 
+  // REFACTORED: All error parsing logic is now centralized here
+  private extractErrorMessage(err: any): string {
+    let exactError = 'Failed to send notification.';
+
+    // 1. Interceptor check (Standard Error object)
+    if (err instanceof Error && err.message !== 'An unexpected error occurred. Please try again.') {
+      exactError = err.message;
+    } 
+    // 2. HTTP Backend Errors
+    else if (err instanceof HttpErrorResponse || err.error) {
+      const backendResponse = err.error;
+
+      // If backend sent a raw string
+      if (typeof backendResponse === 'string') {
+        try {
+          const parsed = JSON.parse(backendResponse);
+          exactError = parsed.message || parsed.error || exactError;
+        } catch (e) {
+          exactError = backendResponse; // Plain text fallback
+        }
+      } 
+      // Standard Angular JSON check
+      else if (backendResponse?.message) {
+        exactError = backendResponse.message;
       }
-      
-      // If the backend sent a plain string directly
-      if (typeof backendResponse === 'string') return backendResponse;
-      
-      // If the backend sent an 'error' field instead of 'message'
-      if (backendResponse && typeof backendResponse.error === 'string') return backendResponse.error;
     }
-    return error.message || 'An unexpected error occurred.';
+
+    // 3. Final Fallback overrides for specific scenarios
+    if (exactError === 'An unexpected error occurred. Please try again.' || exactError.includes('Http failure')) {
+       exactError = 'User ID not found or unavailable.';
+    }
+
+    return exactError;
   }
 
   setNotificationType(type: 'DIRECT' | 'BROADCAST') {
@@ -79,7 +94,7 @@ export class SendNotificationComponent implements OnInit {
     userIdControl?.updateValueAndValidity();
   }
 
- sendNotification() {
+  sendNotification() {
     if (this.notificationForm.invalid) return;
 
     this.isLoading = true;
@@ -121,35 +136,11 @@ export class SendNotificationComponent implements OnInit {
         this.ngZone.run(() => {
           this.isLoading = false;
           
-          let exactError = 'Failed to send notification.';
+          // REFACTORED: We now just call the helper method!
+          const parsedErrorMsg = this.extractErrorMessage(err);
 
-          // 1. Check if the error was intercepted and converted to a standard Error object
-          if (err instanceof Error && err.message !== 'An unexpected error occurred. Please try again.') {
-            exactError = err.message;
-          } 
-          // 2. Check if the backend sent a raw string (due to responseType: 'text')
-          else if (err.error && typeof err.error === 'string') {
-            try {
-              // Try to parse the raw string back into JSON
-              const parsed = JSON.parse(err.error);
-              exactError = parsed.message || parsed.error || exactError;
-            } catch (e) {
-              // If it's plain text (not JSON), just use the text
-              exactError = err.error;
-            }
-          } 
-          // 3. Fallback to standard Angular error extraction
-          else if (err.error?.message) {
-            exactError = err.error.message;
-          }
-
-          // If the generic interceptor message still slipped through, provide a better default for this specific form
-          if (exactError === 'An unexpected error occurred. Please try again.' || exactError.includes('Http failure')) {
-             exactError = 'User ID not found or unavailable.';
-          }
-
-          this.statusInfo = { message: `⚠ ${exactError}`, type: 'error' };
-          this.cdr.detectChanges(); // Force UI to update
+          this.statusInfo = { message: `⚠ ${parsedErrorMsg}`, type: 'error' };
+          this.cdr.detectChanges(); 
         });
       }
     });

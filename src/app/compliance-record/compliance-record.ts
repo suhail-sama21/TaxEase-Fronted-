@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ComplianceService } from '../services/compliance.service';
+import { ComplianceService } from '../core/services/compliance.service';
 import { ComplianceResponse, UpdateComplianceRequest } from '../models/compliance.model';
 import { Observable, BehaviorSubject, map, catchError, of } from 'rxjs';
 

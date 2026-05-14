@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
-import { ReportingService, AuditDashboardResponse, AuditDto } from '../../services/reporting.service';
+import { ReportingService, AuditDashboardResponse, AuditDto } from '../../core/services/reporting.service';
 
 @Component({
   selector: 'app-audit-dashboard',

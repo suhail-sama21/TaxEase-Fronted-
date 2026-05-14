@@ -4,10 +4,10 @@ import { Observable, of, switchMap, map, catchError } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { Jwt } from './jwt';
 import { UserService } from './user-service';
-import { taxpayerDocument, User, TaxpayerProfile, PendingTaxpayerSummary } from '../dto/taxpayer-profile';
-import { environment } from '../environment/environment';
+import { taxpayerDocument, User, TaxpayerProfile, PendingTaxpayerSummary } from '../../dto/taxpayer-profile';
+import { environment } from '../../environment/environment';
 import { Store } from '@ngrx/store';
-import { selectUser } from '../stores/authStore/auth.features';
+import { selectUser } from '../../stores/authStore/auth.features';
 
 @Injectable({
   providedIn: 'root',
