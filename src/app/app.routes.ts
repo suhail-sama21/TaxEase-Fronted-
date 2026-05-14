@@ -23,7 +23,7 @@ export const routes: Routes = [
       { 
         path: 'dashboard', 
         loadComponent: () => import('./dashboard/dashboard').then(m => m.DashboardComponent) ,
-        data: { roles: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] }
+        data: { roles: ["TAXPAYER"] }
       },
       { 
         path: 'profile', 
