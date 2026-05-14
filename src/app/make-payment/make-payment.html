@@ -5,7 +5,6 @@
   </div>
 
   <div class="grid grid-cols-[1fr_340px] gap-5">
-    <!-- Main Payment Form Card  hello -->
     <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl overflow-hidden shadow-sm transition-colors duration-300">
       <div class="px-5 py-4 border-b border-[var(--theme-border)] transition-colors duration-300">
         <h2 class="text-[15px] font-medium text-[var(--theme-text)] transition-colors duration-300">Payment Details</h2>
@@ -14,7 +13,6 @@
       <div class="p-6 flex flex-col gap-5">
         <div>
           <label class="block text-xs text-[var(--theme-muted)] mb-1.5 transition-colors duration-300">Select filing <span class="text-app-danger">*</span></label>
-          <!-- Dynamic dropdown -->
           <select [(ngModel)]="selectedFilingId" (change)="onFilingChange()" class="w-full bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-lg text-[var(--theme-text)] text-sm px-3 py-2.5 outline-none focus:border-app-primary cursor-pointer appearance-none transition-colors duration-300">
             <option [ngValue]="null" disabled selected>-- Select a filing to pay --</option>
             <option *ngFor="let f of filings" [ngValue]="f.id">
@@ -32,10 +30,10 @@
           <label class="block text-xs text-[var(--theme-muted)] mb-2 transition-colors duration-300">Payment method <span class="text-app-danger">*</span></label>
           
           <div (click)="selectMethod('CREDIT_CARD')" class="flex items-center gap-3 p-3.5 mb-2.5 border rounded-lg cursor-pointer transition-colors duration-300"
-               [ngClass]="selectedMethod === 'CREDIT_CARD' ? 'border-app-primary bg-app-primary/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
+               [ngClass]="selectedMethod === 'CREDIT_CARD' ? 'border-blue-600 bg-blue-50/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
             <div class="w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-colors duration-300"
-                 [ngClass]="selectedMethod === 'CREDIT_CARD' ? 'border-app-primary' : 'border-[var(--theme-muted)]'">
-              <div *ngIf="selectedMethod === 'CREDIT_CARD'" class="w-2 h-2 rounded-full bg-app-primary"></div>
+                 [ngClass]="selectedMethod === 'CREDIT_CARD' ? 'border-blue-600' : 'border-[var(--theme-muted)]'">
+              <div *ngIf="selectedMethod === 'CREDIT_CARD'" class="w-2 h-2 rounded-full bg-blue-600"></div>
             </div>
             <div>
               <div class="text-[13px] font-medium text-[var(--theme-text)] transition-colors duration-300">Credit Card</div>
@@ -44,10 +42,10 @@
           </div>
 
           <div (click)="selectMethod('DEBIT_CARD')" class="flex items-center gap-3 p-3.5 mb-2.5 border rounded-lg cursor-pointer transition-colors duration-300"
-               [ngClass]="selectedMethod === 'DEBIT_CARD' ? 'border-app-primary bg-app-primary/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
+               [ngClass]="selectedMethod === 'DEBIT_CARD' ? 'border-blue-600 bg-blue-50/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
             <div class="w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-colors duration-300"
-                 [ngClass]="selectedMethod === 'DEBIT_CARD' ? 'border-app-primary' : 'border-[var(--theme-muted)]'">
-              <div *ngIf="selectedMethod === 'DEBIT_CARD'" class="w-2 h-2 rounded-full bg-app-primary"></div>
+                 [ngClass]="selectedMethod === 'DEBIT_CARD' ? 'border-blue-600' : 'border-[var(--theme-muted)]'">
+              <div *ngIf="selectedMethod === 'DEBIT_CARD'" class="w-2 h-2 rounded-full bg-blue-600"></div>
             </div>
             <div>
               <div class="text-[13px] font-medium text-[var(--theme-text)] transition-colors duration-300">Debit Card</div>
@@ -56,10 +54,10 @@
           </div>
 
           <div (click)="selectMethod('UPI')" class="flex items-center gap-3 p-3.5 mb-2.5 border rounded-lg cursor-pointer transition-colors duration-300"
-               [ngClass]="selectedMethod === 'UPI' ? 'border-app-primary bg-app-primary/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
+               [ngClass]="selectedMethod === 'UPI' ? 'border-blue-600 bg-blue-50/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
             <div class="w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-colors duration-300"
-                 [ngClass]="selectedMethod === 'UPI' ? 'border-app-primary' : 'border-[var(--theme-muted)]'">
-              <div *ngIf="selectedMethod === 'UPI'" class="w-2 h-2 rounded-full bg-app-primary"></div>
+                 [ngClass]="selectedMethod === 'UPI' ? 'border-blue-600' : 'border-[var(--theme-muted)]'">
+              <div *ngIf="selectedMethod === 'UPI'" class="w-2 h-2 rounded-full bg-blue-600"></div>
             </div>
             <div>
               <div class="text-[13px] font-medium text-[var(--theme-text)] transition-colors duration-300">UPI</div>
@@ -68,10 +66,10 @@
           </div>
 
           <div (click)="selectMethod('NET_BANKING')" class="flex items-center gap-3 p-3.5 border rounded-lg cursor-pointer transition-colors duration-300"
-               [ngClass]="selectedMethod === 'NET_BANKING' ? 'border-app-primary bg-app-primary/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
+               [ngClass]="selectedMethod === 'NET_BANKING' ? 'border-blue-600 bg-blue-50/10' : 'border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-text)]'">
             <div class="w-4 h-4 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-colors duration-300"
-                 [ngClass]="selectedMethod === 'NET_BANKING' ? 'border-app-primary' : 'border-[var(--theme-muted)]'">
-              <div *ngIf="selectedMethod === 'NET_BANKING'" class="w-2 h-2 rounded-full bg-app-primary"></div>
+                 [ngClass]="selectedMethod === 'NET_BANKING' ? 'border-blue-600' : 'border-[var(--theme-muted)]'">
+              <div *ngIf="selectedMethod === 'NET_BANKING'" class="w-2 h-2 rounded-full bg-blue-600"></div>
             </div>
             <div>
               <div class="text-[13px] font-medium text-[var(--theme-text)] transition-colors duration-300">Net Banking</div>
@@ -79,10 +77,14 @@
             </div>
           </div>
         </div>
+
+        <div *ngIf="errorMessage" class="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg animate-shake">
+          <span class="text-red-500 text-sm">⚠️</span>
+          <span class="text-[12px] text-red-600 font-medium">{{ errorMessage }}</span>
+        </div>
         
-        <!-- NEW PREMIUM PAY BUTTON -->
-        <button (click)="processPayment()" [disabled]="isProcessing || paymentSuccess" 
-                class="relative w-full overflow-hidden group bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white rounded-xl py-4 text-sm font-semibold shadow-lg shadow-blue-500/20 transition-all duration-300 mt-2 disabled:opacity-50 disabled:grayscale">
+        <button (click)="processPayment()" [disabled]="!selectedFilingId || !selectedMethod || isProcessing || paymentSuccess"
+                class="relative w-full overflow-hidden group bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white rounded-xl py-4 text-sm font-semibold shadow-lg shadow-blue-500/20 transition-all duration-300 mt-2 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed">
           
           <div class="relative z-10 flex items-center justify-center gap-2">
             <span *ngIf="isProcessing" class="animate-spin text-lg">◌</span>
@@ -95,7 +97,6 @@
       </div>
     </div>
 
-    <!-- Sidebar / Summary (Fully Dynamic) -->
     <div class="flex flex-col gap-4">
       <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl transition-colors duration-300 shadow-sm">
         <div class="px-5 py-4 border-b border-[var(--theme-border)] transition-colors duration-300">
@@ -125,13 +126,12 @@
         </div>
       </div>
 
-      <!-- Success Accent Card -->
       <div *ngIf="paymentSuccess" class="bg-[#3fb950]/10 border border-[#3fb950]/30 rounded-xl p-6 text-center animate-fade-in shadow-[0_0_15px_rgba(63,185,80,0.1)] transition-colors duration-300">
         <div class="w-12 h-12 rounded-full bg-[#3fb950]/10 border border-[#3fb950]/30 flex items-center justify-center text-xl text-[#3fb950] mx-auto mb-3 transition-colors duration-300">✓</div>
         <div class="text-[15px] font-medium text-[#3fb950] mb-1 transition-colors duration-300">Payment Successful</div>
         <div class="text-[12px] text-[#3fb950]/80 mb-4 font-mono transition-colors duration-300">{{ generatedPaymentId }} · Just now</div>
         
-        <button (click)="goToHistory()" class="w-full bg-transparent border border-[var(--theme-border)] text-[var(--theme-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] rounded-lg py-2 text-xs transition-colors duration-300 mb-2">View receipt →</button>
+        <button (click)="goToReceipt()" class="w-full bg-transparent border border-[var(--theme-border)] text-[var(--theme-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] rounded-lg py-2 text-xs transition-colors duration-300 mb-2">View receipt →</button>
         <button (click)="goToFilings()" class="w-full bg-transparent border border-[var(--theme-border)] text-[var(--theme-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] rounded-lg py-2 text-xs transition-colors duration-300">Back to filings →</button>
       </div>
     </div>

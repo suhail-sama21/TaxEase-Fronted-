@@ -5,7 +5,6 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
 
-// Import BOTH services
 import { PaymentService } from '../service/payment.service';
 import { TaxFilingService } from '../service/tax-filing.service'; 
 
@@ -16,10 +15,12 @@ import { TaxFilingService } from '../service/tax-filing.service';
   templateUrl: './make-payment.html'
 })
 export class MakePaymentComponent implements OnInit {
-  selectedMethod: string = 'CREDIT_CARD';
+  selectedMethod: string = ''; 
   isProcessing = false;
   paymentSuccess = false;
   generatedPaymentId: string = '';
+  
+  errorMessage: string = ''; 
 
   filings: any[] = [];
   selectedFilingId: number | null = null; 
@@ -37,7 +38,6 @@ export class MakePaymentComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Catch the Retry parameters from the Payment History page
     this.route.queryParams.subscribe(params => {
       if (params['filingId']) {
         this.selectedFilingId = Number(params['filingId']);
@@ -50,7 +50,6 @@ export class MakePaymentComponent implements OnInit {
     this.store.select(selectUser).subscribe(user => {
       if (user) {
         this.userId = user.id;
-        console.log('User Data from Store:', this.userId);
         this.fetchPendingFilings(); 
       }
     });
@@ -71,7 +70,6 @@ export class MakePaymentComponent implements OnInit {
         }));
 
         if (this.filings.length > 0) {
-          // If we DIDN'T come from the Retry button, select the first one by default
           if (!this.selectedFilingId) {
             this.selectedFilingId = this.filings[0].id;
           }
@@ -85,12 +83,13 @@ export class MakePaymentComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to load filings history', err);
-        alert('Could not load your tax filings.');
+        this.errorMessage = 'Could not load your tax filings.'; 
       }
     });
   }
 
   onFilingChange() {
+    this.errorMessage = '';
     this.selectedFiling = this.filings.find(f => f.id == this.selectedFilingId);
     if (this.selectedFiling) {
       this.paymentAmount = this.selectedFiling.amount;
@@ -98,12 +97,25 @@ export class MakePaymentComponent implements OnInit {
   }
 
   selectMethod(method: string) {
-    this.selectedMethod = method;
+    this.errorMessage = '';
+    
+    if (this.selectedMethod === method) {
+      this.selectedMethod = ''; 
+    } else {
+      this.selectedMethod = method; 
+    }
   }
 
   processPayment() {
+    this.errorMessage = '';
+
     if (!this.selectedFilingId) {
-      alert('Please select a valid filing to pay for.');
+      this.errorMessage = 'Please select a valid filing to pay for.';
+      return;
+    }
+
+    if (!this.selectedMethod) {
+      this.errorMessage = 'Please select a payment method.';
       return;
     }
 
@@ -115,19 +127,14 @@ export class MakePaymentComponent implements OnInit {
       status: 'Completed'
     };
     
-    // 1. Process the payment first
     this.paymentService.makePayment(payload).subscribe({
       next: (response: any) => {
-        
-        // 2. If payment is successful, update the tax filing status to 'Completed'
         this.taxFilingService.updateStatus(this.selectedFilingId!, 'Completed').subscribe({
           next: (statusUpdateResponse) => {
-            // Both payment AND status update succeeded!
             this.isProcessing = false;
             this.paymentSuccess = true;
             this.generatedPaymentId = 'PAY-' + response.id;
 
-            // Dynamically remove the paid file from the UI hello
             this.filings = this.filings.filter(f => f.id != this.selectedFilingId);
 
             if (this.filings.length > 0) {
@@ -138,24 +145,26 @@ export class MakePaymentComponent implements OnInit {
               this.selectedFiling = null;
               this.paymentAmount = 0;
             }
+            this.selectedMethod = ''; 
             
             this.cdr.detectChanges();
           },
           error: (statusErr) => {
             this.isProcessing = false;
-            console.error('Payment succeeded but filing status update failed:', statusErr);
-            alert('Payment was successful, but we could not update the filing status. Please contact support.');
+            this.errorMessage = 'Payment was successful, but we could not update the filing status. Please contact support.';
           }
         });
-
       },
       error: (err) => {
         this.isProcessing = false;
-        alert('Payment failed. Check your data.');
+        this.errorMessage = 'Payment failed. Check your data.';
       }
     });
   }
+  goToReceipt() {
+    const cleanId = this.generatedPaymentId.replace('PAY-', '');
+    this.router.navigate(['/portal/receipt', cleanId]);
+  }
 
-  goToHistory() { this.router.navigate(['/portal/history']); }
   goToFilings() { this.router.navigate(['/portal/filings']); }
 }

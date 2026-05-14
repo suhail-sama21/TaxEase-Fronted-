@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { PaymentService } from '../service/payment.service'; // Check path!
+import { PaymentService } from '../service/payment.service';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
 
@@ -15,12 +15,11 @@ export class PaymentHistoryComponent implements OnInit {
 
   store = inject(Store)
 
-  allTransactions: any[] = []; // Backup for filtering
-  transactions: any[] = [];    // Data displayed in the table
+  allTransactions: any[] = []; 
+  transactions: any[] = [];    
   userId: number = 0
 
 
-  // Dashboard calculation variables
   totalPaid: number = 0;
   totalTransactions: number = 0;
   failedTransactions: number = 0;
@@ -46,9 +45,9 @@ export class PaymentHistoryComponent implements OnInit {
   loadHistory() {
     this.paymentService.getPaymentHistory(this.userId).subscribe({
       next: (backendData: any[]) => {
-        // Map backend keys to frontend UI
         this.allTransactions = backendData.map(payment => ({
           id: 'PAY-' + payment.id,
+          rawId: payment.id, // Store raw ID for routing
           date: payment.date ? payment.date.split('T')[0] : 'N/A',
           amount: '$' + parseFloat(payment.amount).toLocaleString('en-US', {minimumFractionDigits: 2}),
           method: this.formatMethod(payment.method),
@@ -56,8 +55,6 @@ export class PaymentHistoryComponent implements OnInit {
           filing: payment.filingId ? 'FIL-' + payment.filingId : 'N/A',
           status: payment.status,
           statusColor: payment.status === 'Completed' || payment.status === 'Success' ? 'green' : 'red',
-
-          // Saving raw data for the Retry feature
           rawFilingId: payment.filingId,
           rawAmount: payment.amount
         }));
@@ -83,7 +80,6 @@ export class PaymentHistoryComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // Helper method to make 'CREDIT_CARD' look like 'Credit Card'
   formatMethod(method: string): string {
     if (!method) return 'N/A';
     if (method === 'UPI') return 'UPI';
@@ -98,12 +94,11 @@ export class PaymentHistoryComponent implements OnInit {
       .reduce((sum, p) => sum + parseFloat(p.amount), 0);
   }
 
-  downloadReceipt(paymentId: string) {
-    alert(`Downloading receipt for ${paymentId}...`);
+  downloadReceipt(rawId: string) {
+    this.router.navigate(['/portal/receipt', rawId]);
   }
 
   retryPayment(transaction: any) {
-    // Note: adjust the path inside navigate() if your routing is different (e.g., ['/payment'])
     this.router.navigate(['/portal/payment'], {
       queryParams: {
         filingId: transaction.rawFilingId,

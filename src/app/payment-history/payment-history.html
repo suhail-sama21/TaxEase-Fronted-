@@ -4,10 +4,7 @@
       <h1 class="text-xl font-medium text-[var(--theme-text)] transition-colors duration-300">Payment History</h1>
       <p class="text-[13px] text-[var(--theme-muted)] mt-1 transition-colors duration-300">View and download receipts for your past transactions.</p>
     </div>
-    <button class="bg-transparent border border-[var(--theme-border)] text-[var(--theme-muted)] rounded-md px-3.5 py-2 text-[13px] cursor-pointer hover:bg-[var(--theme-surface)] hover:text-[var(--theme-text)] transition-colors duration-300">
-      ↓ Export All
-    </button>
-  </div>
+    </div>
 
   <div class="grid grid-cols-3 gap-4 mb-6">
     <div class="bg-[var(--theme-card)] border border-[var(--theme-border)] rounded-xl p-5 relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-0 before:right-0 before:h-[2px] before:bg-[#3fb950] transition-colors duration-300">
@@ -70,7 +67,7 @@
           </tr>
           
           <tr *ngFor="let t of transactions" class="hover:bg-[var(--theme-surface)] border-b border-[var(--theme-border)] last:border-0 transition-colors duration-300">
-            <td class="px-5 py-3 text-app-primary font-mono text-[12px] transition-colors duration-300">{{ t.id }}</td>
+            <td class="px-5 py-3 text-blue-600 font-mono text-[12px] transition-colors duration-300">{{ t.id }}</td>
             <td class="px-5 py-3 text-[var(--theme-muted)] transition-colors duration-300">{{ t.date }}</td>
             <td class="px-5 py-3 text-[var(--theme-text)] font-mono transition-colors duration-300">{{ t.amount }}</td>
             <td class="px-5 py-3 text-[var(--theme-text)] transition-colors duration-300">{{ t.method }}</td>
@@ -82,8 +79,8 @@
               </span>
             </td>
             <td class="px-5 py-3 flex gap-3 items-center">
-              <button *ngIf="t.status === 'Completed' || t.status === 'Success'" (click)="downloadReceipt(t.id)" class="bg-transparent border border-[var(--theme-border)] text-[var(--theme-muted)] rounded-md px-2.5 py-1 text-[11px] hover:bg-[var(--theme-surface)] hover:text-[var(--theme-text)] transition-colors duration-300">
-                ↓ Receipt
+              <button *ngIf="t.status === 'Completed' || t.status === 'Success'" (click)="downloadReceipt(t.rawId)" class="bg-transparent border border-[var(--theme-border)] text-[var(--theme-muted)] rounded-md px-2.5 py-1 text-[11px] hover:bg-[var(--theme-surface)] hover:text-[var(--theme-text)] transition-colors duration-300">
+                📄 Receipt
               </button>
               <button *ngIf="t.status === 'Failed'" (click)="retryPayment(t)" class="bg-transparent border-none text-[#f85149] hover:text-[#ff7b72] hover:underline p-0 m-0 text-[12px] font-medium cursor-pointer transition-all duration-300 flex items-center gap-1">
                 ↻ Retry

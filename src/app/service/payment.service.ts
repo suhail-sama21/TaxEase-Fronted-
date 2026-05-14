@@ -6,22 +6,21 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class PaymentService {
-  // CORRECT PORT: 8084
   private apiUrl = 'http://localhost:8088/api/payments'; 
+  private taxFilingApiUrl = 'http://localhost:8088/api/filings'; 
 
   constructor(private http: HttpClient) {}
-  private taxFilingApiUrl = 'http://localhost:8088/api/filings'; 
-  // ADD THIS FUNCTION: Fetch pending filings for a user
-getAllFilings(userId: number): Observable<any[]> {
+  
+  getAllFilings(userId: number): Observable<any[]> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    console.log('Fetching filings for userId:', userId); // Debug log
+    console.log('Fetching filings for userId:', userId);
 
-    // FIXED: Added { headers } to the request!
     return this.http.get<any[]>(`${this.taxFilingApiUrl}/taxpayer/${userId}`, { headers }); 
   }
+
   getPaymentHistory(userId: number): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
@@ -36,7 +35,15 @@ getAllFilings(userId: number): Observable<any[]> {
       'Authorization': `Bearer ${token}`
     });
     
-    // CORRECT ENDPOINT: /pay
     return this.http.post(`${this.apiUrl}/pay`, paymentData, { headers }); 
+  }
+
+  getPaymentById(paymentId: string): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    
+    return this.http.get(`${this.apiUrl}/${paymentId}`, { headers });
   }
 }

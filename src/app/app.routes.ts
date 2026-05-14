@@ -66,6 +66,11 @@ export const routes: Routes = [
         data: { roles: ["TAXPAYER", "OFFICER"] }
       },
       { 
+        path: 'receipt/:id', 
+        loadComponent: () => import('./payment-receipt/payment-receipt').then(m => m.PaymentReceiptComponent) ,
+        data: { roles: ["TAXPAYER", "OFFICER"] }
+      },
+      { 
         path: 'notifications', 
         loadComponent: () => import('./notifications/notifications').then(m => m.NotificationsComponent) ,
         data: { roles: ["TAXPAYER", "OFFICER", "ADMINISTRATOR", "MANAGER", "COMPLIANCE", "AUDITOR"] }
