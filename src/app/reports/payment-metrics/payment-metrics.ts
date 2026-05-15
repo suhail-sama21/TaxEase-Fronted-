@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
-import { ReportingService, PaymentMetricsResponse, PaymentResponseDto } from '../../services/reporting.service';
+import { ReportingService, PaymentMetricsResponse, PaymentResponseDto } from '../../core/services/reporting.service';
 
 @Component({
   selector: 'app-payment-metrics',

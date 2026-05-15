@@ -1,7 +1,7 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DocumentService } from '../service/document.service';
+import { DocumentService } from '../core/services/document.service';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
 

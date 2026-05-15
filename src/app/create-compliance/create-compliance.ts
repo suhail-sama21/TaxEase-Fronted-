@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router'; // <-- To navigate after success
-import { ComplianceService } from '../services/compliance.service';
+import { ComplianceService } from '../core/services/compliance.service';
 import { CreateComplianceRequest } from '../models/compliance.model';
 
 @Component({

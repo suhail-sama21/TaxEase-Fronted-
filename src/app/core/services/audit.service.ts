@@ -6,7 +6,7 @@ import {
   AuditResponse,
   AuditDashboardResponse,
   CloseAuditRequest,
-} from '../models/audit.model';
+} from '../../models/audit.model';
 
 @Injectable({
   providedIn: 'root',

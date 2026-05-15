@@ -5,9 +5,9 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectUser } from '../stores/authStore/auth.features';
 
-import { PaymentService } from '../service/payment.service';
-import { TaxFilingService } from '../service/tax-filing.service'; 
-
+// Import BOTH services
+import { PaymentService } from '../core/services/payment.service';
+import { TaxFilingService } from '../core/services/tax-filing.service'; 
 @Component({
   selector: 'app-make-payment',
   standalone: true,

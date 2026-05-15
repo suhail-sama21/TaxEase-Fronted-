@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ReportingService } from '../../services/reporting.service';
+import { ReportingService } from '../../core/services/reporting.service';
 
 @Component({
   selector: 'app-report-download',

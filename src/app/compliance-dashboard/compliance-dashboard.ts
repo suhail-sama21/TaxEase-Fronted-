@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ComplianceService } from '../services/compliance.service';
+import { ComplianceService } from '../core/services/compliance.service';
 import { ComplianceDashboardResponse, ComplianceResponse } from '../models/compliance.model';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators'; // Add this import
